@@ -19,7 +19,6 @@ const firebaseConfig = {
   messagingSenderId: "324662251360",
   appId: "1:324662251360:web:b0f7b4180fcd5530a0d805"
 };
-};
 
 let app, auth, db;
 try {
@@ -55,7 +54,7 @@ const initialRisks = [];
 export default function App() {
   const [fbUser, setFbUser] = useState(null);
   const [isDbLoading, setIsDbLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null); 
+  const [currentUser, setCurrentUser] = useState(() => loadLocal('simari_current_user', null)); 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [subReportTab, setSubReportTab] = useState('peta_risiko'); 
 
@@ -68,6 +67,10 @@ export default function App() {
   
   const [adminPassword, setAdminPassword] = useState(() => loadLocal('simari_admin_pass', 'adminbpi2026'));
   useEffect(() => { saveLocal('simari_admin_pass', adminPassword); }, [adminPassword]);
+
+  useEffect(() => {
+    saveLocal('simari_current_user', currentUser);
+  }, [currentUser]);
 
   const [modal, setModal] = useState({ isOpen: false, type: 'alert', title: '', message: '', status: 'info', onConfirm: null });
 
@@ -1850,14 +1853,14 @@ export default function App() {
         </nav>
         <div className="p-4 m-3 bg-teal-950/60 rounded-2xl border border-teal-800/50 flex justify-between items-center shadow-inner">
           <div><p className="text-[10px] text-teal-400 uppercase tracking-wide font-semibold">Role:</p><p className="text-xs text-white font-bold uppercase">{currentUser.role}</p></div>
-          <button type="button" onClick={() => setCurrentUser(null)} className="p-2.5 bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 rounded-xl transition-colors cursor-pointer" title="Keluar"><LogOut size={16} /></button>
+          <button type="button" onClick={() => { setCurrentUser(null); localStorage.removeItem('simari_current_user'); }} className="p-2.5 bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 rounded-xl transition-colors cursor-pointer" title="Keluar"><LogOut size={16} /></button>
         </div>
       </aside>
 
       <main className="flex-1 flex flex-col overflow-hidden relative bg-slate-50">
         <header className="bg-teal-900 text-white p-4 flex md:hidden justify-between shadow-md print:hidden">
           <div className="flex items-center space-x-2"><ShieldAlert size={20} className="text-teal-400" /><h1 className="font-bold text-sm">SI-MARI BPI ({currentUser.tahun})</h1></div>
-          <button type="button" onClick={() => setCurrentUser(null)} className="p-1.5 bg-rose-500/20 text-rose-300 rounded-lg text-xs flex gap-1 items-center"><LogOut size={14} /> Keluar</button>
+          <button type="button" onClick={() => { setCurrentUser(null); localStorage.removeItem('simari_current_user'); }} className="p-1.5 bg-rose-500/20 text-rose-300 rounded-lg text-xs flex gap-1 items-center"><LogOut size={14} /> Keluar</button>
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
