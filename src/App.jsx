@@ -10,14 +10,15 @@ import {
   FileDown, KeyRound, AlertTriangle, Info, X
 } from 'lucide-react';
 
-// === FIREBASE SETUP (Safe Local & Cloud Fallback) ===
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-  apiKey: "local-dev-fallback",
-  authDomain: "local-dev.firebaseapp.com",
-  projectId: "local-dev-project",
-  storageBucket: "local-dev.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:0000000000000000000000"
+// === FIREBASE SETUP (Ganti dengan kredensial asli Firebase Anda) ===
+const firebaseConfig = {
+  apiKey: "AIzaSyC34RHxpaFA4trv8mfUR4AqJzH-HXwtKoA",
+  authDomain: "simaribpi.firebaseapp.com",
+  projectId: "simaribpi",
+  storageBucket: "simaribpi.firebasestorage.app",
+  messagingSenderId: "324662251360",
+  appId: "1:324662251360:web:b0f7b4180fcd5530a0d805"
+};
 };
 
 let app, auth, db;
@@ -68,7 +69,6 @@ export default function App() {
   const [adminPassword, setAdminPassword] = useState(() => loadLocal('simari_admin_pass', 'adminbpi2026'));
   useEffect(() => { saveLocal('simari_admin_pass', adminPassword); }, [adminPassword]);
 
-  // --- STATE POPUP MODAL GLOBAL ---
   const [modal, setModal] = useState({ isOpen: false, type: 'alert', title: '', message: '', status: 'info', onConfirm: null });
 
   const showAlert = (title, message, status = 'info') => {
@@ -149,20 +149,6 @@ export default function App() {
       return;
     }
 
-    const seedInitialData = async () => {
-      try {
-        const uSnap = await getDocs(getCol('units'));
-        if (uSnap.empty && initialUnitKerjaList.length > 0) {
-          initialUnitKerjaList.forEach(u => setDoc(getDocRef('units', u.id), u).catch(()=>{}));
-        }
-        const rSnap = await getDocs(getCol('risks'));
-        if (rSnap.empty && initialRisks.length > 0) {
-          initialRisks.forEach(r => setDoc(getDocRef('risks', r.id), r).catch(()=>{}));
-        }
-      } catch(e) {}
-    };
-    seedInitialData();
-
     try {
       const unsubUnits = onSnapshot(getCol('units'), snap => {
         if (!snap.empty) setUnitKerjaList(snap.docs.map(d => ({ ...d.data(), id: d.id })));
@@ -231,7 +217,6 @@ export default function App() {
     return "Belum Dianalisis";
   };
 
-  // --- HALAMAN LOGIN ---
   const LoginScreen = () => {
     const [loginType, setLoginType] = useState('unit');
     const [selectedUnit, setSelectedUnit] = useState(unitKerjaList[0]?.id || '');
@@ -317,7 +302,6 @@ export default function App() {
     );
   };
 
-  // --- HALAMAN ADMIN ---
   const AdminDashboard = () => {
     const [adminUserTab, setAdminUserTab] = useState('list');
     const [unitForm, setUnitForm] = useState({ id: '', nama: '', username: '', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
@@ -328,7 +312,6 @@ export default function App() {
     const [formSasaran, setFormSasaran] = useState({ nama: '', indikator: '', target: '', satuan: '' });
     const [editSasaranId, setEditSasaranId] = useState(null);
 
-    // Form Ganti Password Admin
     const [oldPass, setOldPass] = useState('');
     const [newPass, setNewPass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
@@ -696,7 +679,6 @@ export default function App() {
     );
   };
 
-  // --- MENU: 0. Dashboard Unit Kerja ---
   const DashboardUnit = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
     const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
@@ -737,7 +719,6 @@ export default function App() {
     );
   };
 
-  // --- TAHAP 1: Penetapan Tujuan ---
   const PenetapanTujuan = () => {
     const [selectedStrategis, setSelectedStrategis] = useState('');
     const [selectedProgram, setSelectedProgram] = useState('');
@@ -828,7 +809,6 @@ export default function App() {
     );
   };
 
-  // --- TAHAP 2: Identifikasi Risiko ---
   const IdentifikasiRisiko = () => {
     const unitTujuanList = tujuanList.filter(t => t.unit === currentUser.nama && t.tahun === currentUser.tahun);
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
@@ -956,7 +936,6 @@ export default function App() {
     );
   };
 
-  // --- TAHAP 3: Analisis & Evaluasi ---
   const AnalisisEvaluasi = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
     const [localRisks, setLocalRisks] = useState([]);
@@ -1032,7 +1011,6 @@ export default function App() {
     );
   };
 
-  // --- TAHAP 4: Penanganan Risiko ---
   const PenangananRisiko = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && r.keputusanMitigasi === "Dimitigasi");
     const [localRisks, setLocalRisks] = useState([]);
@@ -1117,7 +1095,6 @@ export default function App() {
     );
   };
 
-  // --- MENU: 5. Pemantauan ---
   const PemantauanRisiko = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && r.keputusanMitigasi === "Dimitigasi");
     const [localRisks, setLocalRisks] = useState([]);
@@ -1183,7 +1160,6 @@ export default function App() {
     );
   };
 
-  // --- MENU: 6. Pencatatan Keterjadian ---
   const PencatatanKeterjadian = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
     const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
@@ -1255,7 +1231,6 @@ export default function App() {
     );
   };
 
-  // --- MENU: 7. Efektifitas RTP ---
   const EfektivitasRTP = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && r.keputusanMitigasi === "Dimitigasi");
     const [evaluasiList, setEvaluasiList] = useState({});
@@ -1387,7 +1362,6 @@ export default function App() {
     );
   };
 
-  // --- MENU: 8. Modul Laporan ---
   const ModulLaporan = () => {
     const unitTujuanList = tujuanList.filter(t => t.unit === currentUser.nama && t.tahun === currentUser.tahun);
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
