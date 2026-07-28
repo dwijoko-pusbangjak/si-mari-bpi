@@ -58,7 +58,6 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [subReportTab, setSubReportTab] = useState('peta_risiko'); 
 
-  // State dimuat murni dalam keadaan kosong (tanpa cache Local Storage) agar sync 100% dengan Firebase
   const [unitKerjaList, setUnitKerjaList] = useState(initialUnitKerjaList);
   const [masterSasaran, setMasterSasaran] = useState(initialMasterSasaran);
   const [tujuanList, setTujuanList] = useState([]);
@@ -66,7 +65,6 @@ export default function App() {
   const [kejadianList, setKejadianList] = useState([]);
   const [riwayatEfektivitas, setRiwayatEfektivitas] = useState([]);
   
-  // Sandi admin tetap di lokal jika belum migrasi ke Firebase
   const [adminPassword, setAdminPassword] = useState(() => loadLocal('simari_admin_pass', 'adminbpi2026'));
   useEffect(() => { saveLocal('simari_admin_pass', adminPassword); }, [adminPassword]);
 
@@ -428,6 +426,18 @@ export default function App() {
         setFormSasaran({ nama: '', indikator: '', target: '', satuan: '' });
         setEditSasaranId(null);
       }
+    };
+
+    const handleEditClickSasaran = (kat, item) => {
+      setKategoriSasaran(kat);
+      setSelectedParentId(item.parentId || '');
+      setFormSasaran({
+        nama: item.nama || '',
+        indikator: item.indikator || '',
+        target: item.target || '',
+        satuan: item.satuan || ''
+      });
+      setEditSasaranId(item.id);
     };
 
     const handleDeleteSasaran = (kat, id) => {
@@ -1281,7 +1291,6 @@ export default function App() {
       
       if (!originalRisk) return showAlert('Gagal', 'Risiko asal tidak ditemukan.', 'error');
 
-      // Cek apakah risiko sudah pernah diteruskan (mencegah double click/duplikasi di tahun depan)
       const isAlreadyCarriedOver = risks.some(r => r.pernyataanRisiko === originalRisk.pernyataanRisiko && r.tahun === nextYear && r.unit === originalRisk.unit);
 
       if (isAlreadyCarriedOver) {
@@ -1298,7 +1307,6 @@ export default function App() {
             id: newRiskId,
             tahun: nextYear,
             tahap: 'identifikasi',
-            // Reset evaluasi dan analisis agar dapat dilakukan penilaian ulang di tahun berikutnya
             kemungkinan: 0,
             keparahan: 0,
             skor: 0,
@@ -1582,7 +1590,6 @@ export default function App() {
 
     return (
       <div className="space-y-6 max-w-7xl">
-        {/* CSS Khusus Print / Cetak PDF agar muat landscape, otomatis scale-down, dan tabel tampil penuh */}
         <style dangerouslySetInnerHTML={{ __html: `
           @media print {
             @page {
@@ -1593,7 +1600,7 @@ export default function App() {
               background: white !important;
               color: black !important;
               -webkit-print-color-adjust: exact;
-              zoom: 75%; /* Otomatis memperkecil skala agar seluruh kolom tabel lebar muat sempurna di 1 halaman */
+              zoom: 75%;
             }
             aside, header, .print\\:hidden {
               display: none !important;
