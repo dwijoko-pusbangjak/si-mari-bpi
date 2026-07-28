@@ -610,67 +610,113 @@ export default function App() {
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-6">
               <div className="p-4 bg-slate-50 border-b border-slate-200">
-                <h3 className="font-bold text-slate-800 text-sm">Daftar Hierarki Sasaran K/L</h3>
+                <h3 className="font-bold text-slate-800 text-sm">Daftar Hierarki Sasaran K/L (Dikelompokkan Berdasarkan Nama Sasaran)</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-sm min-w-[900px]">
                   <thead>
                     <tr className="bg-slate-50 text-xs text-slate-600 uppercase border-b border-slate-200">
                       <th className="p-4 w-1/2">Level & Uraian Sasaran</th>
-                      <th className="p-4">Indikator (IKU)</th>
-                      <th className="p-4 text-center">Target</th>
+                      <th className="p-4">Indikator (IKU) & Target</th>
                       <th className="p-4 text-center w-24">Aksi</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-xs">
-                    {(masterSasaran.strategis || []).map(strat => (
-                      <React.Fragment key={strat.id}>
-                        <tr className="bg-teal-50/20 hover:bg-teal-50/40">
-                          <td className="p-4 font-bold text-slate-900 border-l-4 border-teal-500">
-                            <span className="inline-block bg-teal-100 text-teal-800 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-semibold">STRATEGIS</span>
-                            {strat.nama}
-                          </td>
-                          <td className="p-4 text-teal-800 font-medium">{strat.indikator}</td>
-                          <td className="p-4 text-center font-bold text-slate-700">{strat.target} {strat.satuan}</td>
-                          <td className="p-4 text-center space-x-1">
-                            <button onClick={() => handleEditClickSasaran('strategis', strat)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
-                            <button onClick={() => handleDeleteSasaran('strategis', strat.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
-                          </td>
-                        </tr>
-                        {(masterSasaran.program || []).filter(p => p.parentId === strat.id).map(prog => (
-                          <React.Fragment key={prog.id}>
-                            <tr className="bg-cyan-50/20 hover:bg-cyan-50/40">
-                              <td className="p-4 pl-10 font-semibold text-slate-800 border-l-4 border-cyan-400">
-                                <span className="inline-block bg-cyan-100 text-cyan-800 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-semibold">PROGRAM</span>
-                                {prog.nama}
-                              </td>
-                              <td className="p-4 text-cyan-800 font-medium">{prog.indikator}</td>
-                              <td className="p-4 text-center font-bold text-slate-700">{prog.target} {prog.satuan}</td>
-                              <td className="p-4 text-center space-x-1">
-                                <button onClick={() => handleEditClickSasaran('program', prog)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
-                                <button onClick={() => handleDeleteSasaran('program', prog.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
-                              </td>
-                            </tr>
-                            {(masterSasaran.kegiatan || []).filter(k => k.parentId === prog.id).map(keg => (
-                              <tr key={keg.id} className="hover:bg-slate-50">
-                                <td className="p-4 pl-16 text-slate-700 border-l-4 border-slate-300">
-                                  <span className="inline-block bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-semibold">KEGIATAN</span>
-                                  {keg.nama}
-                                </td>
-                                <td className="p-4 text-slate-400 italic">-</td>
-                                <td className="p-4 text-center text-slate-400 italic">-</td>
-                                <td className="p-4 text-center space-x-1">
-                                  <button onClick={() => handleEditClickSasaran('kegiatan', keg)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
-                                  <button onClick={() => handleDeleteSasaran('kegiatan', keg.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
-                                </td>
-                              </tr>
-                            ))}
-                          </React.Fragment>
-                        ))}
-                      </React.Fragment>
-                    ))}
+                    {/* Mengelompokkan berdasarkan nama unik sasaran strategis */}
+                    {Array.from(new Set((masterSasaran.strategis || []).map(s => s.nama))).map(stratNama => {
+                      const stratItems = (masterSasaran.strategis || []).filter(s => s.nama === stratNama);
+                      return (
+                        <React.Fragment key={`strat_${stratNama}`}>
+                          <tr className="bg-teal-50/20 hover:bg-teal-50/40 align-top">
+                            <td className="p-4 font-bold text-slate-900 border-l-4 border-teal-500">
+                              <span className="inline-block bg-teal-100 text-teal-800 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-semibold">STRATEGIS</span>
+                              {stratNama}
+                            </td>
+                            <td className="p-4 space-y-2">
+                              {stratItems.map(strat => (
+                                <div key={strat.id} className="flex items-center justify-between bg-white p-2 rounded-lg border border-teal-100 shadow-sm">
+                                  <div>
+                                    <p className="text-teal-900 font-medium"><strong>IKU:</strong> {strat.indikator}</p>
+                                    <p className="text-slate-600"><strong>Target:</strong> {strat.target} {strat.satuan}</p>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    <button onClick={() => handleEditClickSasaran('strategis', strat)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
+                                    <button onClick={() => handleDeleteSasaran('strategis', strat.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
+                                  </div>
+                                </div>
+                              ))}
+                            </td>
+                            <td className="p-4 text-center text-slate-400 italic">-</td>
+                          </tr>
+
+                          {/* Program anak dari strategis ini */}
+                          {Array.from(new Set(
+                            (masterSasaran.program || [])
+                              .filter(p => stratItems.some(s => s.id === p.parentId))
+                              .map(p => p.nama)
+                          )).map(progNama => {
+                            const progItems = (masterSasaran.program || []).filter(p => p.nama === progNama && stratItems.some(s => s.id === p.parentId));
+                            return (
+                              <React.Fragment key={`prog_${progNama}`}>
+                                <tr className="bg-cyan-50/20 hover:bg-cyan-50/40 align-top">
+                                  <td className="p-4 pl-10 font-semibold text-slate-800 border-l-4 border-cyan-400">
+                                    <span className="inline-block bg-cyan-100 text-cyan-800 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-semibold">PROGRAM</span>
+                                    {progNama}
+                                  </td>
+                                  <td className="p-4 space-y-2">
+                                    {progItems.map(prog => (
+                                      <div key={prog.id} className="flex items-center justify-between bg-white p-2 rounded-lg border border-cyan-100 shadow-sm">
+                                        <div>
+                                          <p className="text-cyan-900 font-medium"><strong>IKU:</strong> {prog.indikator}</p>
+                                          <p className="text-slate-600"><strong>Target:</strong> {prog.target} {prog.satuan}</p>
+                                        </div>
+                                        <div className="flex gap-1">
+                                          <button onClick={() => handleEditClickSasaran('program', prog)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
+                                          <button onClick={() => handleDeleteSasaran('program', prog.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </td>
+                                  <td className="p-4 text-center text-slate-400 italic">-</td>
+                                </tr>
+
+                                {/* Kegiatan anak dari program ini */}
+                                {Array.from(new Set(
+                                  (masterSasaran.kegiatan || [])
+                                    .filter(k => progItems.some(p => p.id === k.parentId))
+                                    .map(k => k.nama)
+                                )).map(kegNama => {
+                                  const kegItems = (masterSasaran.kegiatan || []).filter(k => k.nama === kegNama && progItems.some(p => p.id === k.parentId));
+                                  return (
+                                    <tr key={`keg_${kegNama}`} className="hover:bg-slate-50 align-top">
+                                      <td className="p-4 pl-16 text-slate-700 border-l-4 border-slate-300 font-medium">
+                                        <span className="inline-block bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-semibold">KEGIATAN</span>
+                                        {kegNama}
+                                      </td>
+                                      <td className="p-4 space-y-2">
+                                        {kegItems.map(keg => (
+                                          <div key={keg.id} className="flex items-center justify-between bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+                                            <span className="text-slate-600 italic">Sasaran Kegiatan Aktif</span>
+                                            <div className="flex gap-1">
+                                              <button onClick={() => handleEditClickSasaran('kegiatan', keg)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
+                                              <button onClick={() => handleDeleteSasaran('kegiatan', keg.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </td>
+                                      <td className="p-4 text-center text-slate-400 italic">-</td>
+                                    </tr>
+                                  );
+                                })}
+                              </React.Fragment>
+                            );
+                          })}
+                        </React.Fragment>
+                      );
+                    })}
+
                     {(!masterSasaran.strategis || masterSasaran.strategis.length === 0) && (
-                      <tr><td colSpan="4" className="p-6 text-center text-slate-400 italic">Belum ada hierarki sasaran terdaftar.</td></tr>
+                      <tr><td colSpan="3" className="p-6 text-center text-slate-400 italic">Belum ada hierarki sasaran terdaftar.</td></tr>
                     )}
                   </tbody>
                 </table>
