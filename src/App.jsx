@@ -622,7 +622,6 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-xs">
-                    {/* Mengelompokkan berdasarkan nama unik sasaran strategis */}
                     {Array.from(new Set((masterSasaran.strategis || []).map(s => s.nama))).map(stratNama => {
                       const stratItems = (masterSasaran.strategis || []).filter(s => s.nama === stratNama);
                       return (
@@ -649,7 +648,6 @@ export default function App() {
                             <td className="p-4 text-center text-slate-400 italic">-</td>
                           </tr>
 
-                          {/* Program anak dari strategis ini */}
                           {Array.from(new Set(
                             (masterSasaran.program || [])
                               .filter(p => stratItems.some(s => s.id === p.parentId))
@@ -680,7 +678,6 @@ export default function App() {
                                   <td className="p-4 text-center text-slate-400 italic">-</td>
                                 </tr>
 
-                                {/* Kegiatan anak dari program ini */}
                                 {Array.from(new Set(
                                   (masterSasaran.kegiatan || [])
                                     .filter(k => progItems.some(p => p.id === k.parentId))
@@ -776,8 +773,17 @@ export default function App() {
     const [targetKgt, setTargetKgt] = useState('');
     const [editTujuanId, setEditTujuanId] = useState(null);
     
+    // Filter unik untuk dropdown agar tidak ada duplikasi nama sasaran
+    const uniqueStrategis = Array.from(new Set(masterSasaran.strategis.map(s => s.nama)))
+      .map(nama => masterSasaran.strategis.find(s => s.nama === nama));
+
     const filteredProgram = masterSasaran.program.filter(p => !selectedStrategis || p.parentId === selectedStrategis);
+    const uniqueProgram = Array.from(new Set(filteredProgram.map(p => p.nama)))
+      .map(nama => filteredProgram.find(p => p.nama === nama));
+
     const filteredKegiatan = masterSasaran.kegiatan.filter(k => !selectedProgram || k.parentId === selectedProgram);
+    const uniqueKegiatan = Array.from(new Set(filteredKegiatan.map(k => k.nama)))
+      .map(nama => filteredKegiatan.find(k => k.nama === nama));
 
     const handleSaveTujuan = async (e) => {
       e.preventDefault();
@@ -819,15 +825,15 @@ export default function App() {
         <form onSubmit={handleSaveTujuan} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">1. Sasaran Strategis K/L</label>
-              <select required value={selectedStrategis} onChange={(e) => { setSelectedStrategis(e.target.value); setSelectedProgram(''); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white"><option value="">-- Pilih --</option>{masterSasaran.strategis.map(s => <option key={s.id} value={s.id}>{s.nama}</option>)}</select>
+              <select required value={selectedStrategis} onChange={(e) => { setSelectedStrategis(e.target.value); setSelectedProgram(''); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white"><option value="">-- Pilih --</option>{uniqueStrategis.map(s => <option key={s.id} value={s.id}>{s.nama}</option>)}</select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">2. Sasaran Program</label>
-              <select required value={selectedProgram} onChange={(e) => { setSelectedProgram(e.target.value); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white" disabled={!selectedStrategis}><option value="">-- Pilih --</option>{filteredProgram.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}</select>
+              <select required value={selectedProgram} onChange={(e) => { setSelectedProgram(e.target.value); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white" disabled={!selectedStrategis}><option value="">-- Pilih --</option>{uniqueProgram.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}</select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">3. Sasaran Kegiatan</label>
-              <select required value={selectedKegiatan} onChange={(e) => setSelectedKegiatan(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white" disabled={!selectedProgram}><option value="">-- Pilih --</option>{filteredKegiatan.map(k => <option key={k.id} value={k.id}>{k.nama}</option>)}</select>
+              <select required value={selectedKegiatan} onChange={(e) => setSelectedKegiatan(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white" disabled={!selectedProgram}><option value="">-- Pilih --</option>{uniqueKegiatan.map(k => <option key={k.id} value={k.id}>{k.nama}</option>)}</select>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
               <div><label className="block text-xs font-semibold uppercase mb-1">Indikator IKU Unit</label><input required type="text" value={indikatorKgt} onChange={(e) => setIndikatorKgt(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl" /></div>
@@ -862,10 +868,14 @@ export default function App() {
     const unitTujuanList = tujuanList.filter(t => t.unit === currentUser.nama && t.tahun === currentUser.tahun);
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
     const [editRiskId, setEditRiskId] = useState(null);
-    const [formRisk, setFormRisk] = useState({ sasaranKgt: unitTujuanList[0]?.kegiatan || '', permasalahan: '', pernyataanRisiko: '', kategoriRisiko: 'Operasional', pemilikRisiko: '', penyebabUraian: '', penyebabSumber: '', sifatKontrol: 'Controllable', dampakUraian: '', dampakPihak: '', pengendalianRisiko: '', penilaianPengendalian: '', sisaRisiko: '' });
+    const [formRisk, setFormRisk] = useState({ indikatorKgt: unitTujuanList[0]?.indikator || '', permasalahan: '', pernyataanRisiko: '', kategoriRisiko: 'Operasional', pemilikRisiko: '', penyebabUraian: '', penyebabSumber: '', sifatKontrol: 'Controllable', dampakUraian: '', dampakPihak: '', pengendalianRisiko: '', penilaianPengendalian: '', sisaRisiko: '' });
 
     const handleSaveRisk = async (e) => {
       e.preventDefault();
+      // Temukan sasaran kegiatan berdasarkan indikator yang dipilih
+      const matchedTujuan = unitTujuanList.find(t => t.indikator === formRisk.indikatorKgt);
+      const sasaranKgtText = matchedTujuan ? `${matchedTujuan.kegiatan} (IKU: ${matchedTujuan.indikator})` : formRisk.indikatorKgt;
+
       const newId = editRiskId || `RSK-${Date.now()}`;
       const existing = risks.find(r => r.id === newId);
       const newRisk = { 
@@ -873,6 +883,7 @@ export default function App() {
         unit: currentUser.nama, 
         tahun: currentUser.tahun, 
         ...formRisk, 
+        sasaranKgt: sasaranKgtText,
         kemungkinan: existing ? existing.kemungkinan : 0, 
         keparahan: existing ? existing.keparahan : 0, 
         skor: existing ? existing.skor : 0, 
@@ -896,12 +907,13 @@ export default function App() {
       });
 
       setEditRiskId(null);
-      setFormRisk({ sasaranKgt: unitTujuanList[0]?.kegiatan || '', permasalahan: '', pernyataanRisiko: '', kategoriRisiko: 'Operasional', pemilikRisiko: '', penyebabUraian: '', penyebabSumber: '', sifatKontrol: 'Controllable', dampakUraian: '', dampakPihak: '', pengendalianRisiko: '', penilaianPengendalian: '', sisaRisiko: '' });
+      setFormRisk({ indikatorKgt: unitTujuanList[0]?.indikator || '', permasalahan: '', pernyataanRisiko: '', kategoriRisiko: 'Operasional', pemilikRisiko: '', penyebabUraian: '', penyebabSumber: '', sifatKontrol: 'Controllable', dampakUraian: '', dampakPihak: '', pengendalianRisiko: '', penilaianPengendalian: '', sisaRisiko: '' });
     };
 
     const handleEditRisk = (item) => {
       setEditRiskId(item.id);
-      setFormRisk(item);
+      // Ekstrak indikator dari item.sasaranKgt jika tersimpan format gabungan
+      setFormRisk({ ...item, indikatorKgt: item.indikatorKgt || item.sasaranKgt });
     };
 
     const handleDeleteRisk = async (id) => { 
@@ -913,7 +925,12 @@ export default function App() {
       <div className="max-w-6xl space-y-6">
         <div><h2 className="text-2xl font-bold text-slate-800">2. Identifikasi Risiko (Tahun {currentUser?.tahun})</h2></div>
         <form onSubmit={handleSaveRisk} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-          <div><label className="block text-xs font-semibold mb-1">Sasaran Kegiatan</label><select required value={formRisk.sasaranKgt} onChange={(e) => setFormRisk({...formRisk, sasaranKgt: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none">{unitTujuanList.map((t, i) => <option key={i} value={t.kegiatan}>{t.kegiatan}</option>)}</select></div>
+          <div>
+            <label className="block text-xs font-semibold mb-1">Indikator Sasaran Kegiatan (IKU)</label>
+            <select required value={formRisk.indikatorKgt} onChange={(e) => setFormRisk({...formRisk, indikatorKgt: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none">
+              {unitTujuanList.map((t, i) => <option key={i} value={t.indikator}>{t.indikator} — ({t.kegiatan})</option>)}
+            </select>
+          </div>
           <div><label className="block text-xs font-semibold mb-1">Permasalahan</label><textarea required rows="2" value={formRisk.permasalahan} onChange={(e) => setFormRisk({...formRisk, permasalahan: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none" /></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2"><label className="block text-xs font-semibold mb-1">Pernyataan Risiko</label><textarea required rows="2" value={formRisk.pernyataanRisiko} onChange={(e) => {
@@ -966,11 +983,15 @@ export default function App() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[1400px]">
-              <thead><tr className="bg-slate-50 text-xs uppercase text-slate-600"><th className="border border-slate-200 p-3 w-16">ID</th><th className="border border-slate-200 p-3">Pernyataan Risiko</th><th className="border border-slate-200 p-3">Kategori</th><th className="border border-slate-200 p-3">Kendali</th><th className="border border-slate-200 p-3 text-center w-24">Aksi</th></tr></thead>
+              <thead><tr className="bg-slate-50 text-xs uppercase text-slate-600"><th className="border border-slate-200 p-3 w-16">ID</th><th className="border border-slate-200 p-3">Sasaran Kegiatan & Indikator</th><th className="border border-slate-200 p-3">Pernyataan Risiko</th><th className="border border-slate-200 p-3">Kategori</th><th className="border border-slate-200 p-3">Kendali</th><th className="border border-slate-200 p-3 text-center w-24">Aksi</th></tr></thead>
               <tbody className="divide-y divide-slate-100 text-xs">
                 {unitRisks.map(item => (
                   <tr key={item.id} className="hover:bg-slate-50">
-                    <td className="border border-slate-200 p-3 font-bold">{item.id}</td><td className="border border-slate-200 p-3 font-bold text-teal-800">{item.pernyataanRisiko}</td><td className="border border-slate-200 p-3">{item.kategoriRisiko}</td><td className="border border-slate-200 p-3">{item.sifatKontrol}</td>
+                    <td className="border border-slate-200 p-3 font-bold">{item.id}</td>
+                    <td className="border border-slate-200 p-3 text-slate-700 font-medium">{item.sasaranKgt}</td>
+                    <td className="border border-slate-200 p-3 font-bold text-teal-800">{item.pernyataanRisiko}</td>
+                    <td className="border border-slate-200 p-3">{item.kategoriRisiko}</td>
+                    <td className="border border-slate-200 p-3">{item.sifatKontrol}</td>
                     <td className="border border-slate-200 p-3 text-center space-x-1">
                       <button type="button" onClick={() => handleEditRisk(item)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer"><Edit size={14}/></button>
                       <button type="button" onClick={() => handleDeleteRisk(item.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer"><Trash2 size={14}/></button>
