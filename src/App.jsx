@@ -1526,7 +1526,19 @@ export default function App() {
     });
 
     const isSekretariat = currentUser && currentUser.nama && currentUser.nama.toLowerCase().includes('sekretariat');
-    const footerJabatan = isSekretariat ? 'Sekretaris' : `Kepala ${currentUser?.nama || ''}`;
+    
+    // Format jabatan tanda tangan sesuai permintaan:
+    // Jika mengandung 'sekretariat', menjadi Sekretaris Badan [Sisa Unit Kerja setelah kata Sekretariat] atau Sekretaris Badan
+    const getFooterJabatan = (nama) => {
+      if (!nama) return '';
+      if (nama.toLowerCase().includes('sekretariat')) {
+        const remaining = nama.replace(/sekretariat/gi, '').trim();
+        return remaining ? `Sekretaris Badan ${remaining}` : 'Sekretaris Badan';
+      }
+      return `Kepala ${nama}`;
+    };
+
+    const footerJabatan = getFooterJabatan(currentUser?.nama);
 
     const [isPdfLoading, setIsPdfLoading] = useState(false);
 
@@ -1575,7 +1587,7 @@ export default function App() {
           html += `
                 <tr><td colspan="16" style="border:none;"></td></tr>
                 <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">Jakarta, ${dateStr}</td></tr>
-                <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">${footerTagExcel(currentUser.nama)}</td></tr>
+                <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">${footerJabatan}</td></tr>
                 <tr><td colspan="16" style="border:none;"></td></tr><tr><td colspan="16" style="border:none;"></td></tr>
                 <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign" style="font-weight:bold;text-decoration:underline;">${currentUser.namaPimpinan || '......................................'}</td></tr>
                 <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">NIP. ${currentUser.nipPimpinan || '......................................'}</td></tr>
@@ -1706,10 +1718,6 @@ export default function App() {
         showAlert('Gagal', 'Gagal mengunduh Excel.', 'error');
       }
     };
-
-    function footerTagExcel(nama) {
-      return (nama && nama.toLowerCase().includes('sekretariat')) ? 'Sekretaris' : `Kepala ${nama}`;
-    }
 
     const handleDownloadPDF = () => {
       setIsPdfLoading(true);
@@ -1959,7 +1967,7 @@ export default function App() {
             <div className="w-72 text-center space-y-16">
               <p className="text-xs text-slate-700 m-0">
                 Jakarta, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>
-                <span className="font-bold">{footerJabatan} {currentUser?.nama && !currentUser.nama.toLowerCase().includes('sekretariat') ? currentUser.nama : ''}</span>
+                <span className="font-bold">{footerJabatan}</span>
               </p>
               <div>
                 <p className="font-bold underline text-xs text-slate-900 m-0">{currentUser?.namaPimpinan || '......................................'}</p>
