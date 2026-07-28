@@ -342,9 +342,11 @@ export default function App() {
     };
 
     const handleEditUserClick = (unit) => {
-      setEditUnitId(unit.id);
-      setUnitForm(unit);
-      setAdminUserTab('form');
+      showConfirm('Konfirmasi Ubah', `Apakah Anda yakin ingin mengubah data unit kerja "${unit.nama}"?`, () => {
+        setEditUnitId(unit.id);
+        setUnitForm(unit);
+        setAdminUserTab('form');
+      });
     };
 
     const handleSaveUnit = async (e) => {
@@ -369,9 +371,11 @@ export default function App() {
     };
 
     const handleDeleteUnit = (id) => {
-      showConfirm('Hapus Unit Kerja', 'Yakin hapus unit ini permanen?', async () => {
+      const unitTarget = unitKerjaList.find(u => u.id === id);
+      showConfirm('Konfirmasi Hapus', `Apakah Anda yakin ingin menghapus unit kerja "${unitTarget ? unitTarget.nama : id}" secara permanen?`, async () => {
         try { if (db) await deleteDoc(getDocRef('units', id)); } catch(e) {}
         setUnitKerjaList(prev => prev.filter(u => u.id !== id));
+        showAlert('Berhasil', 'Unit kerja berhasil dihapus.', 'success');
       });
     };
 
@@ -802,18 +806,24 @@ export default function App() {
         });
 
         setSelectedStrategis(''); setSelectedProgram(''); setSelectedKegiatan(''); setIndikatorKgt(''); setTargetKgt(''); setEditTujuanId(null);
+        showAlert('Berhasil', 'Data penetapan tujuan berhasil disimpan!', 'success');
       }
     };
     
     const handleEditTujuan = (item) => {
-      setEditTujuanId(item.id);
-      setIndikatorKgt(item.indikator);
-      setTargetKgt(item.target);
+      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin mengubah data penetapan tujuan ini?', () => {
+        setEditTujuanId(item.id);
+        setIndikatorKgt(item.indikator);
+        setTargetKgt(item.target);
+      });
     };
 
     const handleDeleteTujuan = async (id) => { 
-      try { if (db) await deleteDoc(getDocRef('tujuan', id)); } catch(e) {}
-      setTujuanList(prev => prev.filter(t => t.id !== id));
+      showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin menghapus data penetapan tujuan ini?', async () => {
+        try { if (db) await deleteDoc(getDocRef('tujuan', id)); } catch(e) {}
+        setTujuanList(prev => prev.filter(t => t.id !== id));
+        showAlert('Berhasil', 'Data penetapan tujuan berhasil dihapus.', 'success');
+      });
     };
 
     const unitTujuanList = tujuanList.filter(t => t.unit === currentUser.nama && t.tahun === currentUser.tahun);
@@ -941,16 +951,22 @@ export default function App() {
         penilaianPengendalian: '', 
         sisaRisiko: '' 
       });
+      showAlert('Berhasil', 'Data identifikasi risiko berhasil disimpan!', 'success');
     };
 
     const handleEditRisk = (item) => {
-      setEditRiskId(item.id);
-      setFormRisk({ ...item, indikatorKgt: item.indikatorKgt || '', sasaranKgt: item.sasaranKgt || '' });
+      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin mengubah data identifikasi risiko ini?', () => {
+        setEditRiskId(item.id);
+        setFormRisk({ ...item, indikatorKgt: item.indikatorKgt || '', sasaranKgt: item.sasaranKgt || '' });
+      });
     };
 
     const handleDeleteRisk = async (id) => { 
-      try { if (db) await deleteDoc(getDocRef('risks', id)); } catch(e) {}
-      setRisks(prev => prev.filter(r => r.id !== id));
+      showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin menghapus data identifikasi risiko ini?', async () => {
+        try { if (db) await deleteDoc(getDocRef('risks', id)); } catch(e) {}
+        setRisks(prev => prev.filter(r => r.id !== id));
+        showAlert('Berhasil', 'Data risiko berhasil dihapus.', 'success');
+      });
     };
 
     return (
@@ -1064,16 +1080,18 @@ export default function App() {
       setLocalRisks(localRisks.map(r => r.id === id ? { ...r, [field]: parseInt(value) } : r));
     };
 
-    const handleSaveAnalisis = async (id) => {
-      const risk = localRisks.find(r => r.id === id);
-      const skor = calculateSkorRisiko(risk.kemungkinan, risk.keparahan);
-      const levelRisiko = calculateLevelRisiko(skor);
-      const keputusanMitigasi = skor > 12 ? "Dimitigasi" : "Tidak Dimitigasi";
-      const updatedRisk = { ...risk, kemungkinan: risk.kemungkinan, keparahan: risk.keparahan, skor, levelRisiko, keputusanMitigasi, tahap: 'analisis' };
-      try { if (db) await setDoc(getDocRef('risks', id), updatedRisk); } catch(e) {}
-      
-      setRisks(prev => prev.map(r => r.id === id ? updatedRisk : r));
-      showAlert('Berhasil', 'Analisis risiko berhasil disimpan!', 'success');
+    const handleSaveAnalisis = (id) => {
+      showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan analisis & evaluasi risiko ini?', async () => {
+        const risk = localRisks.find(r => r.id === id);
+        const skor = calculateSkorRisiko(risk.kemungkinan, risk.keparahan);
+        const levelRisiko = calculateLevelRisiko(skor);
+        const keputusanMitigasi = skor > 12 ? "Dimitigasi" : "Tidak Dimitigasi";
+        const updatedRisk = { ...risk, kemungkinan: risk.kemungkinan, keparahan: risk.keparahan, skor, levelRisiko, keputusanMitigasi, tahap: 'analisis' };
+        try { if (db) await setDoc(getDocRef('risks', id), updatedRisk); } catch(e) {}
+        
+        setRisks(prev => prev.map(r => r.id === id ? updatedRisk : r));
+        showAlert('Berhasil', 'Analisis risiko berhasil disimpan!', 'success');
+      });
     };
 
     return (
@@ -1136,19 +1154,22 @@ export default function App() {
     useEffect(() => { setLocalRisks(unitRisks); }, [risks]);
 
     const handleFieldChange = (id, field, value) => { setLocalRisks(localRisks.map(r => r.id === id ? { ...r, [field]: value } : r)); };
-    const handleSaveRTP = async (id) => { 
-      const risk = localRisks.find(r => r.id === id); 
-      const updated = { ...risk, tahap: 'selesai' };
-      try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
-      setRisks(prev => prev.map(r => r.id === id ? updated : r));
-      showAlert('Berhasil', 'RTP berhasil diperbarui!', 'success'); 
+    const handleSaveRTP = (id) => { 
+      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin memperbarui RTP ini?', async () => {
+        const risk = localRisks.find(r => r.id === id); 
+        const updated = { ...risk, tahap: 'selesai' };
+        try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
+        setRisks(prev => prev.map(r => r.id === id ? updated : r));
+        showAlert('Berhasil', 'RTP berhasil diperbarui!', 'success'); 
+      });
     };
     const handleDeleteRTP = (id) => {
-      showConfirm('Kosongkan RTP', 'Kosongkan Rencana Tindak Pengendalian ini?', async () => {
+      showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin mengosongkan Rencana Tindak Pengendalian ini?', async () => {
         const risk = risks.find(r => r.id === id);
         const updated = { ...risk, rtp: '', penanggungJawab: '', targetWaktu: '', komunikasi: '' };
         try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
         setRisks(prev => prev.map(r => r.id === id ? updated : r));
+        showAlert('Berhasil', 'RTP berhasil dikosongkan.', 'success');
       });
     };
 
@@ -1220,19 +1241,22 @@ export default function App() {
     useEffect(() => { setLocalRisks(unitRisks); }, [risks]);
     const handleFieldChange = (id, field, value) => { setLocalRisks(localRisks.map(r => r.id === id ? { ...r, [field]: value } : r)); };
     
-    const handleSavePemantauan = async (id) => { 
-      const risk = localRisks.find(r => r.id === id); 
-      try { if (db) await setDoc(getDocRef('risks', id), risk); } catch(e) {}
-      setRisks(prev => prev.map(r => r.id === id ? risk : r));
-      showAlert('Berhasil', 'Progres berhasil disimpan!', 'success'); 
+    const handleSavePemantauan = (id) => { 
+      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin menyimpan progres pemantauan ini?', async () => {
+        const risk = localRisks.find(r => r.id === id); 
+        try { if (db) await setDoc(getDocRef('risks', id), risk); } catch(e) {}
+        setRisks(prev => prev.map(r => r.id === id ? risk : r));
+        showAlert('Berhasil', 'Progres berhasil disimpan!', 'success'); 
+      });
     };
     
     const handleDeletePemantauan = (id) => {
-      showConfirm('Hapus Progres', 'Kosongkan progres pemantauan dan link eviden?', async () => {
+      showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin mengosongkan progres pemantauan dan link eviden?', async () => {
         const risk = risks.find(r => r.id === id);
         const updated = { ...risk, prosesRtp: '', linkEviden: '' };
         try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
         setRisks(prev => prev.map(r => r.id === id ? updated : r));
+        showAlert('Berhasil', 'Progres berhasil dikosongkan.', 'success');
       });
     };
 
@@ -1300,16 +1324,22 @@ export default function App() {
 
       setEditKejadianId(null);
       setFormKejadian({ riskId: unitRisks[0]?.id || '', tanggal: '', kronologi: '', penyebab: '', dampakRiil: '' });
+      showAlert('Berhasil', 'Pencatatan keterjadian berhasil disimpan!', 'success');
     };
 
     const handleEditKejadian = (item) => {
-      setEditKejadianId(item.id);
-      setFormKejadian(item);
+      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin mengubah pencatatan keterjadian risiko ini?', () => {
+        setEditKejadianId(item.id);
+        setFormKejadian(item);
+      });
     };
 
     const handleDeleteKejadian = async (id) => { 
-      try { if (db) await deleteDoc(getDocRef('kejadian', id)); } catch(e) {}
-      setKejadianList(prev => prev.filter(k => k.id !== id));
+      showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin menghapus pencatatan keterjadian risiko ini?', async () => {
+        try { if (db) await deleteDoc(getDocRef('kejadian', id)); } catch(e) {}
+        setKejadianList(prev => prev.filter(k => k.id !== id));
+        showAlert('Berhasil', 'Pencatatan keterjadian berhasil dihapus.', 'success');
+      });
     };
 
     return (
@@ -1355,28 +1385,33 @@ export default function App() {
     const [evaluasiList, setEvaluasiList] = useState({});
     const handleSelectEv = (id, field, val) => { setEvaluasiList({ ...evaluasiList, [id]: { kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3, ...(evaluasiList[id] || {}), [field]: val } }); };
 
-    const handleSaveEv = async (risk) => {
-      const ev = evaluasiList[risk.id] || { kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3 };
-      const srAwal = risk.skor || 0;
-      const srDiharapkan = calculateSkorRisiko(parseInt(ev.kDiharapkan), parseInt(ev.dDiharapkan));
-      const srActual = calculateSkorRisiko(parseInt(ev.kActual), parseInt(ev.dActual));
-      const deviasi = srDiharapkan - srActual;
-      const newId = `EFK-${risk.id}`;
-      const newEntry = { id: newId, riskId: risk.id, pernyataanRisiko: risk.pernyataanRisiko, srAwal, srDiharapkan, srActual, deviasi, ...ev };
-      try { if (db) await setDoc(getDocRef('efektivitas', newId), newEntry); } catch(e) {}
-      
-      setRiwayatEfektivitas(prev => {
-        const exists = prev.some(e => e.id === newId);
-        if (exists) return prev.map(e => e.id === newId ? newEntry : e);
-        return [newEntry, ...prev];
-      });
+    const handleSaveEv = (risk) => {
+      showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan penilaian efektifitas RTP ini?', async () => {
+        const ev = evaluasiList[risk.id] || { kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3 };
+        const srAwal = risk.skor || 0;
+        const srDiharapkan = calculateSkorRisiko(parseInt(ev.kDiharapkan), parseInt(ev.dDiharapkan));
+        const srActual = calculateSkorRisiko(parseInt(ev.kActual), parseInt(ev.dActual));
+        const deviasi = srDiharapkan - srActual;
+        const newId = `EFK-${risk.id}`;
+        const newEntry = { id: newId, riskId: risk.id, pernyataanRisiko: risk.pernyataanRisiko, srAwal, srDiharapkan, srActual, deviasi, ...ev };
+        try { if (db) await setDoc(getDocRef('efektivitas', newId), newEntry); } catch(e) {}
+        
+        setRiwayatEfektivitas(prev => {
+          const exists = prev.some(e => e.id === newId);
+          if (exists) return prev.map(e => e.id === newId ? newEntry : e);
+          return [newEntry, ...prev];
+        });
 
-      showAlert('Berhasil', 'Penilaian efektifitas disimpan!', 'success');
+        showAlert('Berhasil', 'Penilaian efektifitas disimpan!', 'success');
+      });
     };
 
     const handleDeleteEv = async (id) => { 
-      try { if (db) await deleteDoc(getDocRef('efektivitas', id)); } catch(e) {}
-      setRiwayatEfektivitas(prev => prev.filter(e => e.id !== id));
+      showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin menghapus penilaian efektifitas ini?', async () => {
+        try { if (db) await deleteDoc(getDocRef('efektivitas', id)); } catch(e) {}
+        setRiwayatEfektivitas(prev => prev.filter(e => e.id !== id));
+        showAlert('Berhasil', 'Penilaian efektifitas berhasil dihapus.', 'success');
+      });
     };
 
     const handleTeruskanRisiko = async (ev) => {
@@ -1490,6 +1525,9 @@ export default function App() {
       return parentRisk && parentRisk.unit === currentUser.nama && parentRisk.tahun === currentUser.tahun;
     });
 
+    const isSekretariat = currentUser && currentUser.nama && currentUser.nama.toLowerCase().includes('sekretariat');
+    const footerJabatan = isSekretariat ? 'Sekretaris' : `Kepala ${currentUser?.nama || ''}`;
+
     const [isPdfLoading, setIsPdfLoading] = useState(false);
 
     const handleDownloadExcel = () => {
@@ -1537,7 +1575,7 @@ export default function App() {
           html += `
                 <tr><td colspan="16" style="border:none;"></td></tr>
                 <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">Jakarta, ${dateStr}</td></tr>
-                <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">Kepala ${currentUser.nama}</td></tr>
+                <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">${footerTagExcel(currentUser.nama)}</td></tr>
                 <tr><td colspan="16" style="border:none;"></td></tr><tr><td colspan="16" style="border:none;"></td></tr>
                 <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign" style="font-weight:bold;text-decoration:underline;">${currentUser.namaPimpinan || '......................................'}</td></tr>
                 <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">NIP. ${currentUser.nipPimpinan || '......................................'}</td></tr>
@@ -1574,7 +1612,7 @@ export default function App() {
           html += `
                 <tr><td colspan="7" style="border:none;"></td></tr>
                 <tr><td colspan="3" style="border:none;"></td><td colspan="4" class="sign">Jakarta, ${dateStr}</td></tr>
-                <tr><td colspan="3" style="border:none;"></td><td colspan="4" class="sign">Kepala ${currentUser.nama}</td></tr>
+                <tr><td colspan="3" style="border:none;"></td><td colspan="4" class="sign">${footerJabatan}</td></tr>
                 <tr><td colspan="7" style="border:none;"></td></tr><tr><td colspan="7" style="border:none;"></td></tr>
                 <tr><td colspan="3" style="border:none;"></td><td colspan="4" class="sign" style="font-weight:bold;text-decoration:underline;">${currentUser.namaPimpinan || '......................................'}</td></tr>
                 <tr><td colspan="3" style="border:none;"></td><td colspan="4" class="sign">NIP. ${currentUser.nipPimpinan || '......................................'}</td></tr>
@@ -1609,7 +1647,7 @@ export default function App() {
           html += `
                 <tr><td colspan="6" style="border:none;"></td></tr>
                 <tr><td colspan="3" style="border:none;"></td><td colspan="3" class="sign">Jakarta, ${dateStr}</td></tr>
-                <tr><td colspan="3" style="border:none;"></td><td colspan="3" class="sign">Kepala ${currentUser.nama}</td></tr>
+                <tr><td colspan="3" style="border:none;"></td><td colspan="3" class="sign">${footerJabatan}</td></tr>
                 <tr><td colspan="6" style="border:none;"></td></tr><tr><td colspan="6" style="border:none;"></td></tr>
                 <tr><td colspan="3" style="border:none;"></td><td colspan="3" class="sign" style="font-weight:bold;text-decoration:underline;">${currentUser.namaPimpinan || '......................................'}</td></tr>
                 <tr><td colspan="3" style="border:none;"></td><td colspan="3" class="sign">NIP. ${currentUser.nipPimpinan || '......................................'}</td></tr>
@@ -1646,7 +1684,7 @@ export default function App() {
           html += `
                 <tr><td colspan="8" style="border:none;"></td></tr>
                 <tr><td colspan="4" style="border:none;"></td><td colspan="4" class="sign">Jakarta, ${dateStr}</td></tr>
-                <tr><td colspan="4" style="border:none;"></td><td colspan="4" class="sign">Kepala ${currentUser.nama}</td></tr>
+                <tr><td colspan="4" style="border:none;"></td><td colspan="4" class="sign">${footerJabatan}</td></tr>
                 <tr><td colspan="8" style="border:none;"></td></tr><tr><td colspan="8" style="border:none;"></td></tr>
                 <tr><td colspan="4" style="border:none;"></td><td colspan="4" class="sign" style="font-weight:bold;text-decoration:underline;">${currentUser.namaPimpinan || '......................................'}</td></tr>
                 <tr><td colspan="4" style="border:none;"></td><td colspan="4" class="sign">NIP. ${currentUser.nipPimpinan || '......................................'}</td></tr>
@@ -1668,6 +1706,10 @@ export default function App() {
         showAlert('Gagal', 'Gagal mengunduh Excel.', 'error');
       }
     };
+
+    function footerTagExcel(nama) {
+      return (nama && nama.toLowerCase().includes('sekretariat')) ? 'Sekretaris' : `Kepala ${nama}`;
+    }
 
     const handleDownloadPDF = () => {
       setIsPdfLoading(true);
@@ -1917,7 +1959,7 @@ export default function App() {
             <div className="w-72 text-center space-y-16">
               <p className="text-xs text-slate-700 m-0">
                 Jakarta, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}<br/>
-                <span className="font-bold">Kepala {currentUser?.nama}</span>
+                <span className="font-bold">{footerJabatan} {currentUser?.nama && !currentUser.nama.toLowerCase().includes('sekretariat') ? currentUser.nama : ''}</span>
               </p>
               <div>
                 <p className="font-bold underline text-xs text-slate-900 m-0">{currentUser?.namaPimpinan || '......................................'}</p>
