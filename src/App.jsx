@@ -773,7 +773,6 @@ export default function App() {
     const [targetKgt, setTargetKgt] = useState('');
     const [editTujuanId, setEditTujuanId] = useState(null);
     
-    // Filter unik untuk dropdown agar tidak ada duplikasi nama sasaran
     const uniqueStrategis = Array.from(new Set(masterSasaran.strategis.map(s => s.nama)))
       .map(nama => masterSasaran.strategis.find(s => s.nama === nama));
 
@@ -868,14 +867,34 @@ export default function App() {
     const unitTujuanList = tujuanList.filter(t => t.unit === currentUser.nama && t.tahun === currentUser.tahun);
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
     const [editRiskId, setEditRiskId] = useState(null);
-    const [formRisk, setFormRisk] = useState({ indikatorKgt: unitTujuanList[0]?.indikator || '', permasalahan: '', pernyataanRisiko: '', kategoriRisiko: 'Operasional', pemilikRisiko: '', penyebabUraian: '', penyebabSumber: '', sifatKontrol: 'Controllable', dampakUraian: '', dampakPihak: '', pengendalianRisiko: '', penilaianPengendalian: '', sisaRisiko: '' });
+    const [formRisk, setFormRisk] = useState({ 
+      indikatorKgt: unitTujuanList[0]?.indikator || '', 
+      sasaranKgt: unitTujuanList[0]?.kegiatan || '', 
+      permasalahan: '', 
+      pernyataanRisiko: '', 
+      kategoriRisiko: 'Operasional', 
+      pemilikRisiko: '', 
+      penyebabUraian: '', 
+      penyebabSumber: '', 
+      sifatKontrol: 'Controllable', 
+      dampakUraian: '', 
+      dampakPihak: '', 
+      pengendalianRisiko: '', 
+      penilaianPengendalian: '', 
+      sisaRisiko: '' 
+    });
+
+    const handleIndikatorChange = (val) => {
+      const found = unitTujuanList.find(t => t.indikator === val);
+      setFormRisk(prev => ({
+        ...prev,
+        indikatorKgt: val,
+        sasaranKgt: found ? found.kegiatan : prev.sasaranKgt
+      }));
+    };
 
     const handleSaveRisk = async (e) => {
       e.preventDefault();
-      // Temukan sasaran kegiatan berdasarkan indikator yang dipilih
-      const matchedTujuan = unitTujuanList.find(t => t.indikator === formRisk.indikatorKgt);
-      const sasaranKgtText = matchedTujuan ? `${matchedTujuan.kegiatan} (IKU: ${matchedTujuan.indikator})` : formRisk.indikatorKgt;
-
       const newId = editRiskId || `RSK-${Date.now()}`;
       const existing = risks.find(r => r.id === newId);
       const newRisk = { 
@@ -883,7 +902,6 @@ export default function App() {
         unit: currentUser.nama, 
         tahun: currentUser.tahun, 
         ...formRisk, 
-        sasaranKgt: sasaranKgtText,
         kemungkinan: existing ? existing.kemungkinan : 0, 
         keparahan: existing ? existing.keparahan : 0, 
         skor: existing ? existing.skor : 0, 
@@ -907,13 +925,27 @@ export default function App() {
       });
 
       setEditRiskId(null);
-      setFormRisk({ indikatorKgt: unitTujuanList[0]?.indikator || '', permasalahan: '', pernyataanRisiko: '', kategoriRisiko: 'Operasional', pemilikRisiko: '', penyebabUraian: '', penyebabSumber: '', sifatKontrol: 'Controllable', dampakUraian: '', dampakPihak: '', pengendalianRisiko: '', penilaianPengendalian: '', sisaRisiko: '' });
+      setFormRisk({ 
+        indikatorKgt: unitTujuanList[0]?.indikator || '', 
+        sasaranKgt: unitTujuanList[0]?.kegiatan || '', 
+        permasalahan: '', 
+        pernyataanRisiko: '', 
+        kategoriRisiko: 'Operasional', 
+        pemilikRisiko: '', 
+        penyebabUraian: '', 
+        penyebabSumber: '', 
+        sifatKontrol: 'Controllable', 
+        dampakUraian: '', 
+        dampakPihak: '', 
+        pengendalianRisiko: '', 
+        penilaianPengendalian: '', 
+        sisaRisiko: '' 
+      });
     };
 
     const handleEditRisk = (item) => {
       setEditRiskId(item.id);
-      // Ekstrak indikator dari item.sasaranKgt jika tersimpan format gabungan
-      setFormRisk({ ...item, indikatorKgt: item.indikatorKgt || item.sasaranKgt });
+      setFormRisk({ ...item, indikatorKgt: item.indikatorKgt || '', sasaranKgt: item.sasaranKgt || '' });
     };
 
     const handleDeleteRisk = async (id) => { 
@@ -925,11 +957,17 @@ export default function App() {
       <div className="max-w-6xl space-y-6">
         <div><h2 className="text-2xl font-bold text-slate-800">2. Identifikasi Risiko (Tahun {currentUser?.tahun})</h2></div>
         <form onSubmit={handleSaveRisk} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-          <div>
-            <label className="block text-xs font-semibold mb-1">Indikator Sasaran Kegiatan (IKU)</label>
-            <select required value={formRisk.indikatorKgt} onChange={(e) => setFormRisk({...formRisk, indikatorKgt: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none">
-              {unitTujuanList.map((t, i) => <option key={i} value={t.indikator}>{t.indikator} — ({t.kegiatan})</option>)}
-            </select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold mb-1">Indikator Sasaran Kegiatan (IKU)</label>
+              <select required value={formRisk.indikatorKgt} onChange={(e) => handleIndikatorChange(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none">
+                {unitTujuanList.map((t, i) => <option key={i} value={t.indikator}>{t.indikator}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold mb-1">Sasaran Kegiatan</label>
+              <input type="text" value={formRisk.sasaranKgt} readOnly className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50 text-slate-600" />
+            </div>
           </div>
           <div><label className="block text-xs font-semibold mb-1">Permasalahan</label><textarea required rows="2" value={formRisk.permasalahan} onChange={(e) => setFormRisk({...formRisk, permasalahan: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none" /></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -983,12 +1021,23 @@ export default function App() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[1400px]">
-              <thead><tr className="bg-slate-50 text-xs uppercase text-slate-600"><th className="border border-slate-200 p-3 w-16">ID</th><th className="border border-slate-200 p-3">Sasaran Kegiatan & Indikator</th><th className="border border-slate-200 p-3">Pernyataan Risiko</th><th className="border border-slate-200 p-3">Kategori</th><th className="border border-slate-200 p-3">Kendali</th><th className="border border-slate-200 p-3 text-center w-24">Aksi</th></tr></thead>
+              <thead>
+                <tr className="bg-slate-50 text-xs uppercase text-slate-600">
+                  <th className="border border-slate-200 p-3 w-16">ID</th>
+                  <th className="border border-slate-200 p-3">Sasaran Kegiatan</th>
+                  <th className="border border-slate-200 p-3">Indikator Sasaran Kegiatan (IKU)</th>
+                  <th className="border border-slate-200 p-3">Pernyataan Risiko</th>
+                  <th className="border border-slate-200 p-3">Kategori</th>
+                  <th className="border border-slate-200 p-3">Kendali</th>
+                  <th className="border border-slate-200 p-3 text-center w-24">Aksi</th>
+                </tr>
+              </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
                 {unitRisks.map(item => (
                   <tr key={item.id} className="hover:bg-slate-50">
                     <td className="border border-slate-200 p-3 font-bold">{item.id}</td>
                     <td className="border border-slate-200 p-3 text-slate-700 font-medium">{item.sasaranKgt}</td>
+                    <td className="border border-slate-200 p-3 text-teal-700 font-medium">{item.indikatorKgt}</td>
                     <td className="border border-slate-200 p-3 font-bold text-teal-800">{item.pernyataanRisiko}</td>
                     <td className="border border-slate-200 p-3">{item.kategoriRisiko}</td>
                     <td className="border border-slate-200 p-3">{item.sifatKontrol}</td>
@@ -1454,23 +1503,22 @@ export default function App() {
             <head><meta charset="UTF-8"><style>.title{border:none;text-align:center;font-weight:bold;}.data{border:0.5pt solid black;vertical-align:top;padding:4px;}.head{border:0.5pt solid black;background:#f3f4f6;font-weight:bold;text-align:center;padding:4px;}.sign{border:none;text-align:right;}</style></head>
             <body>
               <table style="border-collapse:collapse;font-family:Arial;font-size:11px;">
-                <tr><td colspan="15" class="title" style="font-size:14px;">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</td></tr>
-                <tr><td colspan="15" class="title" style="font-size:13px;">BADAN PENGEMBANGAN DAN INFORMASI</td></tr>
-                <tr><td colspan="15" class="title" style="font-size:12px;color:#0d9488;">LAPORAN PETA REGISTER RISIKO UNIT KERJA (${currentUser.nama.toUpperCase()})</td></tr>
-                <tr><td colspan="15" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
-                <tr><td colspan="15" style="border:none;"></td></tr>
+                <tr><td colspan="16" class="title" style="font-size:14px;">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</td></tr>
+                <tr><td colspan="16" class="title" style="font-size:13px;">BADAN PENGEMBANGAN DAN INFORMASI</td></tr>
+                <tr><td colspan="16" class="title" style="font-size:12px;color:#0d9488;">LAPORAN PETA REGISTER RISIKO UNIT KERJA (${currentUser.nama.toUpperCase()})</td></tr>
+                <tr><td colspan="16" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
+                <tr><td colspan="16" style="border:none;"></td></tr>
                 <tr>
           `;
-          const headers = ['No', 'Sasaran Kegiatan', 'Indikator Sasaran Kegiatan', 'Sumber Risiko', 'Kategori Risiko', 'Risiko', 'Penyebab', 'Dampak', 'Pengendalian yang ada', 'Sisa Risiko', 'Pemilik Risiko', 'K', 'D', 'Skala Risiko', 'Level Risiko'];
+          const headers = ['No', 'Sasaran Kegiatan', 'Indikator Sasaran Kegiatan (IKU)', 'Sumber Risiko', 'Kategori Risiko', 'Risiko', 'Penyebab', 'Dampak', 'Pengendalian yang ada', 'Sisa Risiko', 'Pemilik Risiko', 'K', 'D', 'Skala Risiko', 'Level Risiko'];
           headers.forEach(h => { html += `<td class="head">${h}</td>`; });
           html += '</tr>';
 
           unitRisks.forEach((risk, index) => {
-            const matchTujuan = unitTujuanList.find(t => t.kegiatan === risk.sasaranKgt);
             html += `<tr>
               <td class="data" align="center">${index + 1}</td>
               <td class="data">${risk.sasaranKgt || '-'}</td>
-              <td class="data">${matchTujuan?.indikator || '-'}</td>
+              <td class="data">${risk.indikatorKgt || '-'}</td>
               <td class="data">${risk.penyebabSumber || '-'}</td>
               <td class="data">${risk.kategoriRisiko || '-'}</td>
               <td class="data" style="font-weight:bold;">${risk.pernyataanRisiko || '-'}</td>
@@ -1487,12 +1535,12 @@ export default function App() {
           });
 
           html += `
-                <tr><td colspan="15" style="border:none;"></td></tr>
-                <tr><td colspan="10" style="border:none;"></td><td colspan="5" class="sign">Jakarta, ${dateStr}</td></tr>
-                <tr><td colspan="10" style="border:none;"></td><td colspan="5" class="sign">Kepala ${currentUser.nama}</td></tr>
-                <tr><td colspan="15" style="border:none;"></td></tr><tr><td colspan="15" style="border:none;"></td></tr>
-                <tr><td colspan="10" style="border:none;"></td><td colspan="5" class="sign" style="font-weight:bold;text-decoration:underline;">${currentUser.namaPimpinan || '......................................'}</td></tr>
-                <tr><td colspan="10" style="border:none;"></td><td colspan="5" class="sign">NIP. ${currentUser.nipPimpinan || '......................................'}</td></tr>
+                <tr><td colspan="16" style="border:none;"></td></tr>
+                <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">Jakarta, ${dateStr}</td></tr>
+                <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">Kepala ${currentUser.nama}</td></tr>
+                <tr><td colspan="16" style="border:none;"></td></tr><tr><td colspan="16" style="border:none;"></td></tr>
+                <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign" style="font-weight:bold;text-decoration:underline;">${currentUser.namaPimpinan || '......................................'}</td></tr>
+                <tr><td colspan="11" style="border:none;"></td><td colspan="5" class="sign">NIP. ${currentUser.nipPimpinan || '......................................'}</td></tr>
               </table>
             </body></html>
           `;
@@ -1720,12 +1768,12 @@ export default function App() {
 
           {subReportTab === 'peta_risiko' && (
             <div className="overflow-x-auto w-full">
-              <table className="w-full min-w-[1500px] text-left border-collapse border border-slate-400 text-xs">
+              <table className="w-full min-w-[1600px] text-left border-collapse border border-slate-400 text-xs">
                 <thead>
                   <tr className="bg-slate-100 text-slate-900 uppercase font-bold text-[11px]">
                     <th className="border border-slate-400 p-2 text-center align-middle">No</th>
                     <th className="border border-slate-400 p-2 align-middle">Sasaran Kegiatan</th>
-                    <th className="border border-slate-400 p-2 align-middle">Indikator Sasaran Kegiatan</th>
+                    <th className="border border-slate-400 p-2 align-middle">Indikator Sasaran Kegiatan (IKU)</th>
                     <th className="border border-slate-400 p-2 align-middle">Sumber Risiko</th>
                     <th className="border border-slate-400 p-2 align-middle">Kategori Risiko</th>
                     <th className="border border-slate-400 p-2 align-middle">Risiko</th>
@@ -1742,12 +1790,11 @@ export default function App() {
                 </thead>
                 <tbody className="divide-y divide-slate-300 text-slate-800">
                   {unitRisks.map((risk, index) => {
-                    const matchTujuan = unitTujuanList.find(t => t.kegiatan === risk.sasaranKgt);
                     return (
                       <tr key={risk.id} className="hover:bg-slate-50">
                         <td className="border border-slate-400 p-2 text-center font-bold align-top">{index + 1}</td>
-                        <td className="border border-slate-400 p-2 font-medium align-top">{risk.sasaranKgt}</td>
-                        <td className="border border-slate-400 p-2 text-teal-700 align-top">{matchTujuan?.indikator || '-'}</td>
+                        <td className="border border-slate-400 p-2 font-medium align-top">{risk.sasaranKgt || '-'}</td>
+                        <td className="border border-slate-400 p-2 text-teal-700 align-top">{risk.indikatorKgt || '-'}</td>
                         <td className="border border-slate-400 p-2 align-top">{risk.penyebabSumber || '-'}</td>
                         <td className="border border-slate-400 p-2 font-semibold text-cyan-900 align-top">{risk.kategoriRisiko || 'Operasional'}</td>
                         <td className="border border-slate-400 p-2 font-bold text-slate-900 align-top">{risk.pernyataanRisiko}</td>
