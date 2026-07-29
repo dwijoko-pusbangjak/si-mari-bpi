@@ -19,7 +19,6 @@ const firebaseConfig = {
   messagingSenderId: "324662251360",
   appId: "1:324662251360:web:b0f7b4180fcd5530a0d805"
 };
-
 let app, auth, db;
 try {
   app = initializeApp(firebaseConfig);
@@ -342,31 +341,31 @@ export default function App() {
     };
 
     const handleEditUserClick = (unit) => {
-      showConfirm('Konfirmasi Ubah', `Apakah Anda yakin ingin mengubah data unit kerja "${unit.nama}"?`, () => {
-        setEditUnitId(unit.id);
-        setUnitForm(unit);
-        setAdminUserTab('form');
-      });
+      setEditUnitId(unit.id);
+      setUnitForm(unit);
+      setAdminUserTab('form');
     };
 
     const handleSaveUnit = async (e) => {
       e.preventDefault();
       if (unitForm.nama.trim() && unitForm.username.trim()) {
-        const idToSave = editUnitId || `unit_${Date.now()}`;
-        try {
-          if (db) await setDoc(getDocRef('units', idToSave), { id: idToSave, ...unitForm });
-        } catch(e) {}
-        
-        setUnitKerjaList(prev => {
-          const exists = prev.some(u => u.id === idToSave);
-          if (exists) return prev.map(u => u.id === idToSave ? { ...u, ...unitForm } : u);
-          return [...prev, { id: idToSave, ...unitForm }];
-        });
+        showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan perubahan data unit kerja ini?', async () => {
+          const idToSave = editUnitId || `unit_${Date.now()}`;
+          try {
+            if (db) await setDoc(getDocRef('units', idToSave), { id: idToSave, ...unitForm });
+          } catch(e) {}
+          
+          setUnitKerjaList(prev => {
+            const exists = prev.some(u => u.id === idToSave);
+            if (exists) return prev.map(u => u.id === idToSave ? { ...u, ...unitForm } : u);
+            return [...prev, { id: idToSave, ...unitForm }];
+          });
 
-        showAlert('Berhasil', 'Data unit kerja berhasil disimpan!', 'success');
-        setEditUnitId(null);
-        setUnitForm({ id: '', nama: '', username: '', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
-        setAdminUserTab('list');
+          showAlert('Berhasil', 'Data unit kerja berhasil disimpan!', 'success');
+          setEditUnitId(null);
+          setUnitForm({ id: '', nama: '', username: '', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
+          setAdminUserTab('list');
+        });
       }
     };
 
@@ -382,39 +381,41 @@ export default function App() {
     const handleAddMasterSasaran = async (e) => {
       e.preventDefault();
       if (formSasaran.nama.trim()) {
-        let updated = { ...masterSasaran };
+        showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan perubahan sasaran K/L ini?', async () => {
+          let updated = { ...masterSasaran };
 
-        if (editSasaranId) {
-          updated[kategoriSasaran] = updated[kategoriSasaran].map(item => {
-            if (item.id === editSasaranId) {
-              let updatedItem = { ...item, nama: formSasaran.nama };
-              if (kategoriSasaran !== 'strategis') updatedItem.parentId = selectedParentId;
-              if (kategoriSasaran !== 'kegiatan') {
-                updatedItem.indikator = formSasaran.indikator; 
-                updatedItem.target = formSasaran.target; 
-                updatedItem.satuan = formSasaran.satuan;
+          if (editSasaranId) {
+            updated[kategoriSasaran] = updated[kategoriSasaran].map(item => {
+              if (item.id === editSasaranId) {
+                let updatedItem = { ...item, nama: formSasaran.nama };
+                if (kategoriSasaran !== 'strategis') updatedItem.parentId = selectedParentId;
+                if (kategoriSasaran !== 'kegiatan') {
+                  updatedItem.indikator = formSasaran.indikator; 
+                  updatedItem.target = formSasaran.target; 
+                  updatedItem.satuan = formSasaran.satuan;
+                }
+                return updatedItem;
               }
-              return updatedItem;
+              return item;
+            });
+            showAlert('Berhasil', 'Master sasaran berhasil diperbarui!', 'success');
+          } else {
+            let newItem = { id: `M-${Date.now()}`, nama: formSasaran.nama };
+            if (kategoriSasaran !== 'strategis') newItem.parentId = selectedParentId;
+            if (kategoriSasaran !== 'kegiatan') {
+              newItem.indikator = formSasaran.indikator; 
+              newItem.target = formSasaran.target; 
+              newItem.satuan = formSasaran.satuan;
             }
-            return item;
-          });
-          showAlert('Berhasil', 'Master sasaran berhasil diperbarui!', 'success');
-        } else {
-          let newItem = { id: `M-${Date.now()}`, nama: formSasaran.nama };
-          if (kategoriSasaran !== 'strategis') newItem.parentId = selectedParentId;
-          if (kategoriSasaran !== 'kegiatan') {
-            newItem.indikator = formSasaran.indikator; 
-            newItem.target = formSasaran.target; 
-            newItem.satuan = formSasaran.satuan;
+            updated[kategoriSasaran] = [...(updated[kategoriSasaran] || []), newItem];
+            showAlert('Berhasil', 'Master sasaran berhasil ditambahkan!', 'success');
           }
-          updated[kategoriSasaran] = [...(updated[kategoriSasaran] || []), newItem];
-          showAlert('Berhasil', 'Master sasaran berhasil ditambahkan!', 'success');
-        }
 
-        try { if (db) await setDoc(getDocRef('settings', 'masterSasaran'), updated); } catch(e) {}
-        setMasterSasaran(updated);
-        setFormSasaran({ nama: '', indikator: '', target: '', satuan: '' });
-        setEditSasaranId(null);
+          try { if (db) await setDoc(getDocRef('settings', 'masterSasaran'), updated); } catch(e) {}
+          setMasterSasaran(updated);
+          setFormSasaran({ nama: '', indikator: '', target: '', satuan: '' });
+          setEditSasaranId(null);
+        });
       }
     };
 
@@ -795,27 +796,27 @@ export default function App() {
       const kgtObj = masterSasaran.kegiatan.find(k => k.id === selectedKegiatan);
 
       if (stratObj && progObj && kgtObj) {
-        const newId = editTujuanId || `TSJ-${Date.now()}`;
-        const newEntry = { id: newId, unit: currentUser.nama, tahun: currentUser.tahun, strategis: stratObj.nama, program: progObj.nama, kegiatan: kgtObj.nama, indikator: indikatorKgt, target: targetKgt };
-        try { if (db) await setDoc(getDocRef('tujuan', newId), newEntry); } catch(e) {}
-        
-        setTujuanList(prev => {
-          const exists = prev.some(t => t.id === newId);
-          if (exists) return prev.map(t => t.id === newId ? newEntry : t);
-          return [newEntry, ...prev];
-        });
+        showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan perubahan data penetapan tujuan ini?', async () => {
+          const newId = editTujuanId || `TSJ-${Date.now()}`;
+          const newEntry = { id: newId, unit: currentUser.nama, tahun: currentUser.tahun, strategis: stratObj.nama, program: progObj.nama, kegiatan: kgtObj.nama, indikator: indikatorKgt, target: targetKgt };
+          try { if (db) await setDoc(getDocRef('tujuan', newId), newEntry); } catch(e) {}
+          
+          setTujuanList(prev => {
+            const exists = prev.some(t => t.id === newId);
+            if (exists) return prev.map(t => t.id === newId ? newEntry : t);
+            return [newEntry, ...prev];
+          });
 
-        setSelectedStrategis(''); setSelectedProgram(''); setSelectedKegiatan(''); setIndikatorKgt(''); setTargetKgt(''); setEditTujuanId(null);
-        showAlert('Berhasil', 'Data penetapan tujuan berhasil disimpan!', 'success');
+          setSelectedStrategis(''); setSelectedProgram(''); setSelectedKegiatan(''); setIndikatorKgt(''); setTargetKgt(''); setEditTujuanId(null);
+          showAlert('Berhasil', 'Data penetapan tujuan berhasil disimpan!', 'success');
+        });
       }
     };
     
     const handleEditTujuan = (item) => {
-      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin mengubah data penetapan tujuan ini?', () => {
-        setEditTujuanId(item.id);
-        setIndikatorKgt(item.indikator);
-        setTargetKgt(item.target);
-      });
+      setEditTujuanId(item.id);
+      setIndikatorKgt(item.indikator);
+      setTargetKgt(item.target);
     };
 
     const handleDeleteTujuan = async (id) => { 
@@ -905,60 +906,60 @@ export default function App() {
 
     const handleSaveRisk = async (e) => {
       e.preventDefault();
-      const newId = editRiskId || `RSK-${Date.now()}`;
-      const existing = risks.find(r => r.id === newId);
-      const newRisk = { 
-        id: newId, 
-        unit: currentUser.nama, 
-        tahun: currentUser.tahun, 
-        ...formRisk, 
-        kemungkinan: existing ? existing.kemungkinan : 0, 
-        keparahan: existing ? existing.keparahan : 0, 
-        skor: existing ? existing.skor : 0, 
-        status: existing ? existing.status : "Belum Dianalisis", 
-        levelRisiko: existing ? existing.levelRisiko : "Belum Dianalisis", 
-        keputusanMitigasi: existing ? existing.keputusanMitigasi : "-", 
-        rtp: existing ? existing.rtp : "", 
-        prosesRtp: existing ? existing.prosesRtp : "", 
-        linkEviden: existing ? existing.linkEviden : "", 
-        penanggungJawab: existing ? existing.penanggungJawab : "", 
-        targetWaktu: existing ? existing.targetWaktu : "", 
-        komunikasi: existing ? existing.komunikasi : "", 
-        tahap: existing ? existing.tahap : "identifikasi" 
-      };
-      try { if (db) await setDoc(getDocRef('risks', newId), newRisk); } catch(e) {}
-      
-      setRisks(prev => {
-        const exists = prev.some(r => r.id === newId);
-        if (exists) return prev.map(r => r.id === newId ? newRisk : r);
-        return [newRisk, ...prev];
-      });
+      showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan perubahan data identifikasi risiko ini?', async () => {
+        const newId = editRiskId || `RSK-${Date.now()}`;
+        const existing = risks.find(r => r.id === newId);
+        const newRisk = { 
+          id: newId, 
+          unit: currentUser.nama, 
+          tahun: currentUser.tahun, 
+          ...formRisk, 
+          kemungkinan: existing ? existing.kemungkinan : 0, 
+          keparahan: existing ? existing.keparahan : 0, 
+          skor: existing ? existing.skor : 0, 
+          status: existing ? existing.status : "Belum Dianalisis", 
+          levelRisiko: existing ? existing.levelRisiko : "Belum Dianalisis", 
+          keputusanMitigasi: existing ? existing.keputusanMitigasi : "-", 
+          rtp: existing ? existing.rtp : "", 
+          prosesRtp: existing ? existing.prosesRtp : "", 
+          linkEviden: existing ? existing.linkEviden : "", 
+          penanggungJawab: existing ? existing.penanggungJawab : "", 
+          targetWaktu: existing ? existing.targetWaktu : "", 
+          komunikasi: existing ? existing.komunikasi : "", 
+          tahap: existing ? existing.tahap : "identifikasi" 
+        };
+        try { if (db) await setDoc(getDocRef('risks', newId), newRisk); } catch(e) {}
+        
+        setRisks(prev => {
+          const exists = prev.some(r => r.id === newId);
+          if (exists) return prev.map(r => r.id === newId ? newRisk : r);
+          return [newRisk, ...prev];
+        });
 
-      setEditRiskId(null);
-      setFormRisk({ 
-        indikatorKgt: unitTujuanList[0]?.indikator || '', 
-        sasaranKgt: unitTujuanList[0]?.kegiatan || '', 
-        permasalahan: '', 
-        pernyataanRisiko: '', 
-        kategoriRisiko: 'Operasional', 
-        pemilikRisiko: '', 
-        penyebabUraian: '', 
-        penyebabSumber: '', 
-        sifatKontrol: 'Controllable', 
-        dampakUraian: '', 
-        dampakPihak: '', 
-        pengendalianRisiko: '', 
-        penilaianPengendalian: '', 
-        sisaRisiko: '' 
+        setEditRiskId(null);
+        setFormRisk({ 
+          indikatorKgt: unitTujuanList[0]?.indikator || '', 
+          sasaranKgt: unitTujuanList[0]?.kegiatan || '', 
+          permasalahan: '', 
+          pernyataanRisiko: '', 
+          kategoriRisiko: 'Operasional', 
+          pemilikRisiko: '', 
+          penyebabUraian: '', 
+          penyebabSumber: '', 
+          sifatKontrol: 'Controllable', 
+          dampakUraian: '', 
+          dampakPihak: '', 
+          pengendalianRisiko: '', 
+          penilaianPengendalian: '', 
+          sisaRisiko: '' 
+        });
+        showAlert('Berhasil', 'Data identifikasi risiko berhasil disimpan!', 'success');
       });
-      showAlert('Berhasil', 'Data identifikasi risiko berhasil disimpan!', 'success');
     };
 
     const handleEditRisk = (item) => {
-      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin mengubah data identifikasi risiko ini?', () => {
-        setEditRiskId(item.id);
-        setFormRisk({ ...item, indikatorKgt: item.indikatorKgt || '', sasaranKgt: item.sasaranKgt || '' });
-      });
+      setEditRiskId(item.id);
+      setFormRisk({ ...item, indikatorKgt: item.indikatorKgt || '', sasaranKgt: item.sasaranKgt || '' });
     };
 
     const handleDeleteRisk = async (id) => { 
@@ -1155,7 +1156,7 @@ export default function App() {
 
     const handleFieldChange = (id, field, value) => { setLocalRisks(localRisks.map(r => r.id === id ? { ...r, [field]: value } : r)); };
     const handleSaveRTP = (id) => { 
-      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin memperbarui RTP ini?', async () => {
+      showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin memperbarui RTP ini?', async () => {
         const risk = localRisks.find(r => r.id === id); 
         const updated = { ...risk, tahap: 'selesai' };
         try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
@@ -1242,7 +1243,7 @@ export default function App() {
     const handleFieldChange = (id, field, value) => { setLocalRisks(localRisks.map(r => r.id === id ? { ...r, [field]: value } : r)); };
     
     const handleSavePemantauan = (id) => { 
-      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin menyimpan progres pemantauan ini?', async () => {
+      showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan progres pemantauan ini?', async () => {
         const risk = localRisks.find(r => r.id === id); 
         try { if (db) await setDoc(getDocRef('risks', id), risk); } catch(e) {}
         setRisks(prev => prev.map(r => r.id === id ? risk : r));
@@ -1311,27 +1312,27 @@ export default function App() {
 
     const handleSaveKejadian = async (e) => {
       e.preventDefault();
-      const riskObj = unitRisks.find(r => r.id === formKejadian.riskId);
-      const newId = editKejadianId || `KJG-${Date.now()}`;
-      const newEntry = { id: newId, unit: currentUser.nama, tahun: currentUser.tahun, risiko: riskObj?.pernyataanRisiko || '-', ...formKejadian };
-      try { if (db) await setDoc(getDocRef('kejadian', newId), newEntry); } catch(e) {}
-      
-      setKejadianList(prev => {
-        const exists = prev.some(k => k.id === newId);
-        if (exists) return prev.map(k => k.id === newId ? newEntry : k);
-        return [newEntry, ...prev];
-      });
+      showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan pencatatan keterjadian risiko ini?', async () => {
+        const riskObj = unitRisks.find(r => r.id === formKejadian.riskId);
+        const newId = editKejadianId || `KJG-${Date.now()}`;
+        const newEntry = { id: newId, unit: currentUser.nama, tahun: currentUser.tahun, risiko: riskObj?.pernyataanRisiko || '-', ...formKejadian };
+        try { if (db) await setDoc(getDocRef('kejadian', newId), newEntry); } catch(e) {}
+        
+        setKejadianList(prev => {
+          const exists = prev.some(k => k.id === newId);
+          if (exists) return prev.map(k => k.id === newId ? newEntry : k);
+          return [newEntry, ...prev];
+        });
 
-      setEditKejadianId(null);
-      setFormKejadian({ riskId: unitRisks[0]?.id || '', tanggal: '', kronologi: '', penyebab: '', dampakRiil: '' });
-      showAlert('Berhasil', 'Pencatatan keterjadian berhasil disimpan!', 'success');
+        setEditKejadianId(null);
+        setFormKejadian({ riskId: unitRisks[0]?.id || '', tanggal: '', kronologi: '', penyebab: '', dampakRiil: '' });
+        showAlert('Berhasil', 'Pencatatan keterjadian berhasil disimpan!', 'success');
+      });
     };
 
     const handleEditKejadian = (item) => {
-      showConfirm('Konfirmasi Ubah', 'Apakah Anda yakin ingin mengubah pencatatan keterjadian risiko ini?', () => {
-        setEditKejadianId(item.id);
-        setFormKejadian(item);
-      });
+      setEditKejadianId(item.id);
+      setFormKejadian(item);
     };
 
     const handleDeleteKejadian = async (id) => { 
