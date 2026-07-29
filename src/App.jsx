@@ -1165,25 +1165,37 @@ export default function App() {
 
   const PenangananRisiko = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && r.keputusanMitigasi === "Dimitigasi");
-    const [localRisks, setLocalRisks] = useState([]);
-    useEffect(() => { setLocalRisks(unitRisks); }, [risks]);
+    const [editingRtpId, setEditingRtpId] = useState(null);
+    const [editForm, setEditForm] = useState({ rtp: '', penanggungJawab: '', targetWaktu: '', komunikasi: '' });
 
-    const handleFieldChange = (id, field, value) => { setLocalRisks(localRisks.map(r => r.id === id ? { ...r, [field]: value } : r)); };
+    const handleStartEdit = (risk) => {
+      setEditingRtpId(risk.id);
+      setEditForm({
+        rtp: risk.rtp || '',
+        penanggungJawab: risk.penanggungJawab || '',
+        targetWaktu: risk.targetWaktu || '',
+        komunikasi: risk.komunikasi || ''
+      });
+    };
+
     const handleSaveRTP = (id) => { 
       showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin memperbarui RTP ini?', async () => {
-        const risk = localRisks.find(r => r.id === id); 
-        const updated = { ...risk, tahap: 'selesai' };
+        const risk = risks.find(r => r.id === id); 
+        const updated = { ...risk, ...editForm, tahap: 'selesai' };
         try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
         setRisks(prev => prev.map(r => r.id === id ? updated : r));
+        setEditingRtpId(null);
         showAlert('Berhasil', 'RTP berhasil diperbarui!', 'success'); 
       });
     };
+
     const handleDeleteRTP = (id) => {
       showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin mengosongkan Rencana Tindak Pengendalian ini?', async () => {
         const risk = risks.find(r => r.id === id);
         const updated = { ...risk, rtp: '', penanggungJawab: '', targetWaktu: '', komunikasi: '' };
         try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
         setRisks(prev => prev.map(r => r.id === id ? updated : r));
+        if (editingRtpId === id) setEditingRtpId(null);
         showAlert('Berhasil', 'RTP berhasil dikosongkan.', 'success');
       });
     };
@@ -1191,25 +1203,10 @@ export default function App() {
     return (
       <div className="max-w-6xl space-y-8">
         <div><h2 className="text-2xl font-bold text-slate-800">4. Penanganan Risiko</h2></div>
-        {localRisks.map((risk) => (
-          <div key={risk.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h3 className="font-bold text-slate-900">{risk.pernyataanRisiko} <span className="text-xs text-rose-500 font-semibold">({risk.skor})</span></h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="block text-xs font-semibold mb-1">RTP</label><textarea value={risk.rtp || ''} onChange={(e) => handleFieldChange(risk.id, 'rtp', e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50" /></div>
-              <div><label className="block text-xs font-semibold mb-1">Penanggung Jawab</label><input value={risk.penanggungJawab || ''} onChange={(e) => handleFieldChange(risk.id, 'penanggungJawab', e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50" /></div>
-              <div><label className="block text-xs font-semibold mb-1">Target Waktu</label><input value={risk.targetWaktu || ''} onChange={(e) => handleFieldChange(risk.id, 'targetWaktu', e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50" /></div>
-              <div><label className="block text-xs font-semibold mb-1">Komunikasi</label><input value={risk.komunikasi || ''} onChange={(e) => handleFieldChange(risk.id, 'komunikasi', e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50" /></div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => handleDeleteRTP(risk.id)} className="bg-rose-50 text-rose-600 px-4 py-2.5 rounded-xl text-sm flex gap-1 items-center font-medium cursor-pointer"><Trash2 size={16} /> Hapus RTP</button>
-              <button type="button" onClick={() => handleSaveRTP(risk.id)} className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm flex gap-2 items-center font-medium shadow-sm cursor-pointer"><Save size={16} /> Update RTP</button>
-            </div>
-          </div>
-        ))}
-        
-        {localRisks.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-8">
-            <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Tabel Dinamis Rencana Tindak Pengendalian (RTP)</h3></div>
+
+        {unitRisks.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Tabel Rencana Tindak Pengendalian (RTP)</h3></div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse border border-slate-200 min-w-[1300px]">
                 <thead>
@@ -1221,11 +1218,11 @@ export default function App() {
                     <th className="border border-slate-200 p-3 w-40">Penanggung Jawab</th>
                     <th className="border border-slate-200 p-3 w-32 text-center">Target Waktu</th>
                     <th className="border border-slate-200 p-3 w-40">Komunikasi</th>
-                    <th className="border border-slate-200 p-3 text-center w-24">Aksi</th>
+                    <th className="border border-slate-200 p-3 text-center w-28">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-xs">
-                  {localRisks.map((item) => (
+                  {unitRisks.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-50">
                       <td className="border border-slate-200 p-3 font-bold text-center">{item.id}</td>
                       <td className="border border-slate-200 p-3 font-semibold text-slate-900">{item.pernyataanRisiko}</td>
@@ -1237,12 +1234,34 @@ export default function App() {
                       <td className="border border-slate-200 p-3 text-center">{item.targetWaktu || <span className="text-slate-400 italic">-</span>}</td>
                       <td className="border border-slate-200 p-3">{item.komunikasi || <span className="text-slate-400 italic">-</span>}</td>
                       <td className="border border-slate-200 p-3 text-center space-x-1">
-                        <button type="button" onClick={() => handleDeleteRTP(item.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer"><Trash2 size={14}/></button>
+                        <button type="button" onClick={() => handleStartEdit(item)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100" title="Edit"><Edit size={14}/></button>
+                        <button type="button" onClick={() => handleDeleteRTP(item.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100" title="Hapus"><Trash2 size={14}/></button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {editingRtpId && (
+          <div className="bg-white p-6 rounded-2xl border border-teal-200 shadow-md space-y-4 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <Edit size={16} className="text-teal-600" /> Form Edit RTP: {risks.find(r => r.id === editingRtpId)?.pernyataanRisiko}
+              </h3>
+              <button onClick={() => setEditingRtpId(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={18} /></button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label className="block text-xs font-semibold mb-1">RTP</label><textarea value={editForm.rtp} onChange={(e) => setEditForm({...editForm, rtp: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+              <div><label className="block text-xs font-semibold mb-1">Penanggung Jawab</label><input type="text" value={editForm.penanggungJawab} onChange={(e) => setEditForm({...editForm, penanggungJawab: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+              <div><label className="block text-xs font-semibold mb-1">Target Waktu</label><input type="text" value={editForm.targetWaktu} onChange={(e) => setEditForm({...editForm, targetWaktu: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+              <div><label className="block text-xs font-semibold mb-1">Komunikasi</label><input type="text" value={editForm.komunikasi} onChange={(e) => setEditForm({...editForm, komunikasi: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setEditingRtpId(null)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">Batal</button>
+              <button type="button" onClick={() => handleSaveRTP(editingRtpId)} className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium flex gap-2 items-center shadow-sm cursor-pointer"><Save size={16} /> Simpan Perubahan</button>
             </div>
           </div>
         )}
@@ -1252,15 +1271,24 @@ export default function App() {
 
   const PemantauanRisiko = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && r.keputusanMitigasi === "Dimitigasi");
-    const [localRisks, setLocalRisks] = useState([]);
-    useEffect(() => { setLocalRisks(unitRisks); }, [risks]);
-    const handleFieldChange = (id, field, value) => { setLocalRisks(localRisks.map(r => r.id === id ? { ...r, [field]: value } : r)); };
-    
+    const [editingPemantauanId, setEditingPemantauanId] = useState(null);
+    const [editForm, setEditForm] = useState({ prosesRtp: '', linkEviden: '' });
+
+    const handleStartEdit = (risk) => {
+      setEditingPemantauanId(risk.id);
+      setEditForm({
+        prosesRtp: risk.prosesRtp || '',
+        linkEviden: risk.linkEviden || ''
+      });
+    };
+
     const handleSavePemantauan = (id) => { 
       showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan progres pemantauan ini?', async () => {
-        const risk = localRisks.find(r => r.id === id); 
-        try { if (db) await setDoc(getDocRef('risks', id), risk); } catch(e) {}
-        setRisks(prev => prev.map(r => r.id === id ? risk : r));
+        const risk = risks.find(r => r.id === id); 
+        const updated = { ...risk, ...editForm };
+        try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
+        setRisks(prev => prev.map(r => r.id === id ? updated : r));
+        setEditingPemantauanId(null);
         showAlert('Berhasil', 'Progres berhasil disimpan!', 'success'); 
       });
     };
@@ -1271,6 +1299,7 @@ export default function App() {
         const updated = { ...risk, prosesRtp: '', linkEviden: '' };
         try { if (db) await setDoc(getDocRef('risks', id), updated); } catch(e) {}
         setRisks(prev => prev.map(r => r.id === id ? updated : r));
+        if (editingPemantauanId === id) setEditingPemantauanId(null);
         showAlert('Berhasil', 'Progres berhasil dikosongkan.', 'success');
       });
     };
@@ -1278,40 +1307,46 @@ export default function App() {
     return (
       <div className="max-w-6xl space-y-8">
         <div><h2 className="text-2xl font-bold text-slate-800">5. Pemantauan RTP & Eviden</h2></div>
-        {localRisks.map((risk) => (
-          <div key={risk.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <h3 className="font-bold text-slate-900">{risk.pernyataanRisiko}</h3>
-            <p className="text-xs p-3 bg-teal-50 text-teal-900 rounded-xl border border-teal-100 font-medium">RTP: {risk.rtp}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="block text-xs font-semibold mb-1">Proses/Progres RTP</label><textarea rows="2" value={risk.prosesRtp || ''} onChange={(e) => handleFieldChange(risk.id, 'prosesRtp', e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50" /></div>
-              <div><label className="block text-xs font-semibold mb-1">Link Eviden</label><input type="url" value={risk.linkEviden || ''} onChange={(e) => handleFieldChange(risk.id, 'linkEviden', e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50" /></div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => handleDeletePemantauan(risk.id)} className="bg-rose-50 text-rose-600 px-4 py-2.5 rounded-xl text-sm flex gap-1 items-center font-medium cursor-pointer"><Trash2 size={16} /> Hapus Progres</button>
-              <button type="button" onClick={() => handleSavePemantauan(risk.id)} className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm flex gap-2 items-center font-medium shadow-sm cursor-pointer"><Save size={16} /> Simpan Progres</button>
-            </div>
-          </div>
-        ))}
 
-        {localRisks.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-8">
-            <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Pratinjau Tabel Pemantauan RTP</h3></div>
+        {unitRisks.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Tabel Pemantauan RTP</h3></div>
             <table className="w-full text-left border-collapse border border-slate-200 text-xs">
-              <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">ID</th><th className="p-3 border border-slate-200">Pernyataan Risiko</th><th className="p-3 border border-slate-200">Progres RTP</th><th className="p-3 border border-slate-200">Link Eviden</th><th className="p-3 border border-slate-200 text-center w-24">Aksi</th></tr></thead>
+              <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">ID</th><th className="p-3 border border-slate-200">Pernyataan Risiko</th><th className="p-3 border border-slate-200">Progres RTP</th><th className="p-3 border border-slate-200">Link Eviden</th><th className="p-3 border border-slate-200 text-center w-28">Aksi</th></tr></thead>
               <tbody className="divide-y divide-slate-100">
-                {localRisks.map(r => (
+                {unitRisks.map(r => (
                   <tr key={r.id} className="hover:bg-slate-50">
                     <td className="p-3 border border-slate-200 font-bold text-center">{r.id}</td>
                     <td className="p-3 border border-slate-200 font-semibold">{r.pernyataanRisiko}</td>
                     <td className="p-3 border border-slate-200">{r.prosesRtp || '-'}</td>
                     <td className="p-3 border border-slate-200 text-teal-600 truncate max-w-xs">{r.linkEviden || '-'}</td>
                     <td className="p-3 border border-slate-200 text-center space-x-1">
-                      <button type="button" onClick={() => handleDeletePemantauan(r.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer"><Trash2 size={14}/></button>
+                      <button type="button" onClick={() => handleStartEdit(r)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100" title="Edit"><Edit size={14}/></button>
+                      <button type="button" onClick={() => handleDeletePemantauan(r.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100" title="Hapus"><Trash2 size={14}/></button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {editingPemantauanId && (
+          <div className="bg-white p-6 rounded-2xl border border-teal-200 shadow-md space-y-4 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <Edit size={16} className="text-teal-600" /> Form Edit Progres Pemantauan: {risks.find(r => r.id === editingPemantauanId)?.pernyataanRisiko}
+              </h3>
+              <button onClick={() => setEditingPemantauanId(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={18} /></button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label className="block text-xs font-semibold mb-1">Proses/Progres RTP</label><textarea rows="2" value={editForm.prosesRtp} onChange={(e) => setEditForm({...editForm, prosesRtp: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+              <div><label className="block text-xs font-semibold mb-1">Link Eviden</label><input type="url" value={editForm.linkEviden} onChange={(e) => setEditForm({...editForm, linkEviden: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setEditingPemantauanId(null)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">Batal</button>
+              <button type="button" onClick={() => handleSavePemantauan(editingPemantauanId)} className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium flex gap-2 items-center shadow-sm cursor-pointer"><Save size={16} /> Simpan Progres</button>
+            </div>
           </div>
         )}
       </div>
@@ -1323,6 +1358,19 @@ export default function App() {
     const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
     const [editKejadianId, setEditKejadianId] = useState(null);
     const [formKejadian, setFormKejadian] = useState({ riskId: unitRisks[0]?.id || '', tanggal: '', kronologi: '', penyebab: '', dampakRiil: '' });
+    const [isFormOpen, setIsFormOpen] = useState(false);
+
+    const handleOpenEdit = (item) => {
+      setEditKejadianId(item.id);
+      setFormKejadian({ riskId: item.riskId || unitRisks[0]?.id || '', tanggal: item.tanggal || '', kronologi: item.kronologi || '', penyebab: item.penyebab || '', dampakRiil: item.dampakRiil || '' });
+      setIsFormOpen(true);
+    };
+
+    const handleOpenAdd = () => {
+      setEditKejadianId(null);
+      setFormKejadian({ riskId: unitRisks[0]?.id || '', tanggal: '', kronologi: '', penyebab: '', dampakRiil: '' });
+      setIsFormOpen(true);
+    };
 
     const handleSaveKejadian = async (e) => {
       e.preventDefault();
@@ -1338,44 +1386,35 @@ export default function App() {
           return [newEntry, ...prev];
         });
 
+        setIsFormOpen(false);
         setEditKejadianId(null);
-        setFormKejadian({ riskId: unitRisks[0]?.id || '', tanggal: '', kronologi: '', penyebab: '', dampakRiil: '' });
         showAlert('Berhasil', 'Pencatatan keterjadian berhasil disimpan!', 'success');
       });
-    };
-
-    const handleEditKejadian = (item) => {
-      setEditKejadianId(item.id);
-      setFormKejadian(item);
     };
 
     const handleDeleteKejadian = async (id) => { 
       showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin menghapus pencatatan keterjadian risiko ini?', async () => {
         try { if (db) await deleteDoc(getDocRef('kejadian', id)); } catch(e) {}
         setKejadianList(prev => prev.filter(k => k.id !== id));
+        if (editKejadianId === id) setIsFormOpen(false);
         showAlert('Berhasil', 'Pencatatan keterjadian berhasil dihapus.', 'success');
       });
     };
 
     return (
       <div className="max-w-6xl space-y-6">
-        <div><h2 className="text-2xl font-bold text-slate-800">6. Pencatatan Keterjadian Risiko</h2></div>
-        <form onSubmit={handleSaveKejadian} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label className="block text-xs font-semibold mb-1">Pilih Risiko</label><select required value={formKejadian.riskId} onChange={(e) => setFormKejadian({...formKejadian, riskId: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none">{unitRisks.map(r => <option key={r.id} value={r.id}>{r.id} - {r.pernyataanRisiko}</option>)}</select></div>
-            <div><label className="block text-xs font-semibold mb-1">Tanggal</label><input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl" /></div>
-            <div className="md:col-span-2"><label className="block text-xs font-semibold mb-1">Kronologi</label><textarea required rows="2" value={formKejadian.kronologi} onChange={(e) => setFormKejadian({...formKejadian, kronologi: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl" /></div>
-            <div><label className="block text-xs font-semibold mb-1">Penyebab</label><textarea required rows="2" value={formKejadian.penyebab} onChange={(e) => setFormKejadian({...formKejadian, penyebab: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl" /></div>
-            <div><label className="block text-xs font-semibold mb-1">Dampak Riil</label><textarea required rows="2" value={formKejadian.dampakRiil} onChange={(e) => setFormKejadian({...formKejadian, dampakRiil: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl" /></div>
-          </div>
-          <div className="flex justify-end gap-2">
-            {editKejadianId && <button type="button" onClick={() => setEditKejadianId(null)} className="bg-slate-100 px-4 py-2 rounded-xl text-sm cursor-pointer">Batal</button>}
-            <button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl text-sm flex gap-2 items-center font-medium shadow-sm cursor-pointer"><Save size={16} /> {editKejadianId ? 'Update Kejadian' : 'Rekam Kejadian'}</button>
-          </div>
-        </form>
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-slate-800">6. Pencatatan Keterjadian Risiko</h2>
+          {!isFormOpen && (
+            <button onClick={handleOpenAdd} className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm cursor-pointer">
+              <Plus size={16} /> Rekam Kejadian Baru
+            </button>
+          )}
+        </div>
+
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <table className="w-full text-left border-collapse border border-slate-200 text-xs">
-            <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">Tanggal</th><th className="p-3 border border-slate-200">Risiko</th><th className="p-3 border border-slate-200">Dampak</th><th className="p-3 border border-slate-200 text-center w-24">Aksi</th></tr></thead>
+            <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">Tanggal</th><th className="p-3 border border-slate-200">Risiko</th><th className="p-3 border border-slate-200">Dampak</th><th className="p-3 border border-slate-200 text-center w-28">Aksi</th></tr></thead>
             <tbody className="divide-y divide-slate-100">
               {unitKejadian.map(k => (
                 <tr key={k.id} className="hover:bg-slate-50">
@@ -1383,14 +1422,40 @@ export default function App() {
                   <td className="p-3 border border-slate-200 font-bold">{k.risiko}</td>
                   <td className="p-3 border border-slate-200 text-rose-700 font-medium">{k.dampakRiil}</td>
                   <td className="p-3 border border-slate-200 text-center space-x-1">
-                    <button type="button" onClick={() => handleEditKejadian(k)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer"><Edit size={14}/></button>
-                    <button type="button" onClick={() => handleDeleteKejadian(k.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer"><Trash2 size={14}/></button>
+                    <button type="button" onClick={() => handleOpenEdit(k)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100" title="Edit"><Edit size={14}/></button>
+                    <button type="button" onClick={() => handleDeleteKejadian(k.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100" title="Hapus"><Trash2 size={14}/></button>
                   </td>
                 </tr>
               ))}
+              {unitKejadian.length === 0 && (
+                <tr><td colSpan="4" className="p-6 text-center text-slate-400 italic">Belum ada pencatatan keterjadian risiko.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
+
+        {isFormOpen && (
+          <form onSubmit={handleSaveKejadian} className="bg-white p-6 rounded-2xl shadow-md border border-teal-200 space-y-4 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                {editKejadianId ? <Edit size={16} className="text-teal-600" /> : <PlusCircle size={16} className="text-teal-600" />}
+                {editKejadianId ? 'Edit Pencatatan Keterjadian' : 'Form Rekam Keterjadian Risiko'}
+              </h3>
+              <button type="button" onClick={() => setIsFormOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={18} /></button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label className="block text-xs font-semibold mb-1">Pilih Risiko</label><select required value={formKejadian.riskId} onChange={(e) => setFormKejadian({...formKejadian, riskId: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none focus:border-teal-500">{unitRisks.map(r => <option key={r.id} value={r.id}>{r.id} - {r.pernyataanRisiko}</option>)}</select></div>
+              <div><label className="block text-xs font-semibold mb-1">Tanggal</label><input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
+              <div className="md:col-span-2"><label className="block text-xs font-semibold mb-1">Kronologi</label><textarea required rows="2" value={formKejadian.kronologi} onChange={(e) => setFormKejadian({...formKejadian, kronologi: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
+              <div><label className="block text-xs font-semibold mb-1">Penyebab</label><textarea required rows="2" value={formKejadian.penyebab} onChange={(e) => setFormKejadian({...formKejadian, penyebab: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
+              <div><label className="block text-xs font-semibold mb-1">Dampak Riil</label><textarea required rows="2" value={formKejadian.dampakRiil} onChange={(e) => setFormKejadian({...formKejadian, dampakRiil: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setIsFormOpen(false)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">Batal</button>
+              <button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl text-sm flex gap-2 items-center font-medium shadow-sm cursor-pointer"><Save size={16} /> {editKejadianId ? 'Update Kejadian' : 'Simpan Kejadian'}</button>
+            </div>
+          </form>
+        )}
       </div>
     );
   };
@@ -1398,25 +1463,50 @@ export default function App() {
   const EfektivitasRTP = () => {
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && r.keputusanMitigasi === "Dimitigasi");
     const [evaluasiList, setEvaluasiList] = useState({});
-    const handleSelectEv = (id, field, val) => { setEvaluasiList({ ...evaluasiList, [id]: { kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3, ...(evaluasiList[id] || {}), [field]: val } }); };
+    const [editingEfektivitasId, setEditingEfektivitasId] = useState(null);
+    const [editForm, setEditForm] = useState({ kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3, kondisiSetelahMitigasi: '', langkahPerbaikan: '' });
 
-    const handleSaveEv = (risk) => {
+    const handleStartEdit = (item) => {
+      setEditingEfektivitasId(item.id);
+      setEditForm({
+        kDiharapkan: item.kDiharapkan || 3,
+        dDiharapkan: item.dDiharapkan || 3,
+        kActual: item.kActual || 3,
+        dActual: item.dActual || 3,
+        kondisiSetelahMitigasi: item.kondisiSetelahMitigasi || '',
+        langkahPerbaikan: item.langkahPerbaikan || ''
+      });
+    };
+
+    const handleSaveEv = (riskId, isExistingId = null) => {
       showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan penilaian efektifitas RTP ini?', async () => {
-        const ev = evaluasiList[risk.id] || { kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3 };
-        const srAwal = risk.skor || 0;
-        const srDiharapkan = calculateSkorRisiko(parseInt(ev.kDiharapkan), parseInt(ev.dDiharapkan));
-        const srActual = calculateSkorRisiko(parseInt(ev.kActual), parseInt(ev.dActual));
+        const targetId = isExistingId || `EFK-${riskId}`;
+        const riskObj = risks.find(r => r.id === riskId);
+        const srAwal = riskObj ? (riskObj.skor || 0) : 0;
+        const srDiharapkan = calculateSkorRisiko(parseInt(editForm.kDiharapkan), parseInt(editForm.dDiharapkan));
+        const srActual = calculateSkorRisiko(parseInt(editForm.kActual), parseInt(editForm.dActual));
         const deviasi = srDiharapkan - srActual;
-        const newId = `EFK-${risk.id}`;
-        const newEntry = { id: newId, riskId: risk.id, pernyataanRisiko: risk.pernyataanRisiko, srAwal, srDiharapkan, srActual, deviasi, ...ev };
-        try { if (db) await setDoc(getDocRef('efektivitas', newId), newEntry); } catch(e) {}
+        
+        const newEntry = { 
+          id: targetId, 
+          riskId: riskId, 
+          pernyataanRisiko: riskObj ? riskObj.pernyataanRisiko : '-', 
+          srAwal, 
+          srDiharapkan, 
+          srActual, 
+          deviasi, 
+          ...editForm 
+        };
+
+        try { if (db) await setDoc(getDocRef('efektivitas', targetId), newEntry); } catch(e) {}
         
         setRiwayatEfektivitas(prev => {
-          const exists = prev.some(e => e.id === newId);
-          if (exists) return prev.map(e => e.id === newId ? newEntry : e);
+          const exists = prev.some(e => e.id === targetId);
+          if (exists) return prev.map(e => e.id === targetId ? newEntry : e);
           return [newEntry, ...prev];
         });
 
+        setEditingEfektivitasId(null);
         showAlert('Berhasil', 'Penilaian efektifitas disimpan!', 'success');
       });
     };
@@ -1425,6 +1515,7 @@ export default function App() {
       showConfirm('Konfirmasi Hapus', 'Apakah Anda yakin ingin menghapus penilaian efektifitas ini?', async () => {
         try { if (db) await deleteDoc(getDocRef('efektivitas', id)); } catch(e) {}
         setRiwayatEfektivitas(prev => prev.filter(e => e.id !== id));
+        if (editingEfektivitasId === id) setEditingEfektivitasId(null);
         showAlert('Berhasil', 'Penilaian efektifitas berhasil dihapus.', 'success');
       });
     };
@@ -1481,28 +1572,16 @@ export default function App() {
     return (
       <div className="max-w-6xl space-y-8">
         <div><h2 className="text-2xl font-bold text-slate-800">7. Efektifitas RTP (Tahun {currentUser?.tahun})</h2></div>
-        {unitRisks.map(risk => {
-          const ev = evaluasiList[risk.id] || { kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3 };
-          return (
-            <div key={risk.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <h3 className="font-bold text-slate-900">{risk.pernyataanRisiko} <span className="text-xs font-semibold text-slate-500">(Awal: {risk.skor})</span></h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <div><p className="text-xs font-bold mb-2 text-slate-700">Target (K / D)</p><select value={ev.kDiharapkan} onChange={(e) => handleSelectEv(risk.id, 'kDiharapkan', e.target.value)} className="p-2 border border-slate-200 rounded-lg mr-2 bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select><select value={ev.dDiharapkan} onChange={(e) => handleSelectEv(risk.id, 'dDiharapkan', e.target.value)} className="p-2 border border-slate-200 rounded-lg bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select></div>
-                <div><p className="text-xs font-bold mb-2 text-slate-700">Actual (K / D)</p><select value={ev.kActual} onChange={(e) => handleSelectEv(risk.id, 'kActual', e.target.value)} className="p-2 border border-slate-200 rounded-lg mr-2 bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select><select value={ev.dActual} onChange={(e) => handleSelectEv(risk.id, 'dActual', e.target.value)} className="p-2 border border-slate-200 rounded-lg bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select></div>
-              </div>
-              <div><label className="block text-xs font-semibold mb-1">Kondisi Setelah Mitigasi</label><textarea rows="1" value={ev.kondisiSetelahMitigasi || ''} onChange={(e) => handleSelectEv(risk.id, 'kondisiSetelahMitigasi', e.target.value)} className="w-full p-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50" /></div>
-              <div><label className="block text-xs font-semibold mb-1">Langkah Perbaikan</label><textarea rows="1" value={ev.langkahPerbaikan || ''} onChange={(e) => handleSelectEv(risk.id, 'langkahPerbaikan', e.target.value)} className="w-full p-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50" /></div>
-              <div className="flex justify-end"><button type="button" onClick={() => handleSaveEv(risk)} className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm flex gap-2 items-center font-medium shadow-sm cursor-pointer"><Save size={16} /> Simpan Penilaian</button></div>
-            </div>
-          );
-        })}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-8">
+        
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Tabel Penilaian Efektifitas & Deviasi RTP</h3></div>
           <table className="w-full text-left border-collapse border border-slate-200 text-xs">
-            <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">Risk ID</th><th className="p-3 border border-slate-200 text-center">SR Awal</th><th className="p-3 border border-slate-200 text-center">Target</th><th className="p-3 border border-slate-200 text-center">Actual</th><th className="p-3 border border-slate-200 text-center">Deviasi</th><th className="p-3 border border-slate-200 text-center w-36">Aksi</th></tr></thead>
+            <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">Risk ID</th><th className="p-3 border border-slate-200">Pernyataan Risiko</th><th className="p-3 border border-slate-200 text-center">SR Awal</th><th className="p-3 border border-slate-200 text-center">Target</th><th className="p-3 border border-slate-200 text-center">Actual</th><th className="p-3 border border-slate-200 text-center">Deviasi</th><th className="p-3 border border-slate-200 text-center w-36">Aksi</th></tr></thead>
             <tbody className="divide-y divide-slate-100">
               {unitEfektivitas.map(e => (
                 <tr key={e.id} className="hover:bg-slate-50">
                   <td className="p-3 border border-slate-200 font-bold text-center">{e.riskId}</td>
+                  <td className="p-3 border border-slate-200 font-semibold">{e.pernyataanRisiko}</td>
                   <td className="p-3 border border-slate-200 text-center">{e.srAwal}</td>
                   <td className="p-3 border border-slate-200 text-center text-teal-700 font-semibold">{e.srDiharapkan}</td>
                   <td className="p-3 border border-slate-200 text-center text-cyan-700 font-semibold">{e.srActual}</td>
@@ -1519,14 +1598,75 @@ export default function App() {
                           <Calendar size={12} /> Teruskan ({parseInt(currentUser.tahun) + 1})
                         </button>
                       )}
-                      <button type="button" onClick={() => handleDeleteEv(e.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
+                      <button type="button" onClick={() => handleStartEdit(e)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100" title="Edit"><Edit size={14}/></button>
+                      <button type="button" onClick={() => handleDeleteEv(e.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100" title="Hapus"><Trash2 size={14}/></button>
                     </div>
                   </td>
                 </tr>
               ))}
+              {unitEfektivitas.length === 0 && (
+                <tr><td colSpan="7" className="p-6 text-center text-slate-400 italic">Belum ada riwayat penilaian efektifitas RTP. Pilih risiko di bawah untuk menambah penilaian baru.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
+
+        {/* Daftar opsi untuk menambah penilaian baru atau form edit */}
+        {editingEfektivitasId ? (
+          <div className="bg-white p-6 rounded-2xl border border-teal-200 shadow-md space-y-4 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                <Edit size={16} className="text-teal-600" /> Form Edit Penilaian Efektifitas: {unitEfektivitas.find(e => e.id === editingEfektivitasId)?.pernyataanRisiko}
+              </h3>
+              <button onClick={() => setEditingEfektivitasId(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={18} /></button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div><p className="text-xs font-bold mb-2 text-slate-700">Target (K / D)</p><select value={editForm.kDiharapkan} onChange={(e) => setEditForm({...editForm, kDiharapkan: e.target.value})} className="p-2 border border-slate-200 rounded-lg mr-2 bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select><select value={editForm.dDiharapkan} onChange={(e) => setEditForm({...editForm, dDiharapkan: e.target.value})} className="p-2 border border-slate-200 rounded-lg bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select></div>
+              <div><p className="text-xs font-bold mb-2 text-slate-700">Actual (K / D)</p><select value={editForm.kActual} onChange={(e) => setEditForm({...editForm, kActual: e.target.value})} className="p-2 border border-slate-200 rounded-lg mr-2 bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select><select value={editForm.dActual} onChange={(e) => setEditForm({...editForm, dActual: e.target.value})} className="p-2 border border-slate-200 rounded-lg bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select></div>
+            </div>
+            <div><label className="block text-xs font-semibold mb-1">Kondisi Setelah Mitigasi</label><textarea rows="1" value={editForm.kondisiSetelahMitigasi} onChange={(e) => setEditForm({...editForm, kondisiSetelahMitigasi: e.target.value})} className="w-full p-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+            <div><label className="block text-xs font-semibold mb-1">Langkah Perbaikan</label><textarea rows="1" value={editForm.langkahPerbaikan} onChange={(e) => setEditForm({...editForm, langkahPerbaikan: e.target.value})} className="w-full p-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button type="button" onClick={() => setEditingEfektivitasId(null)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">Batal</button>
+              <button type="button" onClick={() => {
+                const item = unitEfektivitas.find(e => e.id === editingEfektivitasId);
+                if (item) handleSaveEv(item.riskId, item.id);
+              }} className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium flex gap-2 items-center shadow-sm cursor-pointer"><Save size={16} /> Update Penilaian</button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 pt-4 border-t border-slate-200">
+            <h3 className="font-bold text-slate-800 text-sm">Tambah Penilaian Efektifitas Risiko Baru</h3>
+            {unitRisks.map(risk => {
+              const alreadyExists = unitEfektivitas.some(e => e.riskId === risk.id);
+              if (alreadyExists) return null;
+              return (
+                <div key={risk.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                  <h4 className="font-bold text-slate-900">{risk.pernyataanRisiko} <span className="text-xs font-semibold text-slate-500">(Skor Awal: {risk.skor})</span></h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div><p className="text-xs font-bold mb-2 text-slate-700">Target (K / D)</p><select id={`kd_${risk.id}`} defaultValue="3" className="p-2 border border-slate-200 rounded-lg mr-2 bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select><select id={`dd_${risk.id}`} defaultValue="3" className="p-2 border border-slate-200 rounded-lg bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select></div>
+                    <div><p className="text-xs font-bold mb-2 text-slate-700">Actual (K / D)</p><select id={`ka_${risk.id}`} defaultValue="3" className="p-2 border border-slate-200 rounded-lg mr-2 bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select><select id={`da_${risk.id}`} defaultValue="3" className="p-2 border border-slate-200 rounded-lg bg-white">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select></div>
+                  </div>
+                  <div><label className="block text-xs font-semibold mb-1">Kondisi Setelah Mitigasi</label><textarea id={`kondisi_${risk.id}`} rows="1" placeholder="Masukkan kondisi..." className="w-full p-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+                  <div><label className="block text-xs font-semibold mb-1">Langkah Perbaikan</label><textarea id={`langkah_${risk.id}`} rows="1" placeholder="Masukkan langkah perbaikan..." className="w-full p-2.5 text-sm border border-slate-200 rounded-xl bg-slate-50 outline-none focus:border-teal-500" /></div>
+                  <div className="flex justify-end">
+                    <button type="button" onClick={() => {
+                      const kD = document.getElementById(`kd_${risk.id}`).value;
+                      const dD = document.getElementById(`dd_${risk.id}`).value;
+                      const kA = document.getElementById(`ka_${risk.id}`).value;
+                      const dA = document.getElementById(`da_${risk.id}`).value;
+                      const kondisi = document.getElementById(`kondisi_${risk.id}`).value;
+                      const langkah = document.getElementById(`langkah_${risk.id}`).value;
+                      
+                      setEditForm({ kDiharapkan: kD, dDiharapkan: dD, kActual: kA, dActual: dA, kondisiSetelahMitigasi: kondisi, langkahPerbaikan: langkah });
+                      setTimeout(() => handleSaveEv(risk.id), 50);
+                    }} className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl text-sm flex gap-2 items-center font-medium shadow-sm cursor-pointer"><Save size={16} /> Simpan Penilaian</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   };
