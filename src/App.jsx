@@ -19,6 +19,7 @@ const firebaseConfig = {
   messagingSenderId: "324662251360",
   appId: "1:324662251360:web:b0f7b4180fcd5530a0d805"
 };
+
 let app, auth, db;
 try {
   app = initializeApp(firebaseConfig);
@@ -283,16 +284,23 @@ export default function App() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase mb-1.5 flex items-center gap-1.5"><Lock size={14} className="text-teal-600" /> Kata Sandi Akses</label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-700 uppercase flex items-center gap-1.5"><Lock size={14} className="text-teal-600" /> Kata Sandi Akses</label>
+                    <button 
+                      type="button" 
+                      onClick={() => showAlert('Informasi Reset Password', 'Hubungi Admin untuk Reset Password', 'info')}
+                      className="text-xs text-teal-600 hover:text-teal-800 font-medium cursor-pointer underline"
+                    >
+                      Lupa password?
+                    </button>
+                  </div>
                   <input required type="password" value={unitPassword} onChange={(e) => setUnitPassword(e.target.value)} placeholder="Masukkan sandi..." className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-slate-50 focus:border-teal-500" />
-                  <p className="text-[11px] text-slate-400 mt-1 italic">*Default sandi unit: bpi2026</p>
                 </div>
               </>
             ) : (
               <div>
                 <label className="block text-xs font-semibold text-slate-700 uppercase mb-1.5 flex items-center gap-1.5"><Shield size={14} className="text-teal-600" /> Sandi Admin</label>
                 <input required type="password" value={inputAdminPass} onChange={(e) => setInputAdminPass(e.target.value)} placeholder="Masukkan sandi admin..." className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-slate-50 focus:border-teal-500" />
-                <p className="text-[11px] text-slate-400 mt-1 italic">*Default sandi admin: adminbpi2026</p>
               </div>
             )}
             <button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white p-3.5 rounded-xl font-medium text-sm shadow-md flex items-center justify-center gap-2 mt-4 cursor-pointer transition-all">
