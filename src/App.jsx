@@ -7,7 +7,7 @@ import {
   Save, Check, LogOut, Building2, Lock, UserCheck, FileText, Shield, Plus, 
   Trash2, Edit, Users, Compass, Layers, Calendar, List, Printer, Download, 
   Loader2, AlertOctagon, CheckCircle2, Link as LinkIcon, LayoutDashboard,
-  FileDown, KeyRound, AlertTriangle, Info, X
+  FileDown, KeyRound, AlertTriangle, Info, X, Menu
 } from 'lucide-react';
 
 // === FIREBASE SETUP (Ganti dengan kredensial asli Firebase Anda) ===
@@ -57,6 +57,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(() => loadLocal('simari_current_user', null)); 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [subReportTab, setSubReportTab] = useState('peta_risiko'); 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [unitKerjaList, setUnitKerjaList] = useState(initialUnitKerjaList);
   const [masterSasaran, setMasterSasaran] = useState(initialMasterSasaran);
@@ -784,6 +785,7 @@ export default function App() {
     const [selectedKegiatan, setSelectedKegiatan] = useState('');
     const [indikatorKgt, setIndikatorKgt] = useState('');
     const [targetKgt, setTargetKgt] = useState('');
+    const [satuanKgt, setSatuanKgt] = useState('');
     const [editTujuanId, setEditTujuanId] = useState(null);
     
     const uniqueStrategis = Array.from(new Set(masterSasaran.strategis.map(s => s.nama)))
@@ -806,7 +808,7 @@ export default function App() {
       if (stratObj && progObj && kgtObj) {
         showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan perubahan data penetapan tujuan ini?', async () => {
           const newId = editTujuanId || `TSJ-${Date.now()}`;
-          const newEntry = { id: newId, unit: currentUser.nama, tahun: currentUser.tahun, strategis: stratObj.nama, program: progObj.nama, kegiatan: kgtObj.nama, indikator: indikatorKgt, target: targetKgt };
+          const newEntry = { id: newId, unit: currentUser.nama, tahun: currentUser.tahun, strategis: stratObj.nama, program: progObj.nama, kegiatan: kgtObj.nama, indikator: indikatorKgt, target: targetKgt, satuan: satuanKgt };
           try { if (db) await setDoc(getDocRef('tujuan', newId), newEntry); } catch(e) {}
           
           setTujuanList(prev => {
@@ -815,7 +817,7 @@ export default function App() {
             return [newEntry, ...prev];
           });
 
-          setSelectedStrategis(''); setSelectedProgram(''); setSelectedKegiatan(''); setIndikatorKgt(''); setTargetKgt(''); setEditTujuanId(null);
+          setSelectedStrategis(''); setSelectedProgram(''); setSelectedKegiatan(''); setIndikatorKgt(''); setTargetKgt(''); setSatuanKgt(''); setEditTujuanId(null);
           showAlert('Berhasil', 'Data penetapan tujuan berhasil disimpan!', 'success');
         });
       }
@@ -824,7 +826,8 @@ export default function App() {
     const handleEditTujuan = (item) => {
       setEditTujuanId(item.id);
       setIndikatorKgt(item.indikator);
-      setTargetKgt(item.target);
+      setTargetKgt(item.target || '');
+      setSatuanKgt(item.satuan || '');
     };
 
     const handleDeleteTujuan = async (id) => { 
@@ -853,22 +856,25 @@ export default function App() {
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">3. Sasaran Kegiatan</label>
               <select required value={selectedKegiatan} onChange={(e) => setSelectedKegiatan(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white" disabled={!selectedProgram}><option value="">-- Pilih --</option>{uniqueKegiatan.map(k => <option key={k.id} value={k.id}>{k.nama}</option>)}</select>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
-              <div><label className="block text-xs font-semibold uppercase mb-1">Indikator IKU Unit</label><input required type="text" value={indikatorKgt} onChange={(e) => setIndikatorKgt(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl" /></div>
-              <div><label className="block text-xs font-semibold uppercase mb-1">Target & Satuan</label><input required type="text" value={targetKgt} onChange={(e) => setTargetKgt(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl" /></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+              <div><label className="block text-xs font-semibold uppercase mb-1">Indikator IKU Unit</label><input required type="text" value={indikatorKgt} onChange={(e) => setIndikatorKgt(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl" placeholder="Indikator..." /></div>
+              <div><label className="block text-xs font-semibold uppercase mb-1">Target</label><input required type="text" value={targetKgt} onChange={(e) => setTargetKgt(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl" placeholder="Target..." /></div>
+              <div><label className="block text-xs font-semibold uppercase mb-1">Satuan</label><input required type="text" value={satuanKgt} onChange={(e) => setSatuanKgt(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl" placeholder="Satuan..." /></div>
             </div>
           <div className="pt-2 flex justify-end gap-2">
-            {editTujuanId && <button type="button" onClick={() => setEditTujuanId(null)} className="bg-slate-100 px-4 py-2 rounded-xl text-sm cursor-pointer">Batal</button>}
+            {editTujuanId && <button type="button" onClick={() => { setEditTujuanId(null); setIndikatorKgt(''); setTargetKgt(''); setSatuanKgt(''); }} className="bg-slate-100 px-4 py-2 rounded-xl text-sm cursor-pointer">Batal</button>}
             <button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 shadow-sm cursor-pointer"><PlusCircle size={16} /> {editTujuanId ? 'Update Tujuan' : 'Simpan'}</button>
           </div>
         </form>
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <table className="w-full text-left border-collapse min-w-[900px]">
-            <thead><tr className="border-b border-slate-200 text-xs text-slate-600 bg-slate-50"><th className="p-3">ID</th><th className="p-3">Strategis</th><th className="p-3">Kegiatan & Indikator</th><th className="p-3 text-center">Target</th><th className="p-3 text-center">Aksi</th></tr></thead>
+            <thead><tr className="border-b border-slate-200 text-xs text-slate-600 bg-slate-50"><th className="p-3">ID</th><th className="p-3">Strategis</th><th className="p-3">Kegiatan & Indikator</th><th className="p-3 text-center">Target</th><th className="p-3 text-center">Satuan</th><th className="p-3 text-center">Aksi</th></tr></thead>
             <tbody className="divide-y divide-slate-100 text-xs">
               {unitTujuanList.map(item => (
                 <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="p-3 font-bold">{item.id}</td><td className="p-3">{item.strategis}</td><td className="p-3"><strong>{item.kegiatan}</strong><br/><span className="text-teal-700">IKU: {item.indikator}</span></td><td className="p-3 text-center"><span className="bg-teal-50 text-teal-700 px-2.5 py-1 rounded-lg font-bold border border-teal-200">{item.target}</span></td>
+                  <td className="p-3 font-bold">{item.id}</td><td className="p-3">{item.strategis}</td><td className="p-3"><strong>{item.kegiatan}</strong><br/><span className="text-teal-700">IKU: {item.indikator}</span></td>
+                  <td className="p-3 text-center"><span className="bg-teal-50 text-teal-700 px-2.5 py-1 rounded-lg font-bold border border-teal-200">{item.target}</span></td>
+                  <td className="p-3 text-center"><span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-bold">{item.satuan || '-'}</span></td>
                   <td className="p-3 text-center space-x-1">
                     <button type="button" onClick={() => handleEditTujuan(item)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer"><Edit size={14}/></button>
                     <button type="button" onClick={() => handleDeleteTujuan(item.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer"><Trash2 size={14}/></button>
@@ -1536,8 +1542,6 @@ export default function App() {
 
     const isSekretariat = currentUser && currentUser.nama && currentUser.nama.toLowerCase().includes('sekretariat');
     
-    // Format jabatan tanda tangan sesuai permintaan:
-    // Jika mengandung 'sekretariat', menjadi Sekretaris Badan [Sisa Unit Kerja setelah kata Sekretariat] atau Sekretaris Badan
     const getFooterJabatan = (nama) => {
       if (!nama) return '';
       if (nama.toLowerCase().includes('sekretariat')) {
@@ -1548,7 +1552,6 @@ export default function App() {
     };
 
     const footerJabatan = getFooterJabatan(currentUser?.nama);
-
     const [isPdfLoading, setIsPdfLoading] = useState(false);
 
     const handleDownloadExcel = () => {
@@ -2007,6 +2010,8 @@ export default function App() {
   return (
     <div className="flex h-screen bg-slate-100 font-sans text-slate-800">
       {modal.isOpen && <PopupModal />}
+      
+      {/* Sidebar Desktop */}
       <aside className="w-72 bg-gradient-to-b from-teal-900 to-emerald-950 text-white hidden md:flex flex-col shadow-xl z-10 print:hidden">
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-2"><ShieldAlert size={30} className="text-teal-400" /><h1 className="text-2xl font-bold tracking-wider">SI-MARI</h1></div>
@@ -2030,10 +2035,44 @@ export default function App() {
         </div>
       </aside>
 
+      {/* Sidebar Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden bg-slate-900/60 backdrop-blur-sm">
+          <div className="w-72 bg-gradient-to-b from-teal-900 to-emerald-950 text-white flex flex-col shadow-2xl h-full animate-in slide-in-from-left duration-200">
+            <div className="p-6 flex justify-between items-center">
+              <div>
+                <div className="flex items-center space-x-3 mb-1"><ShieldAlert size={26} className="text-teal-400" /><h1 className="text-xl font-bold tracking-wider">SI-MARI</h1></div>
+                <p className="text-[11px] text-teal-100/80 font-medium">{currentUser.nama}</p>
+              </div>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-teal-800 text-teal-200 rounded-xl cursor-pointer"><X size={18} /></button>
+            </div>
+            <div className="px-6 pb-2"><div className="inline-flex gap-1.5 bg-teal-500/20 text-teal-200 px-3 py-1 rounded-xl text-xs font-semibold border border-teal-500/30"><Calendar size={13} /> Tahun: {currentUser.tahun}</div></div>
+            <nav className="flex-1 px-3 mt-2 space-y-1 overflow-y-auto">
+              {currentUser.role === 'admin' ? (
+                <>
+                  <button type="button" onClick={() => { setActiveTab('admin_users'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium ${activeTab === 'admin_users' ? 'bg-teal-700/80 text-white font-semibold' : 'text-teal-100/70'}`}><Users size={18} /><span className="text-xs">User & Unit</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_sasaran'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium ${activeTab === 'admin_sasaran' ? 'bg-teal-700/80 text-white font-semibold' : 'text-teal-100/70'}`}><Compass size={18} /><span className="text-xs">Hierarki K/L</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_security'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium ${activeTab === 'admin_security' ? 'bg-teal-700/80 text-white font-semibold' : 'text-teal-100/70'}`}><KeyRound size={18} /><span className="text-xs">Keamanan Admin</span></button>
+                </>
+              ) : (
+                unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => { setActiveTab(menu.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium ${activeTab === menu.id ? 'bg-teal-700/80 text-white font-semibold' : 'text-teal-100/70'}`}><menu.icon size={18} /><span className="text-xs">{menu.label}</span></button>))
+              )}
+            </nav>
+            <div className="p-4 m-3 bg-teal-950/60 rounded-2xl border border-teal-800/50 flex justify-between items-center shadow-inner">
+              <div><p className="text-[10px] text-teal-400 uppercase tracking-wide font-semibold">Role:</p><p className="text-xs text-white font-bold uppercase">{currentUser.role}</p></div>
+              <button type="button" onClick={() => { setCurrentUser(null); localStorage.removeItem('simari_current_user'); }} className="p-2.5 bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 rounded-xl transition-colors cursor-pointer" title="Keluar"><LogOut size={16} /></button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="flex-1 flex flex-col overflow-hidden relative bg-slate-50">
-        <header className="bg-teal-900 text-white p-4 flex md:hidden justify-between shadow-md print:hidden">
+        <header className="bg-teal-900 text-white p-4 flex md:hidden justify-between items-center shadow-md print:hidden">
           <div className="flex items-center space-x-2"><ShieldAlert size={20} className="text-teal-400" /><h1 className="font-bold text-sm">SI-MARI BPI ({currentUser.tahun})</h1></div>
-          <button type="button" onClick={() => { setCurrentUser(null); localStorage.removeItem('simari_current_user'); }} className="p-1.5 bg-rose-500/20 text-rose-300 rounded-lg text-xs flex gap-1 items-center"><LogOut size={14} /> Keluar</button>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-teal-800 hover:bg-teal-700 text-teal-200 rounded-xl cursor-pointer" title="Menu Navigasi"><Menu size={18} /></button>
+            <button type="button" onClick={() => { setCurrentUser(null); localStorage.removeItem('simari_current_user'); }} className="p-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 rounded-xl text-xs flex gap-1 items-center cursor-pointer" title="Keluar"><LogOut size={16} /></button>
+          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">
