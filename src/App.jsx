@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { 
   ShieldAlert, Target, Search, BarChart2, ShieldCheck, Activity, PlusCircle, 
-  Save, Check, LogOut, Building2, Lock, UserCheck, FileText, Shield, Plus, 
-  Trash2, Edit, Users, Compass, Layers, Calendar, List, Printer, Download, 
-  Loader2, AlertOctagon, CheckCircle2, Link as LinkIcon, LayoutDashboard,
-  FileDown, KeyRound, AlertTriangle, Info, X, Menu
+  Save, LogOut, Building2, Lock, UserCheck, FileText, Shield, Plus, 
+  Trash2, Edit, Users, Compass, Layers, Calendar, List, 
+  Loader2, AlertOctagon, CheckCircle2, 
+  FileDown, KeyRound, AlertTriangle, Info, X, Menu, LayoutDashboard, Download
 } from 'lucide-react';
 
 // === FIREBASE SETUP (Ganti dengan kredensial asli Firebase Anda) ===
@@ -1414,7 +1414,7 @@ export default function App() {
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse border border-slate-200 text-xs min-w-[1000px]">
+            <table className="w-full text-left border-collapse border border-slate-200 text-xs min-w-[1100px]">
               <thead>
                 <tr className="bg-slate-50 uppercase text-slate-700">
                   <th className="p-3 border border-slate-200 text-center w-12">No</th>
@@ -1476,7 +1476,6 @@ export default function App() {
   };
 
   const EfektivitasRTP = () => {
-    // Ambil SEMUA risiko yang ada di pencatatan keterjadian untuk unit & tahun aktif (berdasarkan riskId atau kecocokan teks pernyataan risiko)
     const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
     const matchedRiskIds = Array.from(new Set(unitKejadian.map(k => k.riskId).filter(Boolean)));
     const matchedRiskTexts = Array.from(new Set(unitKejadian.map(k => k.risiko).filter(Boolean)));
@@ -1638,7 +1637,6 @@ export default function App() {
           </table>
         </div>
 
-        {/* Daftar opsi untuk menambah penilaian baru atau form edit */}
         {editingEfektivitasId ? (
           <div className="bg-white p-6 rounded-2xl border border-teal-200 shadow-md space-y-4 animate-in fade-in duration-200">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -1702,7 +1700,6 @@ export default function App() {
   };
 
   const ModulLaporan = () => {
-    const unitTujuanList = tujuanList.filter(t => t.unit === currentUser.nama && t.tahun === currentUser.tahun);
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
     const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
     const unitEfektivitas = riwayatEfektivitas.filter(e => {
@@ -1710,8 +1707,6 @@ export default function App() {
       return parentRisk && parentRisk.unit === currentUser.nama && parentRisk.tahun === currentUser.tahun;
     });
 
-    const isSekretariat = currentUser && currentUser.nama && currentUser.nama.toLowerCase().includes('sekretariat');
-    
     const getFooterJabatan = (nama) => {
       if (!nama) return '';
       if (nama.toLowerCase().includes('sekretariat')) {
