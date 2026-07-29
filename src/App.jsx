@@ -1461,8 +1461,11 @@ export default function App() {
   };
 
   const EfektivitasRTP = () => {
-    const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && r.keputusanMitigasi === "Dimitigasi");
-    const [evaluasiList, setEvaluasiList] = useState({});
+    // Ambil semua risiko yang sama dengan risiko yang ada di pencatatan keterjadian untuk unit & tahun aktif
+    const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
+    const matchedRiskIds = Array.from(new Set(unitKejadian.map(k => k.riskId).filter(Boolean)));
+    const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && matchedRiskIds.includes(r.id));
+
     const [editingEfektivitasId, setEditingEfektivitasId] = useState(null);
     const [editForm, setEditForm] = useState({ kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3, kondisiSetelahMitigasi: '', langkahPerbaikan: '' });
 
@@ -1567,14 +1570,14 @@ export default function App() {
       );
     };
 
-    const unitEfektivitas = riwayatEfektivitas.filter(e => { const r = risks.find(x => x.id === e.riskId); return r && r.unit === currentUser.nama && r.tahun === currentUser.tahun; });
+    const unitEfektivitas = riwayatEfektivitas.filter(e => { const r = risks.find(x => x.id === e.riskId); return r && r.unit === currentUser.nama && r.tahun === currentUser.tahun && matchedRiskIds.includes(r.id); });
 
     return (
       <div className="max-w-6xl space-y-8">
         <div><h2 className="text-2xl font-bold text-slate-800">7. Efektifitas RTP (Tahun {currentUser?.tahun})</h2></div>
         
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Tabel Penilaian Efektifitas & Deviasi RTP</h3></div>
+          <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Tabel Penilaian Efektifitas & Deviasi RTP (Risiko dari Pencatatan Keterjadian)</h3></div>
           <table className="w-full text-left border-collapse border border-slate-200 text-xs">
             <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">Risk ID</th><th className="p-3 border border-slate-200">Pernyataan Risiko</th><th className="p-3 border border-slate-200 text-center">SR Awal</th><th className="p-3 border border-slate-200 text-center">Target</th><th className="p-3 border border-slate-200 text-center">Actual</th><th className="p-3 border border-slate-200 text-center">Deviasi</th><th className="p-3 border border-slate-200 text-center w-36">Aksi</th></tr></thead>
             <tbody className="divide-y divide-slate-100">
@@ -1605,7 +1608,7 @@ export default function App() {
                 </tr>
               ))}
               {unitEfektivitas.length === 0 && (
-                <tr><td colSpan="7" className="p-6 text-center text-slate-400 italic">Belum ada riwayat penilaian efektifitas RTP. Pilih risiko di bawah untuk menambah penilaian baru.</td></tr>
+                <tr><td colSpan="7" className="p-6 text-center text-slate-400 italic">Belum ada riwayat penilaian efektifitas RTP untuk risiko dari pencatatan keterjadian. Pilih risiko di bawah untuk menambah penilaian baru.</td></tr>
               )}
             </tbody>
           </table>
@@ -1636,7 +1639,10 @@ export default function App() {
           </div>
         ) : (
           <div className="space-y-4 pt-4 border-t border-slate-200">
-            <h3 className="font-bold text-slate-800 text-sm">Tambah Penilaian Efektifitas Risiko Baru</h3>
+            <h3 className="font-bold text-slate-800 text-sm">Tambah Penilaian Efektifitas Risiko (Dari Pencatatan Keterjadian)</h3>
+            {unitRisks.length === 0 && (
+              <p className="text-xs text-slate-400 italic">Belum ada risiko yang tercatat di Pencatatan Keterjadian.</p>
+            )}
             {unitRisks.map(risk => {
               const alreadyExists = unitEfektivitas.some(e => e.riskId === risk.id);
               if (alreadyExists) return null;
