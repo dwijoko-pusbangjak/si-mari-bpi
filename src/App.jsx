@@ -1461,10 +1461,16 @@ export default function App() {
   };
 
   const EfektivitasRTP = () => {
-    // Ambil semua risiko yang sama dengan risiko yang ada di pencatatan keterjadian untuk unit & tahun aktif
+    // Ambil semua risiko yang sama dengan risiko yang ada di pencatatan keterjadian untuk unit & tahun aktif (berdasarkan riskId atau kecocokan teks pernyataan risiko)
     const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
     const matchedRiskIds = Array.from(new Set(unitKejadian.map(k => k.riskId).filter(Boolean)));
-    const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun && matchedRiskIds.includes(r.id));
+    const matchedRiskTexts = Array.from(new Set(unitKejadian.map(k => k.risiko).filter(Boolean)));
+
+    const unitRisks = risks.filter(r => 
+      r.unit === currentUser.nama && 
+      r.tahun === currentUser.tahun && 
+      (matchedRiskIds.includes(r.id) || matchedRiskTexts.includes(r.pernyataanRisiko))
+    );
 
     const [editingEfektivitasId, setEditingEfektivitasId] = useState(null);
     const [editForm, setEditForm] = useState({ kDiharapkan: 3, dDiharapkan: 3, kActual: 3, dActual: 3, kondisiSetelahMitigasi: '', langkahPerbaikan: '' });
@@ -1570,7 +1576,10 @@ export default function App() {
       );
     };
 
-    const unitEfektivitas = riwayatEfektivitas.filter(e => { const r = risks.find(x => x.id === e.riskId); return r && r.unit === currentUser.nama && r.tahun === currentUser.tahun && matchedRiskIds.includes(r.id); });
+    const unitEfektivitas = riwayatEfektivitas.filter(e => { 
+      const r = risks.find(x => x.id === e.riskId); 
+      return r && r.unit === currentUser.nama && r.tahun === currentUser.tahun && (matchedRiskIds.includes(e.riskId) || matchedRiskTexts.includes(r.pernyataanRisiko)); 
+    });
 
     return (
       <div className="max-w-6xl space-y-8">
