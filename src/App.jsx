@@ -1413,25 +1413,40 @@ export default function App() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <table className="w-full text-left border-collapse border border-slate-200 text-xs">
-            <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">Tanggal</th><th className="p-3 border border-slate-200">Risiko</th><th className="p-3 border border-slate-200">Dampak</th><th className="p-3 border border-slate-200 text-center w-28">Aksi</th></tr></thead>
-            <tbody className="divide-y divide-slate-100">
-              {unitKejadian.map(k => (
-                <tr key={k.id} className="hover:bg-slate-50">
-                  <td className="p-3 border border-slate-200">{k.tanggal}</td>
-                  <td className="p-3 border border-slate-200 font-bold">{k.risiko}</td>
-                  <td className="p-3 border border-slate-200 text-rose-700 font-medium">{k.dampakRiil}</td>
-                  <td className="p-3 border border-slate-200 text-center space-x-1">
-                    <button type="button" onClick={() => handleOpenEdit(k)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100" title="Edit"><Edit size={14}/></button>
-                    <button type="button" onClick={() => handleDeleteKejadian(k.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100" title="Hapus"><Trash2 size={14}/></button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse border border-slate-200 text-xs min-w-[1000px]">
+              <thead>
+                <tr className="bg-slate-50 uppercase text-slate-700">
+                  <th className="p-3 border border-slate-200 text-center w-12">No</th>
+                  <th className="p-3 border border-slate-200 w-28 text-center">Tanggal Kejadian</th>
+                  <th className="p-3 border border-slate-200">Pernyataan Risiko</th>
+                  <th className="p-3 border border-slate-200">Kronologi</th>
+                  <th className="p-3 border border-slate-200">Penyebab</th>
+                  <th className="p-3 border border-slate-200">Dampak</th>
+                  <th className="p-3 border border-slate-200 text-center w-28">Aksi</th>
                 </tr>
-              ))}
-              {unitKejadian.length === 0 && (
-                <tr><td colSpan="4" className="p-6 text-center text-slate-400 italic">Belum ada pencatatan keterjadian risiko.</td></tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {unitKejadian.map((k, index) => (
+                  <tr key={k.id} className="hover:bg-slate-50 align-top">
+                    <td className="p-3 border border-slate-200 text-center font-bold text-slate-500">{index + 1}</td>
+                    <td className="p-3 border border-slate-200 text-center font-semibold text-teal-800">{k.tanggal || '-'}</td>
+                    <td className="p-3 border border-slate-200 font-bold text-slate-900">{k.risiko}</td>
+                    <td className="p-3 border border-slate-200 text-slate-700">{k.kronologi || '-'}</td>
+                    <td className="p-3 border border-slate-200 text-slate-700">{k.penyebab || '-'}</td>
+                    <td className="p-3 border border-slate-200 text-rose-700 font-medium">{k.dampakRiil || '-'}</td>
+                    <td className="p-3 border border-slate-200 text-center space-x-1 whitespace-nowrap">
+                      <button type="button" onClick={() => handleOpenEdit(k)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100 inline-block" title="Edit"><Edit size={14}/></button>
+                      <button type="button" onClick={() => handleDeleteKejadian(k.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100 inline-block" title="Hapus"><Trash2 size={14}/></button>
+                    </td>
+                  </tr>
+                ))}
+                {unitKejadian.length === 0 && (
+                  <tr><td colSpan="7" className="p-6 text-center text-slate-400 italic">Belum ada pencatatan keterjadian risiko.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {isFormOpen && (
@@ -1445,7 +1460,7 @@ export default function App() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div><label className="block text-xs font-semibold mb-1">Pilih Risiko</label><select required value={formKejadian.riskId} onChange={(e) => setFormKejadian({...formKejadian, riskId: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none focus:border-teal-500">{unitRisks.map(r => <option key={r.id} value={r.id}>{r.id} - {r.pernyataanRisiko}</option>)}</select></div>
-              <div><label className="block text-xs font-semibold mb-1">Tanggal</label><input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
+              <div><label className="block text-xs font-semibold mb-1">Tanggal Kejadian</label><input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
               <div className="md:col-span-2"><label className="block text-xs font-semibold mb-1">Kronologi</label><textarea required rows="2" value={formKejadian.kronologi} onChange={(e) => setFormKejadian({...formKejadian, kronologi: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
               <div><label className="block text-xs font-semibold mb-1">Penyebab</label><textarea required rows="2" value={formKejadian.penyebab} onChange={(e) => setFormKejadian({...formKejadian, penyebab: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
               <div><label className="block text-xs font-semibold mb-1">Dampak Riil</label><textarea required rows="2" value={formKejadian.dampakRiil} onChange={(e) => setFormKejadian({...formKejadian, dampakRiil: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
@@ -1461,7 +1476,7 @@ export default function App() {
   };
 
   const EfektivitasRTP = () => {
-    // Ambil semua risiko yang sama dengan risiko yang ada di pencatatan keterjadian untuk unit & tahun aktif (berdasarkan riskId atau kecocokan teks pernyataan risiko)
+    // Ambil SEMUA risiko yang ada di pencatatan keterjadian untuk unit & tahun aktif (berdasarkan riskId atau kecocokan teks pernyataan risiko)
     const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
     const matchedRiskIds = Array.from(new Set(unitKejadian.map(k => k.riskId).filter(Boolean)));
     const matchedRiskTexts = Array.from(new Set(unitKejadian.map(k => k.risiko).filter(Boolean)));
@@ -1586,7 +1601,7 @@ export default function App() {
         <div><h2 className="text-2xl font-bold text-slate-800">7. Efektifitas RTP (Tahun {currentUser?.tahun})</h2></div>
         
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Tabel Penilaian Efektifitas & Deviasi RTP (Risiko dari Pencatatan Keterjadian)</h3></div>
+          <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Tabel Penilaian Efektifitas & Deviasi RTP (Semua Risiko dari Pencatatan Keterjadian)</h3></div>
           <table className="w-full text-left border-collapse border border-slate-200 text-xs">
             <thead><tr className="bg-slate-50 uppercase text-slate-700"><th className="p-3 border border-slate-200">Risk ID</th><th className="p-3 border border-slate-200">Pernyataan Risiko</th><th className="p-3 border border-slate-200 text-center">SR Awal</th><th className="p-3 border border-slate-200 text-center">Target</th><th className="p-3 border border-slate-200 text-center">Actual</th><th className="p-3 border border-slate-200 text-center">Deviasi</th><th className="p-3 border border-slate-200 text-center w-36">Aksi</th></tr></thead>
             <tbody className="divide-y divide-slate-100">
@@ -1810,17 +1825,17 @@ export default function App() {
                 <tr><td colspan="6" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
                 <tr><td colspan="6" style="border:none;"></td></tr>
                 <tr style="background:#f3f4f6;font-weight:bold;">
-                  <td class="head">No</td><td class="head">Tanggal</td><td class="head">Pernyataan Risiko</td><td class="head">Kronologi</td><td class="head">Penyebab</td><td class="head">Dampak Riil</td>
+                  <td class="head">No</td><td class="head">Tanggal Kejadian</td><td class="head">Pernyataan Risiko</td><td class="head">Kronologi</td><td class="head">Penyebab</td><td class="head">Dampak</td>
                 </tr>
           `;
           unitKejadian.forEach((k, idx) => {
             html += `<tr>
               <td class="data" align="center">${idx + 1}</td>
-              <td class="data" align="center">${k.tanggal}</td>
-              <td class="data" style="font-weight:bold;">${k.risiko}</td>
-              <td class="data">${k.kronologi}</td>
-              <td class="data">${k.penyebab}</td>
-              <td class="data">${k.dampakRiil}</td>
+              <td class="data" align="center">${k.tanggal || '-'}</td>
+              <td class="data" style="font-weight:bold;">${k.risiko || '-'}</td>
+              <td class="data">${k.kronologi || '-'}</td>
+              <td class="data">${k.penyebab || '-'}</td>
+              <td class="data">${k.dampakRiil || '-'}</td>
             </tr>`;
           });
           html += `
@@ -2074,22 +2089,22 @@ export default function App() {
                 <thead>
                   <tr className="bg-slate-100 text-slate-900 uppercase font-bold text-[11px]">
                     <th className="border border-slate-400 p-2 text-center w-12">No</th>
-                    <th className="border border-slate-400 p-2 text-center w-28">Tanggal</th>
+                    <th className="border border-slate-400 p-2 text-center w-28">Tanggal Kejadian</th>
                     <th className="border border-slate-400 p-2">Pernyataan Risiko</th>
                     <th className="border border-slate-400 p-2">Kronologi</th>
                     <th className="border border-slate-400 p-2">Penyebab</th>
-                    <th className="border border-slate-400 p-2">Dampak Riil</th>
+                    <th className="border border-slate-400 p-2">Dampak</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300">
                   {unitKejadian.map((k, index) => (
-                    <tr key={k.id} className="hover:bg-slate-50">
+                    <tr key={k.id} className="hover:bg-slate-50 align-top">
                       <td className="border border-slate-400 p-2 text-center font-bold">{index + 1}</td>
-                      <td className="border border-slate-400 p-2 text-center font-semibold text-teal-800">{k.tanggal}</td>
+                      <td className="border border-slate-400 p-2 text-center font-semibold text-teal-800">{k.tanggal || '-'}</td>
                       <td className="border border-slate-400 p-2 font-bold">{k.risiko}</td>
-                      <td className="border border-slate-400 p-2">{k.kronologi}</td>
-                      <td className="border border-slate-400 p-2">{k.penyebab}</td>
-                      <td className="border border-slate-400 p-2 text-rose-700 font-medium">{k.dampakRiil}</td>
+                      <td className="border border-slate-400 p-2">{k.kronologi || '-'}</td>
+                      <td className="border border-slate-400 p-2">{k.penyebab || '-'}</td>
+                      <td className="border border-slate-400 p-2 text-rose-700 font-medium">{k.dampakRiil || '-'}</td>
                     </tr>
                   ))}
                 </tbody>
