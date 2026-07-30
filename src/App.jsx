@@ -1530,6 +1530,27 @@ export default function App() {
         const srDiharapkan = calculateSkorRisiko(parseInt(editForm.kDiharapkan), parseInt(editForm.dDiharapkan));
         const srActual = calculateSkorRisiko(parseInt(editForm.kActual), parseInt(editForm.dActual));
         const deviasi = srDiharapkan - srActual;
+
+        // --- TAMBAHAN LOGIKA PENGHAPUSAN OTOMATIS (AUTO-CLEANUP) ---
+        // Jika nilai evaluasi direvisi menjadi EFEKTIF (Actual <= Target), 
+        // cek apakah risiko ini pernah diteruskan ke tahun berikutnya. Jika iya, hapus.
+        if (srActual <= srDiharapkan && riskObj) {
+          const nextYear = (parseInt(currentUser.tahun) + 1).toString();
+          const carriedOverRisk = risks.find(r => 
+            r.pernyataanRisiko === riskObj.pernyataanRisiko && 
+            r.tahun === nextYear && 
+            r.unit === riskObj.unit && 
+            r.status === "Lanjutan Tahun Sebelumnya"
+          );
+          
+          if (carriedOverRisk) {
+            try { 
+              if (db) await deleteDoc(getDocRef('risks', carriedOverRisk.id)); 
+              setRisks(prev => prev.filter(r => r.id !== carriedOverRisk.id));
+            } catch(e) { console.error("Gagal menghapus risiko lanjutan:", e); }
+          }
+        }
+        // ---------------------------------------------------------
         
         const newEntry = { 
           id: targetId, 
