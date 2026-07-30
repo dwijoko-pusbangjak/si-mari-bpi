@@ -259,7 +259,7 @@ export default function App() {
         <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-8 border border-slate-200">
           <div className="text-center mb-6">
             <div className="inline-flex p-4 bg-teal-50 text-teal-600 rounded-2xl mb-3 shadow-sm"><ShieldAlert size={40} /></div>
-            <h1 className="text-2xl font-bold text-slate-800">SI-MARI BPI</h1>
+            <h1 className="text-2xl font-bold text-slate-800">SI-MARI BPI <span className="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full ml-1 align-middle">v2.0</span></h1>
             <p className="text-xs text-slate-500 mt-1">Sistem Manajemen Risiko Unit Kerja & Admin<br/>Badan Pengembangan dan Informasi</p>
           </div>
 
@@ -1403,7 +1403,7 @@ export default function App() {
 
     return (
       <div className="max-w-6xl space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center border-b border-slate-200 pb-4">
           <h2 className="text-2xl font-bold text-slate-800">6. Pencatatan Keterjadian Risiko</h2>
           {!isFormOpen && (
             <button onClick={handleOpenAdd} className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 shadow-sm cursor-pointer">
@@ -1412,17 +1412,61 @@ export default function App() {
           )}
         </div>
 
+        {isFormOpen && (
+          <form onSubmit={handleSaveKejadian} className="bg-white p-6 rounded-2xl shadow-md border-2 border-teal-200 space-y-4 animate-in fade-in duration-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                {editKejadianId ? <Edit size={16} className="text-teal-600" /> : <PlusCircle size={16} className="text-teal-600" />}
+                {editKejadianId ? 'Edit Pencatatan Keterjadian' : 'Form Rekam Keterjadian Risiko'}
+              </h3>
+              <button type="button" onClick={() => setIsFormOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={18} /></button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-slate-700">Pilih Risiko</label>
+                <select required value={formKejadian.riskId} onChange={(e) => setFormKejadian({...formKejadian, riskId: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none focus:border-teal-500">
+                  {unitRisks.map(r => <option key={r.id} value={r.id}>{r.id} - {r.pernyataanRisiko}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1 text-slate-700">Tanggal Kejadian</label>
+                <input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" />
+              </div>
+              
+              {/* Kolom dibikin full width untuk detail */}
+              <div className="md:col-span-2">
+                <label className="block text-xs font-semibold mb-1 text-slate-700">Kronologi Kejadian</label>
+                <textarea required rows="2" value={formKejadian.kronologi} onChange={(e) => setFormKejadian({...formKejadian, kronologi: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" placeholder="Uraikan bagaimana kronologi kejadian risiko ini berlangsung..." />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-semibold mb-1 text-slate-700">Penyebab Keterjadian</label>
+                <textarea required rows="2" value={formKejadian.penyebab} onChange={(e) => setFormKejadian({...formKejadian, penyebab: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" placeholder="Apa yang menyebabkan risiko ini benar-benar terjadi pada saat itu?" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-semibold mb-1 text-slate-700">Dampak (Kejadian Riil)</label>
+                <textarea required rows="2" value={formKejadian.dampakRiil} onChange={(e) => setFormKejadian({...formKejadian, dampakRiil: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" placeholder="Sebutkan dampak riil (finansial/non-finansial) yang dirasakan unit kerja..." />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+              <button type="button" onClick={() => setIsFormOpen(false)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-medium cursor-pointer">Batal</button>
+              <button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl text-sm flex gap-2 items-center font-medium shadow-sm cursor-pointer"><Save size={16} /> {editKejadianId ? 'Update Kejadian' : 'Simpan Keterjadian'}</button>
+            </div>
+          </form>
+        )}
+
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse border border-slate-200 text-xs min-w-[1100px]">
+            <table className="w-full text-left border-collapse border border-slate-200 text-xs min-w-[1200px]">
               <thead>
                 <tr className="bg-slate-50 uppercase text-slate-700">
                   <th className="p-3 border border-slate-200 text-center w-12">No</th>
-                  <th className="p-3 border border-slate-200 w-28 text-center">Tanggal Kejadian</th>
-                  <th className="p-3 border border-slate-200">Pernyataan Risiko</th>
-                  <th className="p-3 border border-slate-200">Kronologi</th>
-                  <th className="p-3 border border-slate-200">Penyebab</th>
-                  <th className="p-3 border border-slate-200">Dampak</th>
+                  <th className="p-3 border border-slate-200 w-32 text-center bg-teal-50/50">Tanggal Kejadian</th>
+                  <th className="p-3 border border-slate-200 w-64">Pernyataan Risiko</th>
+                  <th className="p-3 border border-slate-200">Kronologi Kejadian</th>
+                  <th className="p-3 border border-slate-200">Penyebab Keterjadian</th>
+                  <th className="p-3 border border-slate-200 bg-rose-50/50">Dampak Riil</th>
                   <th className="p-3 border border-slate-200 text-center w-28">Aksi</th>
                 </tr>
               </thead>
@@ -1432,45 +1476,22 @@ export default function App() {
                     <td className="p-3 border border-slate-200 text-center font-bold text-slate-500">{index + 1}</td>
                     <td className="p-3 border border-slate-200 text-center font-semibold text-teal-800">{k.tanggal || '-'}</td>
                     <td className="p-3 border border-slate-200 font-bold text-slate-900">{k.risiko}</td>
-                    <td className="p-3 border border-slate-200 text-slate-700">{k.kronologi || '-'}</td>
-                    <td className="p-3 border border-slate-200 text-slate-700">{k.penyebab || '-'}</td>
-                    <td className="p-3 border border-slate-200 text-rose-700 font-medium">{k.dampakRiil || '-'}</td>
+                    <td className="p-3 border border-slate-200 text-slate-700 leading-relaxed">{k.kronologi || '-'}</td>
+                    <td className="p-3 border border-slate-200 text-slate-700 leading-relaxed">{k.penyebab || '-'}</td>
+                    <td className="p-3 border border-slate-200 text-rose-700 font-medium leading-relaxed">{k.dampakRiil || '-'}</td>
                     <td className="p-3 border border-slate-200 text-center space-x-1 whitespace-nowrap">
-                      <button type="button" onClick={() => handleOpenEdit(k)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100 inline-block" title="Edit"><Edit size={14}/></button>
-                      <button type="button" onClick={() => handleDeleteKejadian(k.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100 inline-block" title="Hapus"><Trash2 size={14}/></button>
+                      <button type="button" onClick={() => handleOpenEdit(k)} className="p-2 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100 inline-block" title="Edit"><Edit size={14}/></button>
+                      <button type="button" onClick={() => handleDeleteKejadian(k.id)} className="p-2 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100 inline-block" title="Hapus"><Trash2 size={14}/></button>
                     </td>
                   </tr>
                 ))}
                 {unitKejadian.length === 0 && (
-                  <tr><td colSpan="7" className="p-6 text-center text-slate-400 italic">Belum ada pencatatan keterjadian risiko.</td></tr>
+                  <tr><td colSpan="7" className="p-8 text-center text-slate-400 italic">Belum ada pencatatan keterjadian risiko. Klik 'Rekam Kejadian Baru' untuk menambahkan.</td></tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
-
-        {isFormOpen && (
-          <form onSubmit={handleSaveKejadian} className="bg-white p-6 rounded-2xl shadow-md border border-teal-200 space-y-4 animate-in fade-in duration-200">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                {editKejadianId ? <Edit size={16} className="text-teal-600" /> : <PlusCircle size={16} className="text-teal-600" />}
-                {editKejadianId ? 'Edit Pencatatan Keterjadian' : 'Form Rekam Keterjadian Risiko'}
-              </h3>
-              <button type="button" onClick={() => setIsFormOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer"><X size={18} /></button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className="block text-xs font-semibold mb-1">Pilih Risiko</label><select required value={formKejadian.riskId} onChange={(e) => setFormKejadian({...formKejadian, riskId: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none focus:border-teal-500">{unitRisks.map(r => <option key={r.id} value={r.id}>{r.id} - {r.pernyataanRisiko}</option>)}</select></div>
-              <div><label className="block text-xs font-semibold mb-1">Tanggal Kejadian</label><input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
-              <div className="md:col-span-2"><label className="block text-xs font-semibold mb-1">Kronologi</label><textarea required rows="2" value={formKejadian.kronologi} onChange={(e) => setFormKejadian({...formKejadian, kronologi: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
-              <div><label className="block text-xs font-semibold mb-1">Penyebab</label><textarea required rows="2" value={formKejadian.penyebab} onChange={(e) => setFormKejadian({...formKejadian, penyebab: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
-              <div><label className="block text-xs font-semibold mb-1">Dampak Riil</label><textarea required rows="2" value={formKejadian.dampakRiil} onChange={(e) => setFormKejadian({...formKejadian, dampakRiil: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" /></div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <button type="button" onClick={() => setIsFormOpen(false)} className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer">Batal</button>
-              <button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl text-sm flex gap-2 items-center font-medium shadow-sm cursor-pointer"><Save size={16} /> {editKejadianId ? 'Update Kejadian' : 'Simpan Kejadian'}</button>
-            </div>
-          </form>
-        )}
       </div>
     );
   };
@@ -1820,7 +1841,7 @@ export default function App() {
                 <tr><td colspan="6" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
                 <tr><td colspan="6" style="border:none;"></td></tr>
                 <tr style="background:#f3f4f6;font-weight:bold;">
-                  <td class="head">No</td><td class="head">Tanggal Kejadian</td><td class="head">Pernyataan Risiko</td><td class="head">Kronologi</td><td class="head">Penyebab</td><td class="head">Dampak</td>
+                  <td class="head">No</td><td class="head">Tanggal Kejadian</td><td class="head">Pernyataan Risiko</td><td class="head">Kronologi Kejadian</td><td class="head">Penyebab Keterjadian</td><td class="head">Dampak Kejadian Riil</td>
                 </tr>
           `;
           unitKejadian.forEach((k, idx) => {
@@ -1976,7 +1997,7 @@ export default function App() {
         <div className="flex flex-wrap gap-2 border-b border-slate-200 pb-2 print:hidden">
           <button type="button" onClick={() => setSubReportTab('peta_risiko')} className={`px-4 py-2 text-sm font-medium rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'peta_risiko' ? 'bg-white text-teal-700 border-b-2 border-teal-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Peta Risiko</button>
           <button type="button" onClick={() => setSubReportTab('pemantauan_rtp')} className={`px-4 py-2 text-sm font-medium rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'pemantauan_rtp' ? 'bg-white text-teal-700 border-b-2 border-teal-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Pemantauan RTP</button>
-          <button type="button" onClick={() => setSubReportTab('pencatatan_keterjadian')} className={`px-4 py-2 text-sm font-medium rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'pencatatan_keterjadian' ? 'bg-white text-teal-700 border-b-2 border-teal-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Laporan Keterjadian</button>
+          <button type="button" onClick={() => setSubReportTab('pencatatan_keterjadian')} className={`px-4 py-2 text-sm font-medium rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'pencatatan_keterjadian' ? 'bg-white text-rose-700 border-b-2 border-rose-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Laporan Keterjadian</button>
           <button type="button" onClick={() => setSubReportTab('efektivitas_rtp')} className={`px-4 py-2 text-sm font-medium rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'efektivitas_rtp' ? 'bg-white text-teal-700 border-b-2 border-teal-600 font-bold shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Laporan Efektifitas</button>
         </div>
         
@@ -2086,9 +2107,9 @@ export default function App() {
                     <th className="border border-slate-400 p-2 text-center w-12">No</th>
                     <th className="border border-slate-400 p-2 text-center w-28">Tanggal Kejadian</th>
                     <th className="border border-slate-400 p-2">Pernyataan Risiko</th>
-                    <th className="border border-slate-400 p-2">Kronologi</th>
-                    <th className="border border-slate-400 p-2">Penyebab</th>
-                    <th className="border border-slate-400 p-2">Dampak</th>
+                    <th className="border border-slate-400 p-2">Kronologi Kejadian</th>
+                    <th className="border border-slate-400 p-2">Penyebab Keterjadian</th>
+                    <th className="border border-slate-400 p-2">Dampak Kejadian Riil</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-300">
@@ -2097,11 +2118,14 @@ export default function App() {
                       <td className="border border-slate-400 p-2 text-center font-bold">{index + 1}</td>
                       <td className="border border-slate-400 p-2 text-center font-semibold text-teal-800">{k.tanggal || '-'}</td>
                       <td className="border border-slate-400 p-2 font-bold">{k.risiko}</td>
-                      <td className="border border-slate-400 p-2">{k.kronologi || '-'}</td>
-                      <td className="border border-slate-400 p-2">{k.penyebab || '-'}</td>
-                      <td className="border border-slate-400 p-2 text-rose-700 font-medium">{k.dampakRiil || '-'}</td>
+                      <td className="border border-slate-400 p-2 leading-relaxed">{k.kronologi || '-'}</td>
+                      <td className="border border-slate-400 p-2 leading-relaxed">{k.penyebab || '-'}</td>
+                      <td className="border border-slate-400 p-2 text-rose-700 font-medium leading-relaxed">{k.dampakRiil || '-'}</td>
                     </tr>
                   ))}
+                  {unitKejadian.length === 0 && (
+                    <tr><td colSpan="6" className="border border-slate-400 p-6 text-center text-slate-400 italic">Belum ada laporan pencatatan keterjadian risiko.</td></tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -2179,7 +2203,10 @@ export default function App() {
       {/* Sidebar Desktop */}
       <aside className="w-72 bg-gradient-to-b from-teal-900 to-emerald-950 text-white hidden md:flex flex-col shadow-xl z-10 print:hidden">
         <div className="p-6">
-          <div className="flex items-center space-x-3 mb-2"><ShieldAlert size={30} className="text-teal-400" /><h1 className="text-2xl font-bold tracking-wider">SI-MARI</h1></div>
+          <div className="flex items-center space-x-3 mb-2">
+            <ShieldAlert size={30} className="text-teal-400" />
+            <h1 className="text-2xl font-bold tracking-wider">SI-MARI <span className="text-[10px] bg-teal-700/80 px-2 py-0.5 rounded-full ml-1 font-semibold align-middle">v2.0</span></h1>
+          </div>
           <p className="text-xs text-teal-100/80 border-t border-teal-800/60 pt-2 mt-2 font-medium">{currentUser.nama}</p>
           <div className="mt-2 inline-flex gap-1.5 bg-teal-500/20 text-teal-200 px-3 py-1 rounded-xl text-xs font-semibold border border-teal-500/30"><Calendar size={13} /> Tahun: {currentUser.tahun}</div>
         </div>
