@@ -1928,7 +1928,7 @@ export default function App() {
               <table style="border-collapse:collapse;font-family:Arial;font-size:11px;">
                 <tr><td colspan="16" class="title" style="font-size:14px;">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</td></tr>
                 <tr><td colspan="16" class="title" style="font-size:13px;">BADAN PENGEMBANGAN DAN INFORMASI</td></tr>
-                <tr><td colspan="16" class="title" style="font-size:12px;color:#0d9488;">LAPORAN PETA REGISTER RISIKO UNIT KERJA (${currentUser.nama.toUpperCase()}) - ${currentUser.eselon || 'Eselon 2'}</td></tr>
+                <tr><td colspan="16" class="title" style="font-size:12px;color:#0d9488;">LAPORAN MATRIKS PETA RISIKO UNIT KERJA (${currentUser.nama.toUpperCase()})</td></tr>
                 <tr><td colspan="16" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
                 <tr><td colspan="16" style="border:none;"></td></tr>
                 <tr>
@@ -2181,12 +2181,12 @@ export default function App() {
             <h3 className="font-bold text-slate-900 text-base uppercase m-0 leading-tight">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</h3>
             <h4 className="font-bold text-slate-800 text-sm uppercase m-0 leading-tight">BADAN PENGEMBANGAN DAN INFORMASI</h4>
             <h5 className="font-bold text-teal-800 text-sm uppercase pt-3 m-0 leading-tight">
-              {subReportTab === 'peta_risiko' && `LAPORAN PETA REGISTER RISIKO (${currentUser?.nama.toUpperCase()})`}
+              {subReportTab === 'peta_risiko' && `LAPORAN MATRIKS PETA RISIKO (${currentUser?.nama.toUpperCase()})`}
               {subReportTab === 'pemantauan_rtp' && `LAPORAN PEMANTAUAN RTP (${currentUser?.nama.toUpperCase()})`}
               {subReportTab === 'pencatatan_keterjadian' && `LAPORAN PENCATATAN KETERJADIAN RISIKO (${currentUser?.nama.toUpperCase()})`}
               {subReportTab === 'efektivitas_rtp' && `LAPORAN EFEKTIFITAS & DEVIASI RTP (${currentUser?.nama.toUpperCase()})`}
             </h5>
-            <p className="text-xs text-slate-500 m-0 pt-1">TAHUN ANGGARAN {currentUser?.tahun} ({currentUser?.eselon || 'Eselon 2'})</p>
+            <p className="text-xs text-slate-500 m-0 pt-1">TAHUN ANGGARAN {currentUser?.tahun}</p>
           </div>
 
           {subReportTab === 'peta_risiko' && (
