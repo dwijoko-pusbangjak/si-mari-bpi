@@ -10,7 +10,7 @@ import {
   CheckCircle2, Plus
 } from 'lucide-react';
 
-// === GAYA CSS GLOBAL (DIINJEKSI LANGSUNG) ===
+// === GAYA CSS GLOBAL (TEMA KEMENDES PDT - HIJAU & EMAS) ===
 const GlobalStyle = () => (
   <style dangerouslySetInnerHTML={{__html: `
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
@@ -21,7 +21,8 @@ const GlobalStyle = () => (
       margin: 0;
       padding: 0;
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #f0fdfa 0%, #e0e7ff 50%, #f8fafc 100%);
+      /* Gradien Lembut: Soft Green -> Warm Cream -> Soft Amber */
+      background: linear-gradient(135deg, #ecfdf5 0%, #f4fdf8 50%, #fffbeb 100%);
       background-attachment: fixed;
       color: #1e293b;
       -webkit-font-smoothing: antialiased;
@@ -30,15 +31,15 @@ const GlobalStyle = () => (
 
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #a5b4fc; border-radius: 12px; border: 2px solid transparent; background-clip: padding-box; }
-    ::-webkit-scrollbar-thumb:hover { background: #818cf8; border: 2px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb { background: #6ee7b7; border-radius: 12px; border: 2px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: #10b981; border: 2px solid transparent; background-clip: padding-box; }
 
     .glass-panel {
       background: rgba(255, 255, 255, 0.65);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 8px 32px rgba(30, 41, 59, 0.05);
+      box-shadow: 0 8px 32px rgba(4, 47, 46, 0.05); /* Bayangan sedikit kehijauan */
     }
     
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -56,14 +57,14 @@ const GlobalStyle = () => (
   `}} />
 );
 
-// === FIREBASE SETUP (Ganti dengan kredensial asli Firebase Anda) ===
-const firebaseConfig = {
-  apiKey: "AIzaSyC34RHxpaFA4trv8mfUR4AqJzH-HXwtKoA",
-  authDomain: "simaribpi.firebaseapp.com",
-  projectId: "simaribpi",
-  storageBucket: "simaribpi.firebasestorage.app",
-  messagingSenderId: "324662251360",
-  appId: "1:324662251360:web:b0f7b4180fcd5530a0d805"
+// === FIREBASE SETUP ===
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+  apiKey: "ISI_API_KEY_ANDA",
+  authDomain: "ISI_PROJECT_ID.firebaseapp.com",
+  projectId: "ISI_PROJECT_ID",
+  storageBucket: "ISI_PROJECT_ID.appspot.com",
+  messagingSenderId: "ISI_MESSAGING_SENDER_ID",
+  appId: "ISI_APP_ID"
 };
 
 let app, auth, db;
@@ -127,28 +128,28 @@ export default function App() {
     if (!modal.isOpen) return null;
     const isConfirm = modal.type === 'confirm';
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 print:hidden">
-        <div className="glass-panel rounded-3xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-emerald-950/40 backdrop-blur-sm p-4 print:hidden">
+        <div className="glass-panel rounded-3xl max-w-sm w-full overflow-hidden animate-in fade-in zoom-in duration-200 border border-white/80">
           <div className="p-6 text-center space-y-4">
             <div className="flex justify-center">
               {modal.status === 'error' ? <div className="p-4 bg-rose-50 rounded-full"><AlertTriangle size={36} className="text-rose-500" /></div> :
                modal.status === 'success' ? <div className="p-4 bg-emerald-50 rounded-full"><CheckCircle2 size={36} className="text-emerald-500" /></div> :
                modal.status === 'warning' ? <div className="p-4 bg-amber-50 rounded-full"><AlertTriangle size={36} className="text-amber-500" /></div> :
-               <div className="p-4 bg-indigo-50 rounded-full"><Info size={36} className="text-indigo-500" /></div>}
+               <div className="p-4 bg-sky-50 rounded-full"><Info size={36} className="text-sky-500" /></div>}
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-800 tracking-tight">{modal.title}</h3>
               <p className="text-sm text-slate-500 mt-2 leading-relaxed">{modal.message}</p>
             </div>
           </div>
-          <div className="p-4 bg-white/50 border-t border-slate-100 flex justify-center gap-3">
+          <div className="p-4 bg-white/50 border-t border-emerald-100/50 flex justify-center gap-3">
             {isConfirm ? (
               <>
                 <button onClick={closeModal} className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer">Batal</button>
-                <button onClick={() => { if(modal.onConfirm) modal.onConfirm(); closeModal(); }} className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer">Ya, Lanjutkan</button>
+                <button onClick={() => { if(modal.onConfirm) modal.onConfirm(); closeModal(); }} className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-700 text-white hover:bg-emerald-800 transition-colors shadow-sm cursor-pointer">Ya, Lanjutkan</button>
               </>
             ) : (
-              <button onClick={closeModal} className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer">Tutup</button>
+              <button onClick={closeModal} className="w-full px-5 py-2.5 rounded-xl text-sm font-semibold bg-emerald-700 text-white hover:bg-emerald-800 transition-colors shadow-sm cursor-pointer">Tutup</button>
             )}
           </div>
         </div>
@@ -238,7 +239,7 @@ export default function App() {
       case 'Sangat Tinggi': return 'bg-rose-50 text-rose-700 border-rose-200';
       case 'Tinggi': return 'bg-orange-50 text-orange-700 border-orange-200';
       case 'Sedang': return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'Rendah': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'Rendah': return 'bg-teal-50 text-teal-700 border-teal-200';
       case 'Sangat Rendah': return 'bg-sky-50 text-sky-700 border-sky-200';
       default: return 'bg-slate-50 text-slate-600 border-slate-200';
     }
@@ -290,57 +291,57 @@ export default function App() {
       }
     };
 
-    if (isDbLoading) return <div className="flex h-screen items-center justify-center bg-transparent"><Loader2 size={40} className="animate-spin text-indigo-600" /></div>;
+    if (isDbLoading) return <div className="flex h-screen items-center justify-center bg-transparent"><Loader2 size={40} className="animate-spin text-emerald-600" /></div>;
 
     return (
       <div className="flex h-screen w-screen items-center justify-center p-4">
         <GlobalStyle />
-        <div className="glass-panel w-full max-w-md p-8 rounded-[2rem] relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-teal-400/20 rounded-full blur-2xl"></div>
+        <div className="glass-panel w-full max-w-md p-8 rounded-[2rem] relative overflow-hidden border border-white">
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl"></div>
 
           <div className="text-center mb-8 relative z-10">
-            <div className="inline-flex p-4 bg-white/60 text-indigo-600 rounded-2xl mb-4 shadow-sm border border-white"><Shield size={36} strokeWidth={1.5} /></div>
-            <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">SI-MARI BPI <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2.5 py-0.5 rounded-full ml-1 align-middle font-bold">v2.0</span></h1>
+            <div className="inline-flex p-4 bg-white/80 text-emerald-700 rounded-2xl mb-4 shadow-sm border border-emerald-100"><Shield size={36} strokeWidth={1.5} /></div>
+            <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">SI-MARI BPI <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded-full ml-1 align-middle font-bold border border-emerald-200">v2.0</span></h1>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed font-medium">Sistem Manajemen Risiko<br/>Badan Pengembangan dan Informasi</p>
           </div>
 
-          <div className="flex bg-white/40 p-1.5 rounded-2xl mb-6 relative z-10">
-            <button type="button" onClick={() => setLoginType('unit')} className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${loginType === 'unit' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Unit Kerja</button>
-            <button type="button" onClick={() => setLoginType('admin')} className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${loginType === 'admin' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>Admin Pusat</button>
+          <div className="flex bg-white/50 p-1.5 rounded-2xl mb-6 relative z-10 shadow-sm border border-white/60">
+            <button type="button" onClick={() => setLoginType('unit')} className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${loginType === 'unit' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-emerald-800'}`}>Unit Kerja</button>
+            <button type="button" onClick={() => setLoginType('admin')} className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 ${loginType === 'admin' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-emerald-800'}`}>Admin Pusat</button>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4 relative z-10">
             {loginType === 'unit' ? (
               <>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Building2 size={14} className="text-indigo-500" /> Unit Kerja</label>
-                  <select value={selectedUnit} onChange={(e) => setSelectedUnit(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none bg-white/50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-700">
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Building2 size={14} className="text-emerald-600" /> Unit Kerja</label>
+                  <select value={selectedUnit} onChange={(e) => setSelectedUnit(e.target.value)} className="w-full p-3 text-sm border border-white/80 rounded-xl outline-none bg-white/60 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all font-medium text-slate-700 shadow-sm">
                     {unitKerjaList.length === 0 && <option value="">-- Belum ada unit --</option>}
                     {unitKerjaList.map((unit) => (<option key={unit.id} value={unit.id}>{unit.nama} ({unit.eselon || 'Eselon 2'})</option>))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Calendar size={14} className="text-indigo-500" /> Tahun Anggaran</label>
-                  <select value={selectedTahun} onChange={(e) => setSelectedTahun(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none bg-white/50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-700">
+                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><Calendar size={14} className="text-emerald-600" /> Tahun Anggaran</label>
+                  <select value={selectedTahun} onChange={(e) => setSelectedTahun(e.target.value)} className="w-full p-3 text-sm border border-white/80 rounded-xl outline-none bg-white/60 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all font-medium text-slate-700 shadow-sm">
                     <option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option>
                   </select>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Lock size={14} className="text-indigo-500" /> Kata Sandi</label>
-                    <button type="button" onClick={() => showAlert('Lupa Password?', 'Silakan hubungi Administrator Pusat BPI untuk melakukan reset password akun unit kerja Anda.', 'info')} className="text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold cursor-pointer">Lupa sandi?</button>
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5"><Lock size={14} className="text-emerald-600" /> Kata Sandi</label>
+                    <button type="button" onClick={() => showAlert('Lupa Password?', 'Silakan hubungi Administrator Pusat BPI untuk melakukan reset password akun unit kerja Anda.', 'info')} className="text-[11px] text-emerald-700 hover:text-emerald-900 font-semibold cursor-pointer">Lupa sandi?</button>
                   </div>
-                  <input required type="password" value={unitPassword} onChange={(e) => setUnitPassword(e.target.value)} placeholder="••••••••" className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none bg-white/50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-700" />
+                  <input required type="password" value={unitPassword} onChange={(e) => setUnitPassword(e.target.value)} placeholder="••••••••" className="w-full p-3 text-sm border border-white/80 rounded-xl outline-none bg-white/60 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all font-medium text-slate-700 shadow-sm" />
                 </div>
               </>
             ) : (
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><KeyRound size={14} className="text-indigo-500" /> Kunci Master Admin</label>
-                <input required type="password" value={inputAdminPass} onChange={(e) => setInputAdminPass(e.target.value)} placeholder="••••••••" className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none bg-white/50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-700" />
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5"><KeyRound size={14} className="text-emerald-600" /> Kunci Master Admin</label>
+                <input required type="password" value={inputAdminPass} onChange={(e) => setInputAdminPass(e.target.value)} placeholder="••••••••" className="w-full p-3 text-sm border border-white/80 rounded-xl outline-none bg-white/60 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all font-medium text-slate-700 shadow-sm" />
               </div>
             )}
-            <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-3.5 rounded-xl font-bold text-sm shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 mt-6 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all duration-200">
+            <button type="submit" className="w-full bg-emerald-700 hover:bg-emerald-800 text-white p-3.5 rounded-xl font-bold text-sm shadow-md shadow-emerald-700/20 flex items-center justify-center gap-2 mt-6 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all duration-200">
               Masuk ke Sistem <UserCheck size={18} />
             </button>
           </form>
@@ -506,10 +507,10 @@ export default function App() {
         </div>
 
         <div className="flex flex-wrap border-b border-slate-200/60 glass-panel rounded-t-2xl px-4 pt-2 gap-2">
-          <button onClick={() => setActiveTab('admin_dashboard')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_dashboard' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><LayoutTemplate size={18} /> Dashboard</button>
-          <button onClick={() => setActiveTab('admin_users')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_users' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><Users size={18} /> Manajemen User</button>
-          <button onClick={() => setActiveTab('admin_sasaran')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_sasaran' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><Compass size={18} /> Hierarki Sasaran K/L</button>
-          <button onClick={() => setActiveTab('admin_security')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_security' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><KeyRound size={18} /> Keamanan Admin</button>
+          <button onClick={() => setActiveTab('admin_dashboard')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_dashboard' ? 'border-emerald-600 text-emerald-800' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><LayoutTemplate size={18} /> Dashboard</button>
+          <button onClick={() => setActiveTab('admin_users')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_users' ? 'border-emerald-600 text-emerald-800' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><Users size={18} /> Manajemen User</button>
+          <button onClick={() => setActiveTab('admin_sasaran')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_sasaran' ? 'border-emerald-600 text-emerald-800' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><Compass size={18} /> Hierarki Sasaran K/L</button>
+          <button onClick={() => setActiveTab('admin_security')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_security' ? 'border-emerald-600 text-emerald-800' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><KeyRound size={18} /> Keamanan Admin</button>
         </div>
 
         {activeTab === 'admin_dashboard' && (
@@ -521,22 +522,22 @@ export default function App() {
                </div>
                <div className="flex items-center gap-2 bg-white/60 p-1.5 rounded-xl border border-white">
                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1.5 pl-2"><Calendar size={14}/> Tahun:</label>
-                 <select value={adminTahun} onChange={(e) => setAdminTahun(e.target.value)} className="p-2 text-sm border-none rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-indigo-700 cursor-pointer">
+                 <select value={adminTahun} onChange={(e) => setAdminTahun(e.target.value)} className="p-2 text-sm border-none rounded-lg bg-white shadow-sm focus:ring-2 focus:ring-emerald-500/20 outline-none font-bold text-emerald-700 cursor-pointer">
                     <option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option>
                  </select>
                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Risiko (Global)</p><h3 className="text-3xl font-extrabold text-slate-800 mt-1">{adminTotalRisks}</h3></div><div className="p-4 bg-white/60 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 rounded-2xl transition-colors"><Hexagon size={28} /></div></div>
+              <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Risiko (Global)</p><h3 className="text-3xl font-extrabold text-slate-800 mt-1">{adminTotalRisks}</h3></div><div className="p-4 bg-white/60 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-700 rounded-2xl transition-colors"><Hexagon size={28} /></div></div>
               <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">RTP Ditetapkan</p><h3 className="text-3xl font-extrabold text-amber-600 mt-1">{adminRtpCount}</h3></div><div className="p-4 bg-white/60 text-amber-500 group-hover:bg-amber-50 group-hover:text-amber-600 rounded-2xl transition-colors"><ShieldCheck size={28} /></div></div>
-              <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">RTP Ditindaklanjuti</p><h3 className="text-3xl font-extrabold text-emerald-600 mt-1">{adminRtpFollowedUp}</h3></div><div className="p-4 bg-white/60 text-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-600 rounded-2xl transition-colors"><Zap size={28} /></div></div>
+              <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">RTP Ditindaklanjuti</p><h3 className="text-3xl font-extrabold text-teal-600 mt-1">{adminRtpFollowedUp}</h3></div><div className="p-4 bg-white/60 text-teal-500 group-hover:bg-teal-50 group-hover:text-teal-600 rounded-2xl transition-colors"><Zap size={28} /></div></div>
               <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Unit Kerja Terdaftar</p><h3 className="text-3xl font-extrabold text-sky-600 mt-1">{unitKerjaList.length}</h3></div><div className="p-4 bg-white/60 text-sky-500 group-hover:bg-sky-50 group-hover:text-sky-600 rounded-2xl transition-colors"><Building2 size={28} /></div></div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="glass-panel p-6 rounded-2xl space-y-5">
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200/50 pb-3 flex items-center gap-2"><PieChart size={16} className="text-indigo-500"/> Distribusi Level Risiko</h3>
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-200/50 pb-3 flex items-center gap-2"><PieChart size={16} className="text-emerald-600"/> Distribusi Level Risiko</h3>
                 <div className="space-y-4 pt-1">
                   <div>
                     <div className="flex justify-between text-xs mb-1.5 font-bold"><span className="text-rose-600">Sangat Tinggi</span><span className="text-slate-500">{stCount} Risiko</span></div>
@@ -551,14 +552,14 @@ export default function App() {
                     <div className="w-full bg-slate-200/60 rounded-full h-2.5 overflow-hidden"><div className="bg-amber-500 h-full rounded-full transition-all duration-700 ease-out delay-150" style={{ width: `${adminTotalRisks ? (sCount/adminTotalRisks)*100 : 0}%` }}></div></div>
                   </div>
                   <div>
-                    <div className="flex justify-between text-xs mb-1.5 font-bold"><span className="text-emerald-600">Rendah / Sangat Rendah</span><span className="text-slate-500">{rCount} Risiko</span></div>
-                    <div className="w-full bg-slate-200/60 rounded-full h-2.5 overflow-hidden"><div className="bg-emerald-500 h-full rounded-full transition-all duration-700 ease-out delay-200" style={{ width: `${adminTotalRisks ? (rCount/adminTotalRisks)*100 : 0}%` }}></div></div>
+                    <div className="flex justify-between text-xs mb-1.5 font-bold"><span className="text-teal-600">Rendah / Sangat Rendah</span><span className="text-slate-500">{rCount} Risiko</span></div>
+                    <div className="w-full bg-slate-200/60 rounded-full h-2.5 overflow-hidden"><div className="bg-teal-500 h-full rounded-full transition-all duration-700 ease-out delay-200" style={{ width: `${adminTotalRisks ? (rCount/adminTotalRisks)*100 : 0}%` }}></div></div>
                   </div>
                 </div>
               </div>
               
               <div className="glass-panel rounded-2xl flex flex-col">
-                <div className="p-5 border-b border-slate-200/50"><h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><Crosshair size={16} className="text-indigo-500"/> Progres Mitigasi Global</h3></div>
+                <div className="p-5 border-b border-slate-200/50"><h3 className="font-bold text-slate-800 text-sm uppercase tracking-wider flex items-center gap-2"><Crosshair size={16} className="text-emerald-600"/> Progres Mitigasi Global</h3></div>
                 <div className="flex-1 p-6 flex flex-col items-center justify-center">
                   <div className="relative w-44 h-44 flex items-center justify-center">
                     <svg className="absolute inset-0 w-full h-full -rotate-90 text-slate-200/60" viewBox="0 0 36 36">
@@ -578,7 +579,7 @@ export default function App() {
             </div>
 
             <div className="glass-panel rounded-2xl overflow-hidden">
-              <div className="p-4 bg-white/40 border-b border-slate-200/50"><h3 className="font-bold text-slate-800 text-sm flex items-center gap-2"><Building2 size={16} className="text-indigo-500"/> Statistik Risiko Per Unit Kerja</h3></div>
+              <div className="p-4 bg-white/40 border-b border-slate-200/50"><h3 className="font-bold text-slate-800 text-sm flex items-center gap-2"><Building2 size={16} className="text-emerald-600"/> Statistik Risiko Per Unit Kerja</h3></div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs min-w-[800px]">
                   <thead>
@@ -588,7 +589,7 @@ export default function App() {
                       <th className="p-4 border-b border-slate-200/50 font-bold text-center">Total Risiko</th>
                       <th className="p-4 border-b border-slate-200/50 font-bold text-center text-rose-500">Risiko Tinggi</th>
                       <th className="p-4 border-b border-slate-200/50 font-bold text-center text-amber-500">RTP Ditetapkan</th>
-                      <th className="p-4 border-b border-slate-200/50 font-bold text-center text-emerald-500">RTP Berjalan</th>
+                      <th className="p-4 border-b border-slate-200/50 font-bold text-center text-emerald-600">RTP Berjalan</th>
                       <th className="p-4 border-b border-slate-200/50 font-bold text-center w-40">Progres RTP</th>
                     </tr>
                   </thead>
@@ -602,9 +603,9 @@ export default function App() {
                       const pct = uRtp ? Math.round((uRtpDone/uRtp)*100) : 0;
                       
                       return (
-                        <tr key={unit.id} className="hover:bg-indigo-50/40 transition-colors">
+                        <tr key={unit.id} className="hover:bg-emerald-50/40 transition-colors">
                           <td className="p-4 font-bold text-slate-800">{unit.nama}</td>
-                          <td className="p-4"><span className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${unit.eselon === 'Eselon 1' ? 'bg-indigo-100 text-indigo-700 border border-indigo-200/60' : 'bg-slate-100 text-slate-600 border border-slate-200/60'}`}>{unit.eselon || 'Eselon 2'}</span></td>
+                          <td className="p-4"><span className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${unit.eselon === 'Eselon 1' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200/60' : 'bg-slate-100 text-slate-600 border border-slate-200/60'}`}>{unit.eselon || 'Eselon 2'}</span></td>
                           <td className="p-4 text-center font-bold text-slate-600 bg-white/30">{uTotal}</td>
                           <td className="p-4 text-center font-bold text-rose-600">{uTinggi}</td>
                           <td className="p-4 text-center font-bold text-amber-600 bg-amber-50/30">{uRtp}</td>
@@ -612,7 +613,7 @@ export default function App() {
                           <td className="p-4 text-center">
                             <div className="flex items-center gap-2">
                               <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
-                                <div className={`h-2 rounded-full ${pct === 100 ? 'bg-emerald-500' : (pct > 50 ? 'bg-indigo-400' : 'bg-amber-400')}`} style={{ width: `${pct}%` }}></div>
+                                <div className={`h-2 rounded-full ${pct === 100 ? 'bg-emerald-500' : (pct > 50 ? 'bg-emerald-400' : 'bg-amber-400')}`} style={{ width: `${pct}%` }}></div>
                               </div>
                               <span className="text-[11px] font-bold text-slate-500 w-8">{pct}%</span>
                             </div>
@@ -634,24 +635,24 @@ export default function App() {
           <div className="glass-panel p-6 rounded-2xl max-w-xl space-y-6 animate-in fade-in zoom-in-95 duration-200">
             <div>
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <KeyRound size={18} className="text-indigo-500" /> Ubah Kata Sandi Admin
+                <KeyRound size={18} className="text-emerald-600" /> Ubah Kata Sandi Admin
               </h3>
               <p className="text-xs text-slate-500 mt-1">Perbarui kata sandi administrator pusat secara berkala untuk keamanan sistem.</p>
             </div>
             <form onSubmit={handleUpdateAdminPassword} className="space-y-4">
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kata Sandi Lama</label>
-                <input required type="password" value={oldPass} onChange={(e) => setOldPass(e.target.value)} placeholder="Masukkan sandi lama..." className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" />
+                <input required type="password" value={oldPass} onChange={(e) => setOldPass(e.target.value)} placeholder="Masukkan sandi lama..." className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" />
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kata Sandi Baru</label>
-                <input required type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} placeholder="Minimal 6 karakter..." className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" />
+                <input required type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} placeholder="Minimal 6 karakter..." className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" />
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Konfirmasi Kata Sandi Baru</label>
-                <input required type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} placeholder="Ulangi sandi baru..." className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" />
+                <input required type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} placeholder="Ulangi sandi baru..." className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" />
               </div>
-              <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm shadow-indigo-600/20 cursor-pointer transition-all hover:-translate-y-0.5 active:scale-95">
+              <button type="submit" className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm shadow-emerald-700/20 cursor-pointer transition-all hover:-translate-y-0.5 active:scale-95">
                 <Save size={16} /> Simpan Kata Sandi Baru
               </button>
             </form>
@@ -661,39 +662,39 @@ export default function App() {
         {activeTab === 'admin_users' && (
           <div className="space-y-6">
             <div className="flex space-x-2 border-b border-slate-200/60 pb-2">
-              <button onClick={() => { setAdminUserTab('list'); setEditUnitId(null); }} className={`px-4 py-2 text-sm font-bold rounded-t-xl flex items-center gap-2 cursor-pointer transition-colors ${adminUserTab === 'list' ? 'glass-panel text-indigo-700 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}><List size={16} /> Daftar Unit Kerja</button>
-              <button onClick={handleAddUserClick} className={`px-4 py-2 text-sm font-bold rounded-t-xl flex items-center gap-2 cursor-pointer transition-colors ${adminUserTab === 'form' && !editUnitId ? 'glass-panel text-indigo-700 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-800'}`}><PlusCircle size={16} /> Tambah User</button>
-              {adminUserTab === 'form' && editUnitId && (<button className="px-4 py-2 text-sm font-bold rounded-t-xl glass-panel text-indigo-700 border-b-2 border-indigo-600 flex items-center gap-2"><Edit size={16} /> Edit User</button>)}
+              <button onClick={() => { setAdminUserTab('list'); setEditUnitId(null); }} className={`px-4 py-2 text-sm font-bold rounded-t-xl flex items-center gap-2 cursor-pointer transition-colors ${adminUserTab === 'list' ? 'glass-panel text-emerald-800 border-b-2 border-emerald-600' : 'text-slate-500 hover:text-slate-800'}`}><List size={16} /> Daftar Unit Kerja</button>
+              <button onClick={handleAddUserClick} className={`px-4 py-2 text-sm font-bold rounded-t-xl flex items-center gap-2 cursor-pointer transition-colors ${adminUserTab === 'form' && !editUnitId ? 'glass-panel text-emerald-800 border-b-2 border-emerald-600' : 'text-slate-500 hover:text-slate-800'}`}><PlusCircle size={16} /> Tambah User</button>
+              {adminUserTab === 'form' && editUnitId && (<button className="px-4 py-2 text-sm font-bold rounded-t-xl glass-panel text-emerald-800 border-b-2 border-emerald-600 flex items-center gap-2"><Edit size={16} /> Edit User</button>)}
             </div>
 
             {adminUserTab === 'form' ? (
               <div className="glass-panel p-6 rounded-2xl space-y-6 animate-in fade-in zoom-in-95 duration-200">
                 <form onSubmit={handleSaveUnit} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="md:col-span-2"><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Unit Kerja</label><input required type="text" value={unitForm.nama} onChange={(e) => setUnitForm({...unitForm, nama: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Contoh: Sekretariat Badan / Direktorat..." /></div>
+                    <div className="md:col-span-2"><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Unit Kerja</label><input required type="text" value={unitForm.nama} onChange={(e) => setUnitForm({...unitForm, nama: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Contoh: Sekretariat Badan / Direktorat..." /></div>
                     <div>
                       <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Jenis Unit Kerja</label>
-                      <select required value={unitForm.eselon} onChange={(e) => setUnitForm({...unitForm, eselon: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none bg-white/50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-semibold text-indigo-800">
+                      <select required value={unitForm.eselon} onChange={(e) => setUnitForm({...unitForm, eselon: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none bg-white/50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all font-semibold text-emerald-800">
                         <option value="Eselon 1">Eselon 1</option>
                         <option value="Eselon 2">Eselon 2</option>
                       </select>
                     </div>
-                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Username Login</label><input required type="text" value={unitForm.username} onChange={(e) => setUnitForm({...unitForm, username: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" /></div>
-                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kata Sandi Akun</label><input required type="text" value={unitForm.sandi} onChange={(e) => setUnitForm({...unitForm, sandi: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" /></div>
-                    <div className="md:col-span-2 pt-4 border-t border-slate-200/50"><h4 className="text-[11px] font-bold text-indigo-500 uppercase tracking-widest mb-4">Informasi Pimpinan</h4></div>
-                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Pimpinan</label><input required type="text" value={unitForm.namaPimpinan} onChange={(e) => setUnitForm({...unitForm, namaPimpinan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" /></div>
-                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">NIP Pimpinan</label><input required type="text" value={unitForm.nipPimpinan} onChange={(e) => setUnitForm({...unitForm, nipPimpinan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" /></div>
+                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Username Login</label><input required type="text" value={unitForm.username} onChange={(e) => setUnitForm({...unitForm, username: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" /></div>
+                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kata Sandi Akun</label><input required type="text" value={unitForm.sandi} onChange={(e) => setUnitForm({...unitForm, sandi: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" /></div>
+                    <div className="md:col-span-2 pt-4 border-t border-slate-200/50"><h4 className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest mb-4">Informasi Pimpinan</h4></div>
+                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Pimpinan</label><input required type="text" value={unitForm.namaPimpinan} onChange={(e) => setUnitForm({...unitForm, namaPimpinan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" /></div>
+                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">NIP Pimpinan</label><input required type="text" value={unitForm.nipPimpinan} onChange={(e) => setUnitForm({...unitForm, nipPimpinan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" /></div>
                   </div>
                   <div className="flex justify-end gap-3 pt-6 border-t border-slate-200/50">
                     <button type="button" onClick={() => { setAdminUserTab('list'); setEditUnitId(null); }} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-white/60 border border-slate-200/60 text-slate-700 hover:bg-white transition-colors cursor-pointer">Batal</button>
-                    <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Simpan Data</button>
+                    <button type="submit" className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Simpan Data</button>
                   </div>
                 </form>
               </div>
             ) : (
               <div className="glass-panel rounded-2xl overflow-hidden animate-in fade-in duration-300">
-                <div className="p-3 bg-indigo-50/60 border-b border-indigo-100/50 text-[11px] text-indigo-700 font-bold uppercase tracking-wider flex items-center gap-2">
-                  <Info size={14} className="text-indigo-500" /> Tip: Klik pada nama unit kerja atau ikon Edit untuk mengubah data.
+                <div className="p-3 bg-emerald-50/80 border-b border-emerald-100/50 text-[11px] text-emerald-800 font-bold uppercase tracking-wider flex items-center gap-2">
+                  <Info size={14} className="text-emerald-600" /> Tip: Klik pada nama unit kerja atau ikon Edit untuk mengubah data.
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse min-w-[900px]">
@@ -709,23 +710,23 @@ export default function App() {
                     </thead>
                     <tbody className="divide-y divide-slate-200/50 text-[13px]">
                       {unitKerjaList.map((unit, idx) => (
-                        <tr key={unit.id} className="hover:bg-indigo-50/40 transition-colors group">
+                        <tr key={unit.id} className="hover:bg-emerald-50/40 transition-colors group">
                           <td className="p-4 text-center text-slate-400 font-bold">{idx + 1}</td>
                           <td className="p-4">
                             <button 
                               type="button"
                               onClick={() => handleEditUserClick(unit)}
-                              className="font-bold text-slate-800 hover:text-indigo-600 text-left cursor-pointer flex items-center gap-2 transition-colors"
+                              className="font-bold text-slate-800 hover:text-emerald-700 text-left cursor-pointer flex items-center gap-2 transition-colors"
                             >
                               <span>{unit.nama}</span>
-                              <Edit size={13} className="text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                              <Edit size={13} className="text-slate-300 group-hover:text-emerald-500 transition-colors" />
                             </button>
                           </td>
-                          <td className="p-4"><span className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${unit.eselon === 'Eselon 1' ? 'bg-indigo-100 text-indigo-700 border border-indigo-200/60' : 'bg-slate-100 text-slate-600 border border-slate-200/60'}`}>{unit.eselon || 'Eselon 2'}</span></td>
-                          <td className="p-4"><p className="text-slate-500">User: <span className="font-bold text-indigo-700">{unit.username}</span></p><p className="text-slate-500 text-[11px] mt-0.5">Pass: {unit.sandi}</p></td>
+                          <td className="p-4"><span className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${unit.eselon === 'Eselon 1' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200/60' : 'bg-slate-100 text-slate-600 border border-slate-200/60'}`}>{unit.eselon || 'Eselon 2'}</span></td>
+                          <td className="p-4"><p className="text-slate-500">User: <span className="font-bold text-emerald-800">{unit.username}</span></p><p className="text-slate-500 text-[11px] mt-0.5">Pass: {unit.sandi}</p></td>
                           <td className="p-4"><p className="font-bold text-slate-800">{unit.namaPimpinan}</p><p className="text-[11px] text-slate-500 mt-0.5">NIP: {unit.nipPimpinan}</p></td>
                           <td className="p-4 text-center space-x-2">
-                            <button onClick={() => handleEditUserClick(unit)} className="p-2 bg-white/60 text-slate-500 border border-white rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer" title="Edit"><Edit size={16} /></button>
+                            <button onClick={() => handleEditUserClick(unit)} className="p-2 bg-white/60 text-slate-500 border border-white rounded-xl hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer" title="Edit"><Edit size={16} /></button>
                             <button onClick={() => handleDeleteUnit(unit.id)} className="p-2 bg-white/60 text-slate-500 border border-white rounded-xl hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer" title="Hapus"><Trash2 size={16} /></button>
                           </td>
                         </tr>
@@ -745,13 +746,13 @@ export default function App() {
           <div className="space-y-6 animate-in fade-in duration-300">
             <form onSubmit={handleAddMasterSasaran} className="glass-panel p-6 rounded-2xl space-y-5">
               <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2 border-b border-slate-200/50 pb-4">
-                <Layers size={16} className="text-indigo-500" /> 
+                <Layers size={16} className="text-emerald-600" /> 
                 {editSasaranId ? "Edit Hierarki Sasaran K/L" : "Tambah Hierarki Sasaran K/L"}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Level Sasaran</label>
-                  <select value={kategoriSasaran} onChange={(e) => { setKategoriSasaran(e.target.value); setSelectedParentId(''); }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-semibold text-slate-700">
+                  <select value={kategoriSasaran} onChange={(e) => { setKategoriSasaran(e.target.value); setSelectedParentId(''); }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-semibold text-slate-700">
                     <option value="strategis">Sasaran Strategis</option>
                     <option value="program">Sasaran Program</option>
                     <option value="kegiatan">Sasaran Kegiatan</option>
@@ -760,7 +761,7 @@ export default function App() {
                 {kategoriSasaran === 'program' && (
                   <div>
                     <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Induk Strategis</label>
-                    <select required value={selectedParentId} onChange={(e) => setSelectedParentId(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50">
+                    <select required value={selectedParentId} onChange={(e) => setSelectedParentId(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50">
                       <option value="">-- Pilih --</option>
                       {(masterSasaran.strategis || []).map(s => <option key={s.id} value={s.id}>{s.nama}</option>)}
                     </select>
@@ -769,7 +770,7 @@ export default function App() {
                 {kategoriSasaran === 'kegiatan' && (
                   <div>
                     <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Induk Program</label>
-                    <select required value={selectedParentId} onChange={(e) => setSelectedParentId(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50">
+                    <select required value={selectedParentId} onChange={(e) => setSelectedParentId(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50">
                       <option value="">-- Pilih --</option>
                       {(masterSasaran.program || []).map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}
                     </select>
@@ -777,14 +778,14 @@ export default function App() {
                 )}
                 <div className={kategoriSasaran === 'kegiatan' ? "md:col-span-2" : "md:col-span-1"}>
                   <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Uraian Sasaran</label>
-                  <input required type="text" value={formSasaran.nama} onChange={(e) => setFormSasaran({...formSasaran, nama: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Masukkan uraian..." />
+                  <input required type="text" value={formSasaran.nama} onChange={(e) => setFormSasaran({...formSasaran, nama: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Masukkan uraian..." />
                 </div>
               </div>
               {kategoriSasaran !== 'kegiatan' && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-2">
-                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Indikator (IKU)</label><input required type="text" value={formSasaran.indikator} onChange={(e) => setFormSasaran({...formSasaran, indikator: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Indikator..." /></div>
-                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Target</label><input required type="text" value={formSasaran.target} onChange={(e) => setFormSasaran({...formSasaran, target: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Target..." /></div>
-                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Satuan</label><input required type="text" value={formSasaran.satuan} onChange={(e) => setFormSasaran({...formSasaran, satuan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Satuan..." /></div>
+                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Indikator (IKU)</label><input required type="text" value={formSasaran.indikator} onChange={(e) => setFormSasaran({...formSasaran, indikator: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Indikator..." /></div>
+                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Target</label><input required type="text" value={formSasaran.target} onChange={(e) => setFormSasaran({...formSasaran, target: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Target..." /></div>
+                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Satuan</label><input required type="text" value={formSasaran.satuan} onChange={(e) => setFormSasaran({...formSasaran, satuan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Satuan..." /></div>
                 </div>
               )}
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-200/50">
@@ -793,7 +794,7 @@ export default function App() {
                     Batal
                   </button>
                 )}
-                <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all">
+                <button type="submit" className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all">
                   {editSasaranId ? <Save size={16} /> : <Plus size={16} />} {editSasaranId ? 'Simpan Perubahan' : 'Tambahkan'}
                 </button>
               </div>
@@ -817,20 +818,20 @@ export default function App() {
                       const stratItems = (masterSasaran.strategis || []).filter(s => s.nama === stratNama);
                       return (
                         <React.Fragment key={`strat_${stratNama}`}>
-                          <tr className="bg-indigo-50/40 hover:bg-indigo-50/70 align-top transition-colors">
-                            <td className="p-4 font-bold text-slate-900 border-l-4 border-indigo-500">
-                              <span className="inline-block bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-bold uppercase tracking-wide">Strategis</span>
+                          <tr className="bg-emerald-50/40 hover:bg-emerald-50/70 align-top transition-colors">
+                            <td className="p-4 font-bold text-slate-900 border-l-4 border-emerald-600">
+                              <span className="inline-block bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-bold uppercase tracking-wide">Strategis</span>
                               <span className="leading-relaxed">{stratNama}</span>
                             </td>
                             <td className="p-4 space-y-2">
                               {stratItems.map(strat => (
-                                <div key={strat.id} className="flex items-center justify-between bg-white/80 p-3 rounded-xl border border-indigo-100/50 shadow-sm backdrop-blur-sm">
+                                <div key={strat.id} className="flex items-center justify-between bg-white/80 p-3 rounded-xl border border-emerald-100/50 shadow-sm backdrop-blur-sm">
                                   <div className="space-y-1">
-                                    <p className="text-indigo-900 font-bold text-xs"><span className="text-indigo-400/80 mr-1">IKU:</span> {strat.indikator}</p>
+                                    <p className="text-emerald-900 font-bold text-xs"><span className="text-emerald-600/80 mr-1">IKU:</span> {strat.indikator}</p>
                                     <p className="text-slate-500 text-xs font-medium"><span className="text-slate-400 mr-1">Target:</span> {strat.target} <span className="bg-slate-100/80 px-1.5 rounded">{strat.satuan}</span></p>
                                   </div>
                                   <div className="flex gap-1.5 ml-3">
-                                    <button onClick={() => handleEditClickSasaran('strategis', strat)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
+                                    <button onClick={() => handleEditClickSasaran('strategis', strat)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
                                     <button onClick={() => handleDeleteSasaran('strategis', strat.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
                                   </div>
                                 </div>
@@ -847,20 +848,20 @@ export default function App() {
                             const progItems = (masterSasaran.program || []).filter(p => p.nama === progNama && stratItems.some(s => s.id === p.parentId));
                             return (
                               <React.Fragment key={`prog_${progNama}`}>
-                                <tr className="bg-sky-50/30 hover:bg-sky-50/60 align-top transition-colors">
-                                  <td className="p-4 pl-10 font-bold text-slate-800 border-l-4 border-sky-400">
-                                    <span className="inline-block bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-bold uppercase tracking-wide">Program</span>
+                                <tr className="bg-teal-50/30 hover:bg-teal-50/60 align-top transition-colors">
+                                  <td className="p-4 pl-10 font-bold text-slate-800 border-l-4 border-teal-500">
+                                    <span className="inline-block bg-teal-100 text-teal-800 px-2.5 py-0.5 rounded-md mr-2 text-[10px] font-bold uppercase tracking-wide">Program</span>
                                     <span className="leading-relaxed">{progNama}</span>
                                   </td>
                                   <td className="p-4 space-y-2">
                                     {progItems.map(prog => (
-                                      <div key={prog.id} className="flex items-center justify-between bg-white/80 p-3 rounded-xl border border-sky-100/50 shadow-sm backdrop-blur-sm">
+                                      <div key={prog.id} className="flex items-center justify-between bg-white/80 p-3 rounded-xl border border-teal-100/50 shadow-sm backdrop-blur-sm">
                                         <div className="space-y-1">
-                                          <p className="text-sky-900 font-bold text-xs"><span className="text-sky-400/80 mr-1">IKU:</span> {prog.indikator}</p>
+                                          <p className="text-teal-900 font-bold text-xs"><span className="text-teal-600/80 mr-1">IKU:</span> {prog.indikator}</p>
                                           <p className="text-slate-500 text-xs font-medium"><span className="text-slate-400 mr-1">Target:</span> {prog.target} <span className="bg-slate-100/80 px-1.5 rounded">{prog.satuan}</span></p>
                                         </div>
                                         <div className="flex gap-1.5 ml-3">
-                                          <button onClick={() => handleEditClickSasaran('program', prog)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
+                                          <button onClick={() => handleEditClickSasaran('program', prog)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
                                           <button onClick={() => handleDeleteSasaran('program', prog.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
                                         </div>
                                       </div>
@@ -886,7 +887,7 @@ export default function App() {
                                           <div key={keg.id} className="flex items-center justify-between bg-white/60 p-3 rounded-xl border border-slate-200/50 shadow-sm">
                                             <span className="text-slate-500 text-xs font-medium italic">Sasaran Kegiatan Aktif</span>
                                             <div className="flex gap-1.5 ml-3">
-                                              <button onClick={() => handleEditClickSasaran('kegiatan', keg)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
+                                              <button onClick={() => handleEditClickSasaran('kegiatan', keg)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
                                               <button onClick={() => handleDeleteSasaran('kegiatan', keg.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
                                             </div>
                                           </div>
@@ -936,23 +937,23 @@ export default function App() {
         <div>
           <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Dashboard Manajemen Risiko</h2>
           <div className="flex items-center gap-2 mt-1.5">
-            <span className={`px-2.5 py-0.5 rounded-md text-[10px] uppercase tracking-wider font-bold ${currentUser.eselon === 'Eselon 1' ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-200/80 text-slate-700'}`}>{currentUser.eselon || 'Eselon 2'}</span>
+            <span className={`px-2.5 py-0.5 rounded-md text-[10px] uppercase tracking-wider font-bold ${currentUser.eselon === 'Eselon 1' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200/80 text-slate-700'}`}>{currentUser.eselon || 'Eselon 2'}</span>
             <p className="text-slate-500 text-sm font-medium">{currentUser.nama}</p>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Risiko</p><h3 className="text-3xl font-extrabold text-slate-800 mt-1">{totalRisiko}</h3></div><div className="p-4 bg-white/60 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 rounded-2xl transition-colors"><Hexagon size={28} /></div></div>
-          <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">RTP Dimitigasi</p><h3 className="text-3xl font-extrabold text-sky-600 mt-1">{risikoDimitigasi}</h3></div><div className="p-4 bg-white/60 text-sky-500 group-hover:bg-sky-50 group-hover:text-sky-600 rounded-2xl transition-colors"><ShieldCheck size={28} /></div></div>
+          <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Risiko</p><h3 className="text-3xl font-extrabold text-slate-800 mt-1">{totalRisiko}</h3></div><div className="p-4 bg-white/60 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-700 rounded-2xl transition-colors"><Hexagon size={28} /></div></div>
+          <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">RTP Dimitigasi</p><h3 className="text-3xl font-extrabold text-teal-600 mt-1">{risikoDimitigasi}</h3></div><div className="p-4 bg-white/60 text-teal-500 group-hover:bg-teal-50 group-hover:text-teal-600 rounded-2xl transition-colors"><ShieldCheck size={28} /></div></div>
           <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Kejadian Risiko</p><h3 className="text-3xl font-extrabold text-rose-600 mt-1">{unitKejadian.length}</h3></div><div className="p-4 bg-white/60 text-rose-500 group-hover:bg-rose-50 group-hover:text-rose-600 rounded-2xl transition-colors"><AlertTriangle size={28} /></div></div>
           <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Efektifitas</p><h3 className="text-3xl font-extrabold text-emerald-600 mt-1">{unitEfektivitas.length}</h3></div><div className="p-4 bg-white/60 text-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-600 rounded-2xl transition-colors"><BadgeCheck size={28} /></div></div>
         </div>
         <div className="glass-panel p-6 rounded-2xl space-y-5">
-          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2"><PieChart size={16} className="text-indigo-500"/> Distribusi Level Risiko</h3>
+          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2"><PieChart size={16} className="text-emerald-600"/> Distribusi Level Risiko</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="p-5 bg-rose-50/70 border border-rose-100 rounded-2xl hover:bg-rose-100 transition-colors"><p className="text-[11px] font-bold text-rose-600 uppercase tracking-wide">Sangat Tinggi</p><p className="text-3xl font-extrabold text-rose-900 mt-2">{risikoSangatTinggi}</p></div>
             <div className="p-5 bg-orange-50/70 border border-orange-100 rounded-2xl hover:bg-orange-100 transition-colors"><p className="text-[11px] font-bold text-orange-600 uppercase tracking-wide">Tinggi</p><p className="text-3xl font-extrabold text-orange-900 mt-2">{risikoTinggi}</p></div>
             <div className="p-5 bg-amber-50/70 border border-amber-100 rounded-2xl hover:bg-amber-100 transition-colors"><p className="text-[11px] font-bold text-amber-600 uppercase tracking-wide">Sedang</p><p className="text-3xl font-extrabold text-amber-900 mt-2">{risikoSedang}</p></div>
-            <div className="p-5 bg-emerald-50/70 border border-emerald-100 rounded-2xl hover:bg-emerald-100 transition-colors"><p className="text-[11px] font-bold text-emerald-600 uppercase tracking-wide">Rendah</p><p className="text-3xl font-extrabold text-emerald-900 mt-2">{risikoRendah}</p></div>
+            <div className="p-5 bg-teal-50/70 border border-teal-100 rounded-2xl hover:bg-teal-100 transition-colors"><p className="text-[11px] font-bold text-teal-600 uppercase tracking-wide">Rendah</p><p className="text-3xl font-extrabold text-teal-900 mt-2">{risikoRendah}</p></div>
           </div>
         </div>
       </div>
@@ -1026,33 +1027,33 @@ export default function App() {
       <div className="w-full space-y-6 animate-in fade-in duration-300">
         <div>
           <h2 className="text-2xl font-bold text-slate-800 tracking-tight">1. Penetapan Tujuan</h2>
-          <p className="text-xs text-slate-500 mt-1 font-medium">Tahun <span className="font-bold text-slate-700">{currentUser?.tahun}</span> &bull; Mode: <span className="font-bold text-indigo-600">{currentUser.eselon || 'Eselon 2'}</span> {isEselon1 ? '(Hierarki Sasaran Program)' : '(Hierarki Sasaran Kegiatan)'}</p>
+          <p className="text-xs text-slate-500 mt-1 font-medium">Tahun <span className="font-bold text-slate-700">{currentUser?.tahun}</span> &bull; Mode: <span className="font-bold text-emerald-700">{currentUser.eselon || 'Eselon 2'}</span> {isEselon1 ? '(Hierarki Sasaran Program)' : '(Hierarki Sasaran Kegiatan)'}</p>
         </div>
         <form onSubmit={handleSaveTujuan} className="glass-panel p-6 rounded-2xl space-y-5">
             <div>
               <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">1. Sasaran Strategis K/L</label>
-              <select required value={selectedStrategis} onChange={(e) => { setSelectedStrategis(e.target.value); setSelectedProgram(''); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-medium text-slate-800"><option value="">-- Pilih --</option>{uniqueStrategis.map(s => <option key={s.id} value={s.id}>{s.nama}</option>)}</select>
+              <select required value={selectedStrategis} onChange={(e) => { setSelectedStrategis(e.target.value); setSelectedProgram(''); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-medium text-slate-800"><option value="">-- Pilih --</option>{uniqueStrategis.map(s => <option key={s.id} value={s.id}>{s.nama}</option>)}</select>
             </div>
             <div>
               <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">2. Sasaran Program</label>
-              <select required value={selectedProgram} onChange={(e) => { setSelectedProgram(e.target.value); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-medium text-slate-800" disabled={!selectedStrategis}><option value="">-- Pilih --</option>{uniqueProgram.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}</select>
+              <select required value={selectedProgram} onChange={(e) => { setSelectedProgram(e.target.value); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-medium text-slate-800" disabled={!selectedStrategis}><option value="">-- Pilih --</option>{uniqueProgram.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}</select>
             </div>
             
             {!isEselon1 && (
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">3. Sasaran Kegiatan</label>
-                <select required value={selectedKegiatan} onChange={(e) => setSelectedKegiatan(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-medium text-slate-800" disabled={!selectedProgram}><option value="">-- Pilih --</option>{uniqueKegiatan.map(k => <option key={k.id} value={k.id}>{k.nama}</option>)}</select>
+                <select required value={selectedKegiatan} onChange={(e) => setSelectedKegiatan(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-medium text-slate-800" disabled={!selectedProgram}><option value="">-- Pilih --</option>{uniqueKegiatan.map(k => <option key={k.id} value={k.id}>{k.nama}</option>)}</select>
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-3 border-t border-slate-200/50">
-              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Indikator IKU Unit</label><input required type="text" value={indikatorKgt} onChange={(e) => setIndikatorKgt(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Ketik indikator..." /></div>
-              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Target</label><input required type="text" value={targetKgt} onChange={(e) => setTargetKgt(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Nilai target..." /></div>
-              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Satuan</label><input required type="text" value={satuanKgt} onChange={(e) => setSatuanKgt(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Misal: Dokumen..." /></div>
+              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Indikator IKU Unit</label><input required type="text" value={indikatorKgt} onChange={(e) => setIndikatorKgt(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Ketik indikator..." /></div>
+              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Target</label><input required type="text" value={targetKgt} onChange={(e) => setTargetKgt(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Nilai target..." /></div>
+              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Satuan</label><input required type="text" value={satuanKgt} onChange={(e) => setSatuanKgt(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Misal: Dokumen..." /></div>
             </div>
           <div className="pt-4 flex justify-end gap-3">
             {editTujuanId && <button type="button" onClick={() => { setEditTujuanId(null); setIndikatorKgt(''); setTargetKgt(''); setSatuanKgt(''); }} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-white/60 border border-slate-200/60 text-slate-700 hover:bg-white transition-colors cursor-pointer">Batal</button>}
-            <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><PlusCircle size={16} /> {editTujuanId ? 'Update Tujuan' : 'Simpan Data'}</button>
+            <button type="submit" className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><PlusCircle size={16} /> {editTujuanId ? 'Update Tujuan' : 'Simpan Data'}</button>
           </div>
         </form>
         <div className="glass-panel rounded-2xl overflow-hidden">
@@ -1065,14 +1066,14 @@ export default function App() {
               </thead>
               <tbody className="divide-y divide-slate-200/50 text-[13px]">
                 {unitTujuanList.map(item => (
-                  <tr key={item.id} className="hover:bg-indigo-50/40 transition-colors">
+                  <tr key={item.id} className="hover:bg-emerald-50/40 transition-colors">
                     <td className="p-4 font-bold text-slate-400">{item.id}</td>
                     <td className="p-4 font-medium text-slate-700 leading-relaxed">{item.strategis}</td>
-                    <td className="p-4 leading-relaxed"><strong className="text-slate-800">{isEselon1 ? item.program : item.kegiatan}</strong><br/><span className="text-indigo-600 text-[11px] font-bold mt-1 inline-block bg-indigo-50/50 px-2 py-0.5 rounded border border-indigo-100/50">IKU: {item.indikator}</span></td>
-                    <td className="p-4 text-center"><span className="bg-indigo-100/80 text-indigo-800 px-3 py-1.5 rounded-lg font-bold border border-indigo-200/50">{item.target}</span></td>
+                    <td className="p-4 leading-relaxed"><strong className="text-slate-800">{isEselon1 ? item.program : item.kegiatan}</strong><br/><span className="text-emerald-700 text-[11px] font-bold mt-1 inline-block bg-emerald-50/50 px-2 py-0.5 rounded border border-emerald-100/50">IKU: {item.indikator}</span></td>
+                    <td className="p-4 text-center"><span className="bg-emerald-100/80 text-emerald-800 px-3 py-1.5 rounded-lg font-bold border border-emerald-200/50">{item.target}</span></td>
                     <td className="p-4 text-center"><span className="bg-white/60 text-slate-600 px-3 py-1.5 rounded-lg font-bold border border-white">{item.satuan || '-'}</span></td>
                     <td className="p-4 text-center space-x-1 whitespace-nowrap">
-                      <button type="button" onClick={() => handleEditTujuan(item)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
+                      <button type="button" onClick={() => handleEditTujuan(item)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
                       <button type="button" onClick={() => handleDeleteTujuan(item.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
                     </td>
                   </tr>
@@ -1192,7 +1193,7 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Indikator Sasaran (IKU)</label>
-              <select required value={formRisk.indikatorKgt} onChange={(e) => handleIndikatorChange(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-medium text-slate-800">
+              <select required value={formRisk.indikatorKgt} onChange={(e) => handleIndikatorChange(e.target.value)} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-medium text-slate-800">
                 {unitTujuanList.map((t, i) => <option key={i} value={t.indikator}>{t.indikator}</option>)}
               </select>
             </div>
@@ -1201,22 +1202,22 @@ export default function App() {
               <input type="text" value={formRisk.sasaranKgt} readOnly className="w-full p-3 text-sm border border-slate-200/50 rounded-xl bg-slate-100/50 text-slate-500 font-medium" />
             </div>
           </div>
-          <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Permasalahan</label><textarea required rows="2" value={formRisk.permasalahan} onChange={(e) => setFormRisk({...formRisk, permasalahan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Deskripsikan masalah secara umum..." /></div>
+          <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Permasalahan</label><textarea required rows="2" value={formRisk.permasalahan} onChange={(e) => setFormRisk({...formRisk, permasalahan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Deskripsikan masalah secara umum..." /></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="md:col-span-2"><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Pernyataan Risiko</label><textarea required rows="2" value={formRisk.pernyataanRisiko} onChange={(e) => {
               const val = e.target.value;
               setFormRisk(prev => ({ ...prev, pernyataanRisiko: val, sisaRisiko: prev.penilaianPengendalian === 'Belum Memadai' ? val : prev.sisaRisiko }));
-            }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-medium text-slate-800" placeholder="Rumusan risiko definitif..." /></div>
-            <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kategori Risiko</label><select required value={formRisk.kategoriRisiko} onChange={(e) => setFormRisk({...formRisk, kategoriRisiko: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-medium text-slate-800"><option value="Operasional">Operasional</option><option value="Kepatuhan">Kepatuhan</option><option value="Strategis">Strategis</option><option value="Fraud">Fraud</option></select></div>
-            <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Pemilik Risiko</label><input required type="text" value={formRisk.pemilikRisiko} onChange={(e) => setFormRisk({...formRisk, pemilikRisiko: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Nama/Jabatan pemilik..." /></div>
+            }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-medium text-slate-800" placeholder="Rumusan risiko definitif..." /></div>
+            <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kategori Risiko</label><select required value={formRisk.kategoriRisiko} onChange={(e) => setFormRisk({...formRisk, kategoriRisiko: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-medium text-slate-800"><option value="Operasional">Operasional</option><option value="Kepatuhan">Kepatuhan</option><option value="Strategis">Strategis</option><option value="Fraud">Fraud</option></select></div>
+            <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Pemilik Risiko</label><input required type="text" value={formRisk.pemilikRisiko} onChange={(e) => setFormRisk({...formRisk, pemilikRisiko: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Nama/Jabatan pemilik..." /></div>
           </div>
           
           <div className="p-4 bg-white/40 rounded-xl border border-white/60 space-y-4">
-            <h4 className="text-[11px] font-bold text-indigo-500 uppercase tracking-widest border-b border-slate-200/50 pb-2">Analisis Penyebab</h4>
+            <h4 className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest border-b border-slate-200/50 pb-2">Analisis Penyebab</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <input required type="text" value={formRisk.penyebabUraian} onChange={(e) => setFormRisk({...formRisk, penyebabUraian: e.target.value})} placeholder="Uraian Penyebab" className="p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all" />
-              <input required type="text" value={formRisk.penyebabSumber} onChange={(e) => setFormRisk({...formRisk, penyebabSumber: e.target.value})} placeholder="Sumber Penyebab (Eksternal/Internal)" className="p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all" />
-              <select value={formRisk.sifatKontrol} onChange={(e) => setFormRisk({...formRisk, sifatKontrol: e.target.value})} className="p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium text-slate-700"><option value="Controllable">Controllable (Dapat Dikendalikan)</option><option value="Uncontrollable">Uncontrollable (Sulit Dikendalikan)</option></select>
+              <input required type="text" value={formRisk.penyebabUraian} onChange={(e) => setFormRisk({...formRisk, penyebabUraian: e.target.value})} placeholder="Uraian Penyebab" className="p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all" />
+              <input required type="text" value={formRisk.penyebabSumber} onChange={(e) => setFormRisk({...formRisk, penyebabSumber: e.target.value})} placeholder="Sumber Penyebab (Eksternal/Internal)" className="p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all" />
+              <select value={formRisk.sifatKontrol} onChange={(e) => setFormRisk({...formRisk, sifatKontrol: e.target.value})} className="p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all font-medium text-slate-700"><option value="Controllable">Controllable (Dapat Dikendalikan)</option><option value="Uncontrollable">Uncontrollable (Sulit Dikendalikan)</option></select>
             </div>
           </div>
           
@@ -1231,7 +1232,7 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             <div>
               <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Pengendalian Eksisting</label>
-              <textarea required rows="2" value={formRisk.pengendalianRisiko} onChange={(e) => setFormRisk({...formRisk, pengendalianRisiko: e.target.value})} placeholder="Pengendalian yang sudah ada saat ini..." className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" />
+              <textarea required rows="2" value={formRisk.pengendalianRisiko} onChange={(e) => setFormRisk({...formRisk, pengendalianRisiko: e.target.value})} placeholder="Pengendalian yang sudah ada saat ini..." className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" />
             </div>
             <div>
               <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Penilaian Pengendalian</label>
@@ -1242,7 +1243,7 @@ export default function App() {
                   penilaianPengendalian: val,
                   sisaRisiko: val === 'Memadai' ? '-' : (val === 'Belum Memadai' ? prev.pernyataanRisiko : '')
                 }));
-              }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-medium text-slate-800">
+              }} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-medium text-slate-800">
                 <option value="">-- Pilih Penilaian --</option>
                 <option value="Memadai">Sudah Memadai</option>
                 <option value="Belum Memadai">Belum Memadai</option>
@@ -1255,7 +1256,7 @@ export default function App() {
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-slate-200/50">
             {editRiskId && <button type="button" onClick={() => setEditRiskId(null)} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-white/60 border border-slate-200/60 text-slate-700 hover:bg-white transition-colors cursor-pointer">Batal</button>}
-            <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> {editRiskId ? 'Update Risiko' : 'Simpan Identifikasi'}</button>
+            <button type="submit" className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> {editRiskId ? 'Update Risiko' : 'Simpan Identifikasi'}</button>
           </div>
         </form>
 
@@ -1275,15 +1276,15 @@ export default function App() {
               </thead>
               <tbody className="divide-y divide-slate-200/50 text-[13px]">
                 {unitRisks.map(item => (
-                  <tr key={item.id} className="hover:bg-indigo-50/40 transition-colors">
+                  <tr key={item.id} className="hover:bg-emerald-50/40 transition-colors">
                     <td className="p-4 font-bold text-slate-400 text-center">{item.id}</td>
                     <td className="p-4 text-slate-600 font-medium leading-relaxed">{item.sasaranKgt}</td>
-                    <td className="p-4 text-indigo-700 font-bold leading-relaxed">{item.indikatorKgt}</td>
+                    <td className="p-4 text-emerald-700 font-bold leading-relaxed">{item.indikatorKgt}</td>
                     <td className="p-4 font-bold text-slate-800 leading-relaxed">{item.pernyataanRisiko}</td>
                     <td className="p-4"><span className="bg-white/60 border border-white text-slate-600 px-2.5 py-1 rounded-md text-[11px] font-bold">{item.kategoriRisiko}</span></td>
                     <td className="p-4"><span className="text-slate-500 font-medium">{item.sifatKontrol}</span></td>
                     <td className="p-4 text-center space-x-1 whitespace-nowrap">
-                      <button type="button" onClick={() => handleEditRisk(item)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
+                      <button type="button" onClick={() => handleEditRisk(item)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer" title="Edit"><Edit size={14}/></button>
                       <button type="button" onClick={() => handleDeleteRisk(item.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
                     </td>
                   </tr>
@@ -1333,8 +1334,8 @@ export default function App() {
                 <tr className="bg-white/30 text-[10px] text-slate-400 uppercase tracking-wider font-bold border-b border-slate-200/60">
                   <th className="p-4 w-16 text-center">ID</th>
                   <th className="p-4 w-60">Pernyataan Risiko</th>
-                  <th className="p-4 w-32 text-center text-indigo-600">K (1-5)</th>
-                  <th className="p-4 w-32 text-center text-indigo-600">D (1-5)</th>
+                  <th className="p-4 w-32 text-center text-emerald-700">K (1-5)</th>
+                  <th className="p-4 w-32 text-center text-emerald-700">D (1-5)</th>
                   <th className="p-4 w-28 text-center">Skor</th>
                   <th className="p-4 w-36 text-center">Level</th>
                   <th className="p-4 w-28 text-center">Aksi</th>
@@ -1345,14 +1346,14 @@ export default function App() {
                   const s = calculateSkorRisiko(risk.kemungkinan, risk.keparahan);
                   const l = calculateLevelRisiko(s);
                   return (
-                    <tr key={risk.id} className="hover:bg-indigo-50/40 transition-colors">
+                    <tr key={risk.id} className="hover:bg-emerald-50/40 transition-colors">
                       <td className="p-4 font-bold text-slate-400 text-center">{risk.id}</td>
                       <td className="p-4 font-bold text-slate-800 leading-relaxed">{risk.pernyataanRisiko}</td>
-                      <td className="p-4 text-center"><select value={risk.kemungkinan || 0} onChange={(e) => handleSelectChange(risk.id, 'kemungkinan', e.target.value)} className="p-2.5 w-16 text-center border border-white/60 rounded-lg outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 font-bold text-indigo-800 bg-white/60"><option value="0">-</option>{[1,2,3,4,5].map(n=><option key={n} value={n}>{n}</option>)}</select></td>
-                      <td className="p-4 text-center"><select value={risk.keparahan || 0} onChange={(e) => handleSelectChange(risk.id, 'keparahan', e.target.value)} className="p-2.5 w-16 text-center border border-white/60 rounded-lg outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 font-bold text-indigo-800 bg-white/60"><option value="0">-</option>{[1,2,3,4,5].map(n=><option key={n} value={n}>{n}</option>)}</select></td>
+                      <td className="p-4 text-center"><select value={risk.kemungkinan || 0} onChange={(e) => handleSelectChange(risk.id, 'kemungkinan', e.target.value)} className="p-2.5 w-16 text-center border border-white/60 rounded-lg outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-600/20 font-bold text-emerald-800 bg-white/60"><option value="0">-</option>{[1,2,3,4,5].map(n=><option key={n} value={n}>{n}</option>)}</select></td>
+                      <td className="p-4 text-center"><select value={risk.keparahan || 0} onChange={(e) => handleSelectChange(risk.id, 'keparahan', e.target.value)} className="p-2.5 w-16 text-center border border-white/60 rounded-lg outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-600/20 font-bold text-emerald-800 bg-white/60"><option value="0">-</option>{[1,2,3,4,5].map(n=><option key={n} value={n}>{n}</option>)}</select></td>
                       <td className="p-4 text-center font-extrabold text-lg text-slate-700">{s > 0 ? s : '-'}</td>
                       <td className="p-4 text-center">{s > 0 ? <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border ${getStatusColor(l)}`}>{l}</span> : <span className="text-slate-300">-</span>}</td>
-                      <td className="p-4 text-center"><button type="button" onClick={() => handleSaveAnalisis(risk.id)} className="bg-white/80 text-indigo-700 px-4 py-2 rounded-xl border border-white font-bold text-xs hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer shadow-sm hover:shadow-indigo-600/20 active:scale-95">Simpan</button></td>
+                      <td className="p-4 text-center"><button type="button" onClick={() => handleSaveAnalisis(risk.id)} className="bg-white/80 text-emerald-700 px-4 py-2 rounded-xl border border-white font-bold text-xs hover:bg-emerald-700 hover:text-white transition-colors cursor-pointer shadow-sm hover:shadow-emerald-700/20 active:scale-95">Simpan</button></td>
                     </tr>
                   );
                 })}
@@ -1381,7 +1382,7 @@ export default function App() {
               </thead>
               <tbody className="divide-y divide-slate-200/50 text-[13px]">
                 {unitRisks.filter(r => r.skor > 0).map(r => (
-                  <tr key={r.id} className="hover:bg-indigo-50/40 transition-colors">
+                  <tr key={r.id} className="hover:bg-emerald-50/40 transition-colors">
                     <td className="p-4 font-bold text-slate-400 text-center">{r.id}</td>
                     <td className="p-4 font-bold text-slate-800 leading-relaxed">{r.pernyataanRisiko}</td>
                     <td className="p-4 text-center font-extrabold text-slate-600">{r.kemungkinan}</td>
@@ -1462,18 +1463,18 @@ export default function App() {
                 </thead>
                 <tbody className="divide-y divide-slate-200/50 text-[13px]">
                   {unitRisks.map((item) => (
-                    <tr key={item.id} className="hover:bg-indigo-50/40 transition-colors">
+                    <tr key={item.id} className="hover:bg-emerald-50/40 transition-colors">
                       <td className="p-4 font-bold text-center text-slate-400">{item.id}</td>
                       <td className="p-4 font-bold text-slate-800 leading-relaxed">{item.pernyataanRisiko}</td>
                       <td className="p-4 text-center">
                         <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border block w-max mx-auto ${getStatusColor(item.levelRisiko)}`}>{item.skor} ({item.levelRisiko})</span>
                       </td>
-                      <td className="p-4 text-indigo-700 font-semibold leading-relaxed">{item.rtp || <span className="text-slate-400/70 italic font-medium">Belum diisi</span>}</td>
+                      <td className="p-4 text-emerald-700 font-semibold leading-relaxed">{item.rtp || <span className="text-slate-400/70 italic font-medium">Belum diisi</span>}</td>
                       <td className="p-4 font-medium text-slate-700">{item.penanggungJawab || <span className="text-slate-400/70 italic">-</span>}</td>
                       <td className="p-4 text-center font-medium text-slate-700">{item.targetWaktu || <span className="text-slate-400/70 italic">-</span>}</td>
                       <td className="p-4 font-medium text-slate-700">{item.komunikasi || <span className="text-slate-400/70 italic">-</span>}</td>
                       <td className="p-4 text-center space-x-1 whitespace-nowrap">
-                        <button type="button" onClick={() => handleStartEdit(item)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Edit"><Edit size={14}/></button>
+                        <button type="button" onClick={() => handleStartEdit(item)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-emerald-50 hover:text-emerald-700 transition-colors" title="Edit"><Edit size={14}/></button>
                         <button type="button" onClick={() => handleDeleteRTP(item.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Hapus"><Trash2 size={14}/></button>
                       </td>
                     </tr>
@@ -1490,26 +1491,26 @@ export default function App() {
         )}
 
         {editingRtpId && (
-          <div className="glass-panel p-6 rounded-2xl border-2 border-indigo-200/80 shadow-lg space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300 relative z-10">
+          <div className="glass-panel p-6 rounded-2xl border-2 border-emerald-200/80 shadow-lg space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300 relative z-10">
             <div className="flex justify-between items-center border-b border-slate-200/50 pb-3">
               <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                <Edit size={16} className="text-indigo-500" /> Form Edit RTP: <span className="text-indigo-700">{risks.find(r => r.id === editingRtpId)?.pernyataanRisiko}</span>
+                <Edit size={16} className="text-emerald-600" /> Form Edit RTP: <span className="text-emerald-800">{risks.find(r => r.id === editingRtpId)?.pernyataanRisiko}</span>
               </h3>
               <button onClick={() => setEditingRtpId(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer bg-white/60 p-1.5 rounded-lg hover:bg-white transition-colors"><X size={16} /></button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">RTP</label><textarea value={editForm.rtp} onChange={(e) => setEditForm({...editForm, rtp: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 min-h-[100px]" placeholder="Uraikan rencana tindak pengendalian..." /></div>
+              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">RTP</label><textarea value={editForm.rtp} onChange={(e) => setEditForm({...editForm, rtp: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 min-h-[100px]" placeholder="Uraikan rencana tindak pengendalian..." /></div>
               <div className="space-y-5">
-                <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Penanggung Jawab</label><input type="text" value={editForm.penanggungJawab} onChange={(e) => setEditForm({...editForm, penanggungJawab: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Nama / Jabatan Penanggung Jawab..." /></div>
+                <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Penanggung Jawab</label><input type="text" value={editForm.penanggungJawab} onChange={(e) => setEditForm({...editForm, penanggungJawab: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Nama / Jabatan Penanggung Jawab..." /></div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Target Waktu</label><input type="text" value={editForm.targetWaktu} onChange={(e) => setEditForm({...editForm, targetWaktu: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Misal: TW 1 / Juli..." /></div>
-                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Komunikasi</label><input type="text" value={editForm.komunikasi} onChange={(e) => setEditForm({...editForm, komunikasi: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Media/Cara komunikasi..." /></div>
+                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Target Waktu</label><input type="text" value={editForm.targetWaktu} onChange={(e) => setEditForm({...editForm, targetWaktu: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Misal: TW 1 / Juli..." /></div>
+                  <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Komunikasi</label><input type="text" value={editForm.komunikasi} onChange={(e) => setEditForm({...editForm, komunikasi: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Media/Cara komunikasi..." /></div>
                 </div>
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-200/50">
               <button type="button" onClick={() => setEditingRtpId(null)} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-white/60 border border-slate-200/60 text-slate-700 hover:bg-white transition-colors cursor-pointer">Batal</button>
-              <button type="button" onClick={() => handleSaveRTP(editingRtpId)} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex gap-2 items-center shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Simpan Perubahan</button>
+              <button type="button" onClick={() => handleSaveRTP(editingRtpId)} className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex gap-2 items-center shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Simpan Perubahan</button>
             </div>
           </div>
         )}
@@ -1572,13 +1573,13 @@ export default function App() {
                 </thead>
                 <tbody className="divide-y divide-slate-200/50 text-[13px]">
                   {unitRisks.map(r => (
-                    <tr key={r.id} className="hover:bg-indigo-50/40 transition-colors">
+                    <tr key={r.id} className="hover:bg-emerald-50/40 transition-colors">
                       <td className="p-4 font-bold text-center text-slate-400">{r.id}</td>
                       <td className="p-4 font-bold text-slate-800 leading-relaxed">{r.pernyataanRisiko}</td>
                       <td className="p-4 font-medium text-slate-700 leading-relaxed">{r.prosesRtp || <span className="text-slate-400/70 italic">Belum ada progres dilaporkan.</span>}</td>
                       <td className="p-4">
                         {r.linkEviden ? (
-                          <a href={r.linkEviden.startsWith('http') ? r.linkEviden : `https://${r.linkEviden}`} target="_blank" rel="noreferrer" className="text-indigo-600 font-bold hover:underline truncate block w-48 text-[11px] bg-white/60 p-1.5 rounded-md border border-white">
+                          <a href={r.linkEviden.startsWith('http') ? r.linkEviden : `https://${r.linkEviden}`} target="_blank" rel="noreferrer" className="text-emerald-700 font-bold hover:underline truncate block w-48 text-[11px] bg-white/60 p-1.5 rounded-md border border-white">
                             Buka Tautan &rarr;
                           </a>
                         ) : (
@@ -1586,7 +1587,7 @@ export default function App() {
                         )}
                       </td>
                       <td className="p-4 text-center space-x-1 whitespace-nowrap">
-                        <button type="button" onClick={() => handleStartEdit(r)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Update Progres"><Edit size={14}/></button>
+                        <button type="button" onClick={() => handleStartEdit(r)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-emerald-50 hover:text-emerald-700 transition-colors" title="Update Progres"><Edit size={14}/></button>
                         <button type="button" onClick={() => handleDeletePemantauan(r.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Hapus Progres"><Trash2 size={14}/></button>
                       </td>
                     </tr>
@@ -1603,20 +1604,20 @@ export default function App() {
         )}
 
         {editingPemantauanId && (
-          <div className="glass-panel p-6 rounded-2xl border-2 border-indigo-200/80 shadow-lg space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300 relative z-10">
+          <div className="glass-panel p-6 rounded-2xl border-2 border-emerald-200/80 shadow-lg space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300 relative z-10">
             <div className="flex justify-between items-center border-b border-slate-200/50 pb-3">
               <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                <Edit size={16} className="text-indigo-500" /> Update Progres: <span className="text-indigo-700">{risks.find(r => r.id === editingPemantauanId)?.pernyataanRisiko}</span>
+                <Edit size={16} className="text-emerald-600" /> Update Progres: <span className="text-emerald-800">{risks.find(r => r.id === editingPemantauanId)?.pernyataanRisiko}</span>
               </h3>
               <button onClick={() => setEditingPemantauanId(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer bg-white/60 p-1.5 rounded-lg hover:bg-white transition-colors"><X size={16} /></button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Proses / Progres Pelaksanaan RTP</label><textarea rows="3" value={editForm.prosesRtp} onChange={(e) => setEditForm({...editForm, prosesRtp: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Ceritakan progres penanganan..." /></div>
-              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Tautan (Link) Dokumen Eviden</label><input type="url" value={editForm.linkEviden} onChange={(e) => setEditForm({...editForm, linkEviden: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="https://drive.google.com/..." /></div>
+              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Proses / Progres Pelaksanaan RTP</label><textarea rows="3" value={editForm.prosesRtp} onChange={(e) => setEditForm({...editForm, prosesRtp: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Ceritakan progres penanganan..." /></div>
+              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Tautan (Link) Dokumen Eviden</label><input type="url" value={editForm.linkEviden} onChange={(e) => setEditForm({...editForm, linkEviden: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="https://drive.google.com/..." /></div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-200/50">
               <button type="button" onClick={() => setEditingPemantauanId(null)} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-white/60 border border-slate-200/60 text-slate-700 hover:bg-white transition-colors cursor-pointer">Batal</button>
-              <button type="button" onClick={() => handleSavePemantauan(editingPemantauanId)} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex gap-2 items-center shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Simpan Progres</button>
+              <button type="button" onClick={() => handleSavePemantauan(editingPemantauanId)} className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex gap-2 items-center shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Simpan Progres</button>
             </div>
           </div>
         )}
@@ -1680,17 +1681,17 @@ export default function App() {
             <p className="text-xs text-slate-500 mt-1 font-medium">Rekam insiden risiko riil di tahun berjalan.</p>
           </div>
           {!isFormOpen && (
-            <button onClick={handleOpenAdd} className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all">
+            <button onClick={handleOpenAdd} className="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all">
               <Plus size={16} /> Rekam Kejadian Baru
             </button>
           )}
         </div>
 
         {isFormOpen && (
-          <form onSubmit={handleSaveKejadian} className="glass-panel p-6 rounded-2xl border-2 border-indigo-200/80 shadow-lg space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
+          <form onSubmit={handleSaveKejadian} className="glass-panel p-6 rounded-2xl border-2 border-emerald-200/80 shadow-lg space-y-5 animate-in fade-in slide-in-from-top-4 duration-300">
             <div className="flex justify-between items-center border-b border-slate-200/50 pb-3">
               <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                {editKejadianId ? <Edit size={16} className="text-indigo-500" /> : <PlusCircle size={16} className="text-indigo-500" />}
+                {editKejadianId ? <Edit size={16} className="text-emerald-600" /> : <PlusCircle size={16} className="text-emerald-600" />}
                 {editKejadianId ? 'Edit Pencatatan Keterjadian' : 'Form Rekam Keterjadian Risiko'}
               </h3>
               <button type="button" onClick={() => setIsFormOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer bg-white/60 p-1.5 rounded-lg hover:bg-white transition-colors"><X size={16} /></button>
@@ -1699,22 +1700,22 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Risiko Terkait</label>
-                <select required value={formKejadian.riskId} onChange={(e) => setFormKejadian({...formKejadian, riskId: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-bold text-slate-700">
+                <select required value={formKejadian.riskId} onChange={(e) => setFormKejadian({...formKejadian, riskId: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-bold text-slate-700">
                   {unitRisks.map(r => <option key={r.id} value={r.id}>{r.id} - {r.pernyataanRisiko}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Kejadian</label>
-                <input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50 font-medium text-slate-700" />
+                <input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50 font-medium text-slate-700" />
               </div>
               
               <div className="md:col-span-2">
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kronologi Kejadian</label>
-                <textarea required rows="2" value={formKejadian.kronologi} onChange={(e) => setFormKejadian({...formKejadian, kronologi: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Uraikan urutan peristiwa secara detail..." />
+                <textarea required rows="2" value={formKejadian.kronologi} onChange={(e) => setFormKejadian({...formKejadian, kronologi: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Uraikan urutan peristiwa secara detail..." />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Akar Penyebab Riil</label>
-                <textarea required rows="2" value={formKejadian.penyebab} onChange={(e) => setFormKejadian({...formKejadian, penyebab: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all bg-white/50" placeholder="Apa penyebab sesungguhnya dari kejadian ini?" />
+                <textarea required rows="2" value={formKejadian.penyebab} onChange={(e) => setFormKejadian({...formKejadian, penyebab: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all bg-white/50" placeholder="Apa penyebab sesungguhnya dari kejadian ini?" />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-[11px] font-bold text-rose-500 uppercase tracking-wider mb-2">Dampak Aktual / Riil</label>
@@ -1724,7 +1725,7 @@ export default function App() {
 
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-200/50">
               <button type="button" onClick={() => setIsFormOpen(false)} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-white/60 border border-slate-200/60 text-slate-700 hover:bg-white transition-colors cursor-pointer">Batal</button>
-              <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex gap-2 items-center shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> {editKejadianId ? 'Update Kejadian' : 'Simpan Kejadian'}</button>
+              <button type="submit" className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl text-sm font-bold flex gap-2 items-center shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> {editKejadianId ? 'Update Kejadian' : 'Simpan Kejadian'}</button>
             </div>
           </form>
         )}
@@ -1735,7 +1736,7 @@ export default function App() {
               <thead>
                 <tr className="bg-white/30 text-[10px] text-slate-400 uppercase tracking-wider font-bold border-b border-slate-200/60">
                   <th className="p-4 w-12 text-center">No</th>
-                  <th className="p-4 w-32 text-center text-indigo-600">Tanggal Kejadian</th>
+                  <th className="p-4 w-32 text-center text-emerald-700">Tanggal Kejadian</th>
                   <th className="p-4 w-64">Pernyataan Risiko</th>
                   <th className="p-4">Kronologi & Penyebab</th>
                   <th className="p-4 w-64 text-rose-500">Dampak Riil</th>
@@ -1744,9 +1745,9 @@ export default function App() {
               </thead>
               <tbody className="divide-y divide-slate-200/50 text-[13px]">
                 {unitKejadian.map((k, index) => (
-                  <tr key={k.id} className="hover:bg-indigo-50/40 align-top transition-colors">
+                  <tr key={k.id} className="hover:bg-emerald-50/40 align-top transition-colors">
                     <td className="p-4 text-center font-bold text-slate-400">{index + 1}</td>
-                    <td className="p-4 text-center font-bold text-indigo-700"><span className="bg-white/60 px-2.5 py-1 rounded-md border border-white block">{k.tanggal || '-'}</span></td>
+                    <td className="p-4 text-center font-bold text-emerald-800"><span className="bg-white/60 px-2.5 py-1 rounded-md border border-white block">{k.tanggal || '-'}</span></td>
                     <td className="p-4 font-bold text-slate-800 leading-relaxed">{k.risiko}</td>
                     <td className="p-4 space-y-2">
                       <div><strong className="text-[10px] uppercase text-slate-400/80 tracking-wider block mb-0.5">Kronologi:</strong> <span className="text-slate-700 font-medium">{k.kronologi || '-'}</span></div>
@@ -1754,7 +1755,7 @@ export default function App() {
                     </td>
                     <td className="p-4 text-rose-700 font-semibold leading-relaxed">{k.dampakRiil || '-'}</td>
                     <td className="p-4 text-center space-x-1 whitespace-nowrap">
-                      <button type="button" onClick={() => handleOpenEdit(k)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Edit"><Edit size={14}/></button>
+                      <button type="button" onClick={() => handleOpenEdit(k)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-emerald-50 hover:text-emerald-700 transition-colors" title="Edit"><Edit size={14}/></button>
                       <button type="button" onClick={() => handleDeleteKejadian(k.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Hapus"><Trash2 size={14}/></button>
                     </td>
                   </tr>
@@ -1920,7 +1921,7 @@ export default function App() {
                   <th className="p-4 w-20 text-center">Risk ID</th>
                   <th className="p-4 w-72">Pernyataan Risiko</th>
                   <th className="p-4 text-center w-24">Skor Awal</th>
-                  <th className="p-4 text-center w-24 text-indigo-500">Skor Target</th>
+                  <th className="p-4 text-center w-24 text-emerald-600">Skor Target</th>
                   <th className="p-4 text-center w-24 text-sky-500">Skor Aktual</th>
                   <th className="p-4 text-center w-24">Deviasi</th>
                   <th className="p-4 text-center w-36">Status & Aksi</th>
@@ -1928,11 +1929,11 @@ export default function App() {
               </thead>
               <tbody className="divide-y divide-slate-200/50 text-[13px]">
                 {unitEfektivitas.map(e => (
-                  <tr key={e.id} className="hover:bg-indigo-50/40 transition-colors">
+                  <tr key={e.id} className="hover:bg-emerald-50/40 transition-colors">
                     <td className="p-4 font-bold text-slate-400 text-center">{e.riskId}</td>
                     <td className="p-4 font-bold text-slate-800 leading-relaxed">{e.pernyataanRisiko}</td>
                     <td className="p-4 text-center font-extrabold text-slate-500">{e.srAwal}</td>
-                    <td className="p-4 text-center font-extrabold text-indigo-600">{e.srDiharapkan}</td>
+                    <td className="p-4 text-center font-extrabold text-emerald-700">{e.srDiharapkan}</td>
                     <td className="p-4 text-center font-extrabold text-sky-600">{e.srActual}</td>
                     <td className="p-4 text-center font-extrabold text-emerald-600">{e.deviasi}</td>
                     <td className="p-4 text-center">
@@ -1950,7 +1951,7 @@ export default function App() {
                           </button>
                         )}
                         <div className="flex gap-1.5 justify-center w-full">
-                          <button type="button" onClick={() => handleStartEdit(e)} className="p-1.5 w-full flex justify-center bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-indigo-50 hover:text-indigo-600 transition-colors" title="Edit"><Edit size={14}/></button>
+                          <button type="button" onClick={() => handleStartEdit(e)} className="p-1.5 w-full flex justify-center bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-emerald-50 hover:text-emerald-700 transition-colors" title="Edit"><Edit size={14}/></button>
                           <button type="button" onClick={() => handleDeleteEv(e.id)} className="p-1.5 w-full flex justify-center bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Hapus"><Trash2 size={14}/></button>
                         </div>
                       </div>
@@ -1966,10 +1967,10 @@ export default function App() {
         </div>
 
         {editingEfektivitasId ? (
-          <div className="glass-panel p-6 rounded-2xl border-2 border-indigo-200/80 shadow-lg space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300 relative z-10">
+          <div className="glass-panel p-6 rounded-2xl border-2 border-emerald-200/80 shadow-lg space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-300 relative z-10">
             <div className="flex justify-between items-center border-b border-slate-200/50 pb-3">
               <h3 className="font-bold text-slate-800 text-sm flex items-center gap-2">
-                <Edit size={16} className="text-indigo-500" /> Form Edit Penilaian Efektifitas: <span className="text-indigo-700">{unitEfektivitas.find(e => e.id === editingEfektivitasId)?.pernyataanRisiko}</span>
+                <Edit size={16} className="text-emerald-600" /> Form Edit Penilaian Efektifitas: <span className="text-emerald-800">{unitEfektivitas.find(e => e.id === editingEfektivitasId)?.pernyataanRisiko}</span>
               </h3>
               <button onClick={() => setEditingEfektivitasId(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer bg-white/60 p-1.5 rounded-lg hover:bg-white transition-colors"><X size={16} /></button>
             </div>
@@ -1977,8 +1978,8 @@ export default function App() {
               <div>
                 <p className="text-[11px] font-bold mb-3 text-slate-500 uppercase tracking-wider">Target (K &times; D)</p>
                 <div className="flex gap-2">
-                  <select value={editForm.kDiharapkan} onChange={(e) => setEditForm({...editForm, kDiharapkan: e.target.value})} className="flex-1 p-2.5 border border-white/60 rounded-xl bg-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-indigo-700">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select>
-                  <select value={editForm.dDiharapkan} onChange={(e) => setEditForm({...editForm, dDiharapkan: e.target.value})} className="flex-1 p-2.5 border border-white/60 rounded-xl bg-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-indigo-700">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select>
+                  <select value={editForm.kDiharapkan} onChange={(e) => setEditForm({...editForm, kDiharapkan: e.target.value})} className="flex-1 p-2.5 border border-white/60 rounded-xl bg-white/60 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-600/20 outline-none font-bold text-emerald-800">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select>
+                  <select value={editForm.dDiharapkan} onChange={(e) => setEditForm({...editForm, dDiharapkan: e.target.value})} className="flex-1 p-2.5 border border-white/60 rounded-xl bg-white/60 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-600/20 outline-none font-bold text-emerald-800">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select>
                 </div>
               </div>
               <div>
@@ -1990,15 +1991,15 @@ export default function App() {
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kondisi Setelah Mitigasi</label><textarea rows="2" value={editForm.kondisiSetelahMitigasi} onChange={(e) => setEditForm({...editForm, kondisiSetelahMitigasi: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all" placeholder="Uraikan kondisi nyata..." /></div>
-              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Langkah Perbaikan (Jika Gagal)</label><textarea rows="2" value={editForm.langkahPerbaikan} onChange={(e) => setEditForm({...editForm, langkahPerbaikan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all" placeholder="Rencana korektif..." /></div>
+              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kondisi Setelah Mitigasi</label><textarea rows="2" value={editForm.kondisiSetelahMitigasi} onChange={(e) => setEditForm({...editForm, kondisiSetelahMitigasi: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all" placeholder="Uraikan kondisi nyata..." /></div>
+              <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Langkah Perbaikan (Jika Gagal)</label><textarea rows="2" value={editForm.langkahPerbaikan} onChange={(e) => setEditForm({...editForm, langkahPerbaikan: e.target.value})} className="w-full p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all" placeholder="Rencana korektif..." /></div>
             </div>
             <div className="flex justify-end gap-3 pt-4 border-t border-slate-200/50">
               <button type="button" onClick={() => setEditingEfektivitasId(null)} className="px-5 py-2.5 rounded-xl text-sm font-bold bg-white/60 border border-slate-200/60 text-slate-700 hover:bg-white transition-colors cursor-pointer">Batal</button>
               <button type="button" onClick={() => {
                 const item = unitEfektivitas.find(e => e.id === editingEfektivitasId);
                 if (item) handleSaveEv(item.riskId, item.id);
-              }} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex gap-2 items-center shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Update Penilaian</button>
+              }} className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex gap-2 items-center shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Update Penilaian</button>
             </div>
           </div>
         ) : (
@@ -2018,8 +2019,8 @@ export default function App() {
                     <div>
                       <p className="text-[11px] font-bold mb-3 text-slate-500 uppercase tracking-wider">Target (K &times; D)</p>
                       <div className="flex gap-2">
-                        <select id={`kd_${risk.id}`} defaultValue="3" className="flex-1 p-2.5 border border-white/60 rounded-xl bg-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-indigo-700">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select>
-                        <select id={`dd_${risk.id}`} defaultValue="3" className="flex-1 p-2.5 border border-white/60 rounded-xl bg-white/60 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-indigo-700">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select>
+                        <select id={`kd_${risk.id}`} defaultValue="3" className="flex-1 p-2.5 border border-white/60 rounded-xl bg-white/60 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-600/20 outline-none font-bold text-emerald-800">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select>
+                        <select id={`dd_${risk.id}`} defaultValue="3" className="flex-1 p-2.5 border border-white/60 rounded-xl bg-white/60 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-600/20 outline-none font-bold text-emerald-800">{[1,2,3,4,5].map(n=><option key={n}>{n}</option>)}</select>
                       </div>
                     </div>
                     <div>
@@ -2031,8 +2032,8 @@ export default function App() {
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kondisi Setelah Mitigasi</label><textarea id={`kondisi_${risk.id}`} rows="2" placeholder="Uraikan kondisi..." className="w-full p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all" /></div>
-                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Langkah Perbaikan (Jika Gagal)</label><textarea id={`langkah_${risk.id}`} rows="2" placeholder="Rencana korektif..." className="w-full p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all" /></div>
+                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Kondisi Setelah Mitigasi</label><textarea id={`kondisi_${risk.id}`} rows="2" placeholder="Uraikan kondisi..." className="w-full p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all" /></div>
+                    <div><label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Langkah Perbaikan (Jika Gagal)</label><textarea id={`langkah_${risk.id}`} rows="2" placeholder="Rencana korektif..." className="w-full p-3 text-sm border border-white/60 rounded-xl bg-white/60 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-600/10 transition-all" /></div>
                   </div>
                   <div className="flex justify-end pt-2">
                     <button type="button" onClick={() => {
@@ -2045,7 +2046,7 @@ export default function App() {
                       
                       setEditForm({ kDiharapkan: kD, dDiharapkan: dD, kActual: kA, dActual: dA, kondisiSetelahMitigasi: kondisi, langkahPerbaikan: langkah });
                       setTimeout(() => handleSaveEv(risk.id), 50);
-                    }} className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm flex gap-2 items-center font-bold shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Simpan Penilaian</button>
+                    }} className="bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-2.5 rounded-xl text-sm flex gap-2 items-center font-bold shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all"><Save size={16} /> Simpan Penilaian</button>
                   </div>
                 </div>
               );
@@ -2090,7 +2091,7 @@ export default function App() {
               <table style="border-collapse:collapse;font-family:Arial;font-size:11px;">
                 <tr><td colspan="16" class="title" style="font-size:14px;">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</td></tr>
                 <tr><td colspan="16" class="title" style="font-size:13px;">BADAN PENGEMBANGAN DAN INFORMASI</td></tr>
-                <tr><td colspan="16" class="title" style="font-size:12px;color:#4f46e5;">LAPORAN MATRIKS PETA RISIKO UNIT KERJA (${currentUser.nama.toUpperCase()})</td></tr>
+                <tr><td colspan="16" class="title" style="font-size:12px;color:#047857;">LAPORAN MATRIKS PETA RISIKO UNIT KERJA (${currentUser.nama.toUpperCase()})</td></tr>
                 <tr><td colspan="16" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
                 <tr><td colspan="16" style="border:none;"></td></tr>
                 <tr>
@@ -2137,7 +2138,7 @@ export default function App() {
               <table style="border-collapse:collapse;font-family:Arial;font-size:11px;">
                 <tr><td colspan="7" class="title" style="font-size:14px;">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</td></tr>
                 <tr><td colspan="7" class="title" style="font-size:13px;">BADAN PENGEMBANGAN DAN INFORMASI</td></tr>
-                <tr><td colspan="7" class="title" style="font-size:12px;color:#4f46e5;">LAPORAN PEMANTAUAN RTP UNIT KERJA (${currentUser.nama.toUpperCase()})</td></tr>
+                <tr><td colspan="7" class="title" style="font-size:12px;color:#047857;">LAPORAN PEMANTAUAN RTP UNIT KERJA (${currentUser.nama.toUpperCase()})</td></tr>
                 <tr><td colspan="7" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
                 <tr><td colspan="7" style="border:none;"></td></tr>
                 <tr style="background:#f3f4f6;font-weight:bold;">
@@ -2174,7 +2175,7 @@ export default function App() {
               <table style="border-collapse:collapse;font-family:Arial;font-size:11px;">
                 <tr><td colspan="6" class="title" style="font-size:14px;">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</td></tr>
                 <tr><td colspan="6" class="title" style="font-size:13px;">BADAN PENGEMBANGAN DAN INFORMASI</td></tr>
-                <tr><td colspan="6" class="title" style="font-size:12px;color:#4f46e5;">LAPORAN PENCATATAN KETERJADIAN RISIKO (${currentUser.nama.toUpperCase()})</td></tr>
+                <tr><td colspan="6" class="title" style="font-size:12px;color:#047857;">LAPORAN PENCATATAN KETERJADIAN RISIKO (${currentUser.nama.toUpperCase()})</td></tr>
                 <tr><td colspan="6" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
                 <tr><td colspan="6" style="border:none;"></td></tr>
                 <tr style="background:#f3f4f6;font-weight:bold;">
@@ -2209,7 +2210,7 @@ export default function App() {
               <table style="border-collapse:collapse;font-family:Arial;font-size:11px;">
                 <tr><td colspan="8" class="title" style="font-size:14px;">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</td></tr>
                 <tr><td colspan="8" class="title" style="font-size:13px;">BADAN PENGEMBANGAN DAN INFORMASI</td></tr>
-                <tr><td colspan="8" class="title" style="font-size:12px;color:#4f46e5;">LAPORAN EFEKTIFITAS & DEVIASI RTP (${currentUser.nama.toUpperCase()})</td></tr>
+                <tr><td colspan="8" class="title" style="font-size:12px;color:#047857;">LAPORAN EFEKTIFITAS & DEVIASI RTP (${currentUser.nama.toUpperCase()})</td></tr>
                 <tr><td colspan="8" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
                 <tr><td colspan="8" style="border:none;"></td></tr>
                 <tr style="background:#f3f4f6;font-weight:bold;">
@@ -2274,9 +2275,9 @@ export default function App() {
           </div>
           <div className="flex gap-3">
             <button type="button" onClick={handleDownloadExcel} className="bg-white/60 border border-white hover:bg-white text-slate-700 px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm cursor-pointer transition-all">
-              <Download size={16} className="text-indigo-600" /> Unduh Excel
+              <Download size={16} className="text-emerald-700" /> Unduh Excel
             </button>
-            <button type="button" onClick={handleDownloadPDF} disabled={isPdfLoading} className={`${isPdfLoading ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'} text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm shadow-indigo-600/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all`}>
+            <button type="button" onClick={handleDownloadPDF} disabled={isPdfLoading} className={`${isPdfLoading ? 'bg-emerald-400' : 'bg-emerald-700 hover:bg-emerald-800'} text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 shadow-sm shadow-emerald-700/20 cursor-pointer hover:-translate-y-0.5 active:scale-95 transition-all`}>
               {isPdfLoading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} />}
               {isPdfLoading ? 'Mempersiapkan...' : 'Cetak / Simpan PDF'}
             </button>
@@ -2284,17 +2285,17 @@ export default function App() {
         </div>
 
         <div className="flex flex-wrap gap-2 border-b border-slate-200/60 pb-2 print:hidden">
-          <button type="button" onClick={() => setSubReportTab('peta_risiko')} className={`px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'peta_risiko' ? 'glass-panel text-indigo-700 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>Peta Risiko</button>
-          <button type="button" onClick={() => setSubReportTab('pemantauan_rtp')} className={`px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'pemantauan_rtp' ? 'glass-panel text-indigo-700 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>Pemantauan RTP</button>
+          <button type="button" onClick={() => setSubReportTab('peta_risiko')} className={`px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'peta_risiko' ? 'glass-panel text-emerald-800 border-b-2 border-emerald-700' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>Peta Risiko</button>
+          <button type="button" onClick={() => setSubReportTab('pemantauan_rtp')} className={`px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'pemantauan_rtp' ? 'glass-panel text-emerald-800 border-b-2 border-emerald-700' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>Pemantauan RTP</button>
           <button type="button" onClick={() => setSubReportTab('pencatatan_keterjadian')} className={`px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'pencatatan_keterjadian' ? 'glass-panel text-rose-700 border-b-2 border-rose-600' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>Laporan Keterjadian</button>
-          <button type="button" onClick={() => setSubReportTab('efektivitas_rtp')} className={`px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'efektivitas_rtp' ? 'glass-panel text-indigo-700 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>Laporan Efektifitas</button>
+          <button type="button" onClick={() => setSubReportTab('efektivitas_rtp')} className={`px-5 py-2.5 text-sm font-bold rounded-t-xl transition-colors cursor-pointer ${subReportTab === 'efektivitas_rtp' ? 'glass-panel text-emerald-800 border-b-2 border-emerald-700' : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'}`}>Laporan Efektifitas</button>
         </div>
         
         <div id="report-container" className="glass-panel p-8 rounded-2xl space-y-6">
           <div className="text-center space-y-1 pb-4">
             <h3 className="font-extrabold text-slate-900 text-base uppercase m-0 leading-tight">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</h3>
             <h4 className="font-bold text-slate-800 text-sm uppercase m-0 leading-tight tracking-wide">BADAN PENGEMBANGAN DAN INFORMASI</h4>
-            <h5 className="font-extrabold text-indigo-700 text-sm uppercase pt-4 m-0 leading-tight">
+            <h5 className="font-extrabold text-emerald-800 text-sm uppercase pt-4 m-0 leading-tight">
               {subReportTab === 'peta_risiko' && `LAPORAN MATRIKS PETA RISIKO (${currentUser?.nama.toUpperCase()})`}
               {subReportTab === 'pemantauan_rtp' && `LAPORAN PEMANTAUAN RTP (${currentUser?.nama.toUpperCase()})`}
               {subReportTab === 'pencatatan_keterjadian' && `LAPORAN PENCATATAN KETERJADIAN RISIKO (${currentUser?.nama.toUpperCase()})`}
@@ -2313,7 +2314,7 @@ export default function App() {
                     <th className="border border-slate-300 p-2.5 align-middle">Indikator Sasaran (IKU)</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Sumber Risiko</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Kategori Risiko</th>
-                    <th className="border border-slate-300 p-2.5 align-middle bg-indigo-50/50">Risiko</th>
+                    <th className="border border-slate-300 p-2.5 align-middle bg-emerald-50/50">Risiko</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Penyebab</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Dampak</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Pengendalian yang ada</th>
@@ -2331,10 +2332,10 @@ export default function App() {
                       <tr key={risk.id} className="hover:bg-white/40">
                         <td className="border border-slate-300 p-2 text-center font-bold align-top">{index + 1}</td>
                         <td className="border border-slate-300 p-2 font-medium align-top leading-relaxed">{risk.sasaranKgt || '-'}</td>
-                        <td className="border border-slate-300 p-2 text-indigo-700 font-semibold align-top leading-relaxed">{risk.indikatorKgt || '-'}</td>
+                        <td className="border border-slate-300 p-2 text-emerald-800 font-semibold align-top leading-relaxed">{risk.indikatorKgt || '-'}</td>
                         <td className="border border-slate-300 p-2 align-top">{risk.penyebabSumber || '-'}</td>
                         <td className="border border-slate-300 p-2 font-semibold text-slate-600 align-top">{risk.kategoriRisiko || 'Operasional'}</td>
-                        <td className="border border-slate-300 p-2 font-bold text-slate-900 align-top leading-relaxed bg-indigo-50/20">{risk.pernyataanRisiko}</td>
+                        <td className="border border-slate-300 p-2 font-bold text-slate-900 align-top leading-relaxed bg-emerald-50/20">{risk.pernyataanRisiko}</td>
                         <td className="border border-slate-300 p-2 align-top leading-relaxed">{risk.penyebabUraian}</td>
                         <td className="border border-slate-300 p-2 align-top leading-relaxed">{risk.dampakUraian}</td>
                         <td className="border border-slate-300 p-2 align-top leading-relaxed">{risk.pengendalianRisiko}</td>
@@ -2364,7 +2365,7 @@ export default function App() {
                   <tr className="bg-white/60 text-slate-700 uppercase font-bold text-[10px] tracking-wider">
                     <th className="border border-slate-300 p-2.5 text-center w-12">No</th>
                     <th className="border border-slate-300 p-2.5 text-center w-24">ID Risiko</th>
-                    <th className="border border-slate-300 p-2.5 bg-indigo-50/50">Pernyataan Risiko</th>
+                    <th className="border border-slate-300 p-2.5 bg-emerald-50/50">Pernyataan Risiko</th>
                     <th className="border border-slate-300 p-2.5">RTP Awal</th>
                     <th className="border border-slate-300 p-2.5">Proses RTP / Progres</th>
                     <th className="border border-slate-300 p-2.5">Link Eviden</th>
@@ -2376,10 +2377,10 @@ export default function App() {
                     <tr key={risk.id} className="hover:bg-white/40">
                       <td className="border border-slate-300 p-2 text-center font-bold">{index + 1}</td>
                       <td className="border border-slate-300 p-2 text-center font-semibold text-slate-500">{risk.id}</td>
-                      <td className="border border-slate-300 p-2 font-bold text-slate-900 bg-indigo-50/20 leading-relaxed">{risk.pernyataanRisiko}</td>
+                      <td className="border border-slate-300 p-2 font-bold text-slate-900 bg-emerald-50/20 leading-relaxed">{risk.pernyataanRisiko}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{risk.rtp || '-'}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{risk.prosesRtp || <span className="text-slate-400 italic">Belum diisi</span>}</td>
-                      <td className="border border-slate-300 p-2 text-indigo-600 truncate max-w-xs">{risk.linkEviden || '-'}</td>
+                      <td className="border border-slate-300 p-2 text-emerald-700 truncate max-w-xs">{risk.linkEviden || '-'}</td>
                       <td className="border border-slate-300 p-2 text-center font-bold"><span className={`px-2 py-0.5 rounded text-[11px] border block w-max mx-auto ${getStatusColor(risk.levelRisiko)}`}>{risk.levelRisiko}</span></td>
                     </tr>
                   ))}
@@ -2395,7 +2396,7 @@ export default function App() {
                   <tr className="bg-white/60 text-slate-700 uppercase font-bold text-[10px] tracking-wider">
                     <th className="border border-slate-300 p-2.5 text-center w-12">No</th>
                     <th className="border border-slate-300 p-2.5 text-center w-28">Tanggal Kejadian</th>
-                    <th className="border border-slate-300 p-2.5 bg-indigo-50/50">Pernyataan Risiko</th>
+                    <th className="border border-slate-300 p-2.5 bg-emerald-50/50">Pernyataan Risiko</th>
                     <th className="border border-slate-300 p-2.5">Kronologi Kejadian</th>
                     <th className="border border-slate-300 p-2.5">Penyebab Keterjadian</th>
                     <th className="border border-slate-300 p-2.5 text-rose-700">Dampak Kejadian Riil</th>
@@ -2405,8 +2406,8 @@ export default function App() {
                   {unitKejadian.map((k, index) => (
                     <tr key={k.id} className="hover:bg-white/40 align-top">
                       <td className="border border-slate-300 p-2 text-center font-bold">{index + 1}</td>
-                      <td className="border border-slate-300 p-2 text-center font-semibold text-indigo-700">{k.tanggal || '-'}</td>
-                      <td className="border border-slate-300 p-2 font-bold bg-indigo-50/20 leading-relaxed">{k.risiko}</td>
+                      <td className="border border-slate-300 p-2 text-center font-semibold text-emerald-800">{k.tanggal || '-'}</td>
+                      <td className="border border-slate-300 p-2 font-bold bg-emerald-50/20 leading-relaxed">{k.risiko}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{k.kronologi || '-'}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{k.penyebab || '-'}</td>
                       <td className="border border-slate-300 p-2 text-rose-700 font-medium leading-relaxed">{k.dampakRiil || '-'}</td>
@@ -2427,12 +2428,12 @@ export default function App() {
                   <tr className="bg-white/60 text-slate-700 uppercase font-bold text-[10px] tracking-wider">
                     <th className="border border-slate-300 p-2.5 text-center w-12">No</th>
                     <th className="border border-slate-300 p-2.5 text-center w-24">ID Risiko</th>
-                    <th className="border border-slate-300 p-2.5 bg-indigo-50/50">Pernyataan Risiko</th>
+                    <th className="border border-slate-300 p-2.5 bg-emerald-50/50">Pernyataan Risiko</th>
                     <th className="border border-slate-300 p-2.5">Kondisi Setelah Mitigasi</th>
                     <th className="border border-slate-300 p-2.5 text-center">SR Awal</th>
-                    <th className="border border-slate-300 p-2.5 text-center text-indigo-600">SR Target</th>
-                    <th className="border border-slate-300 p-2.5 text-center text-sky-600">SR Actual</th>
-                    <th className="border border-slate-300 p-2.5 text-center text-emerald-600">Deviasi</th>
+                    <th className="border border-slate-300 p-2.5 text-center text-emerald-800">SR Target</th>
+                    <th className="border border-slate-300 p-2.5 text-center text-sky-700">SR Actual</th>
+                    <th className="border border-slate-300 p-2.5 text-center text-emerald-700">Deviasi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200/50">
@@ -2440,10 +2441,10 @@ export default function App() {
                     <tr key={e.id} className="hover:bg-white/40">
                       <td className="border border-slate-300 p-2 text-center font-bold">{index + 1}</td>
                       <td className="border border-slate-300 p-2 text-center font-semibold text-slate-500">{e.riskId}</td>
-                      <td className="border border-slate-300 p-2 font-bold bg-indigo-50/20 leading-relaxed">{e.pernyataanRisiko}</td>
+                      <td className="border border-slate-300 p-2 font-bold bg-emerald-50/20 leading-relaxed">{e.pernyataanRisiko}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{e.kondisiSetelahMitigasi || '-'}</td>
                       <td className="border border-slate-300 p-2 text-center font-bold text-slate-500">{e.srAwal}</td>
-                      <td className="border border-slate-300 p-2 text-center font-bold text-indigo-700">{e.srDiharapkan}</td>
+                      <td className="border border-slate-300 p-2 text-center font-bold text-emerald-800">{e.srDiharapkan}</td>
                       <td className="border border-slate-300 p-2 text-center font-bold text-sky-700">{e.srActual}</td>
                       <td className="border border-slate-300 p-2 text-center font-extrabold bg-white/50 text-emerald-700">{e.deviasi}</td>
                     </tr>
@@ -2491,88 +2492,88 @@ export default function App() {
   );
 
   return (
-    <div className="flex h-screen bg-transparent font-sans text-slate-800 selection:bg-indigo-200 selection:text-indigo-900">
+    <div className="flex h-screen bg-transparent font-sans text-slate-800 selection:bg-emerald-200 selection:text-emerald-900">
       <GlobalStyle />
       {modal.isOpen && <PopupModal />}
       
-      {/* Sidebar Desktop */}
-      <aside className="w-72 bg-slate-900/95 backdrop-blur-xl text-slate-300 hidden md:flex flex-col shadow-2xl z-10 print:hidden relative overflow-hidden border-r border-slate-700/50">
-        <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-500/10 rounded-full blur-3xl"></div>
+      {/* Sidebar Desktop (Tema Kemendes PDT - Hijau Gelap) */}
+      <aside className="w-72 bg-emerald-950/95 backdrop-blur-xl text-emerald-50 hidden md:flex flex-col shadow-2xl z-10 print:hidden relative overflow-hidden border-r border-emerald-900/50">
+        <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl"></div>
         
-        <div className="p-6 relative z-10 border-b border-slate-800/50">
+        <div className="p-6 relative z-10 border-b border-emerald-900/50">
           <div className="flex items-center space-x-3 mb-3">
-            <div className="p-2 bg-indigo-500/20 rounded-xl border border-indigo-400/20">
-              <Shield size={24} className="text-indigo-400" />
+            <div className="p-2 bg-emerald-800/50 rounded-xl border border-emerald-700/50">
+              <Shield size={24} className="text-amber-400" />
             </div>
-            <h1 className="text-2xl font-extrabold text-white tracking-tight">SI-MARI <span className="text-[9px] bg-indigo-500 text-white px-2 py-0.5 rounded-full ml-1 font-bold align-middle uppercase tracking-widest">v2.0</span></h1>
+            <h1 className="text-2xl font-extrabold text-white tracking-tight">SI-MARI <span className="text-[9px] bg-emerald-600 text-white px-2 py-0.5 rounded-full ml-1 font-bold align-middle uppercase tracking-widest border border-emerald-500">v2.0</span></h1>
           </div>
-          <p className="text-xs text-slate-400 font-medium leading-relaxed">{currentUser.nama}</p>
+          <p className="text-xs text-emerald-200 font-medium leading-relaxed">{currentUser.nama}</p>
           <div className="mt-3 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 bg-slate-800/80 text-slate-300 px-3 py-1 rounded-lg text-[11px] font-bold border border-slate-700/80"><Calendar size={13} className="text-indigo-400" /> THN: {currentUser.tahun}</span>
+            <span className="inline-flex items-center gap-1.5 bg-emerald-800/80 text-emerald-100 px-3 py-1 rounded-lg text-[11px] font-bold border border-emerald-700/80"><Calendar size={13} className="text-amber-400" /> THN: {currentUser.tahun}</span>
             {currentUser.role !== 'admin' && (
-              <span className="inline-block bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider">{currentUser.eselon || 'Eselon 2'}</span>
+              <span className="inline-block bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider">{currentUser.eselon || 'Eselon 2'}</span>
             )}
           </div>
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto relative z-10 custom-scrollbar">
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 px-2">Menu Utama</p>
+          <p className="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest mb-3 px-2">Menu Utama</p>
           {currentUser.role === 'admin' ? (
             <>
-              <button type="button" onClick={() => setActiveTab('admin_dashboard')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_dashboard' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><LayoutTemplate size={18} /><span className="text-[13px]">Dashboard Admin</span></button>
-              <button type="button" onClick={() => setActiveTab('admin_users')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_users' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><Users size={18} /><span className="text-[13px]">User & Unit</span></button>
-              <button type="button" onClick={() => setActiveTab('admin_sasaran')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_sasaran' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><Compass size={18} /><span className="text-[13px]">Hierarki K/L</span></button>
-              <button type="button" onClick={() => setActiveTab('admin_security')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_security' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><KeyRound size={18} /><span className="text-[13px]">Keamanan Admin</span></button>
+              <button type="button" onClick={() => setActiveTab('admin_dashboard')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_dashboard' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><LayoutTemplate size={18} /><span className="text-[13px]">Dashboard Admin</span></button>
+              <button type="button" onClick={() => setActiveTab('admin_users')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_users' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><Users size={18} /><span className="text-[13px]">User & Unit</span></button>
+              <button type="button" onClick={() => setActiveTab('admin_sasaran')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_sasaran' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><Compass size={18} /><span className="text-[13px]">Hierarki K/L</span></button>
+              <button type="button" onClick={() => setActiveTab('admin_security')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_security' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><KeyRound size={18} /><span className="text-[13px]">Keamanan Admin</span></button>
             </>
           ) : (
-            unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => setActiveTab(menu.id)} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === menu.id ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}><menu.icon size={18} className={activeTab === menu.id ? 'text-indigo-200' : 'text-slate-500'} /><span className="text-[13px]">{menu.label}</span></button>))
+            unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => setActiveTab(menu.id)} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === menu.id ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><menu.icon size={18} className={activeTab === menu.id ? 'text-amber-400' : 'text-emerald-400/80'} /><span className="text-[13px]">{menu.label}</span></button>))
           )}
         </nav>
         
-        <div className="p-4 m-4 bg-slate-800/40 rounded-2xl border border-slate-700/50 flex justify-between items-center relative z-10">
-          <div><p className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Role Akses</p><p className="text-xs text-white font-bold uppercase mt-0.5">{currentUser.role}</p></div>
+        <div className="p-4 m-4 bg-emerald-900/50 rounded-2xl border border-emerald-800/50 flex justify-between items-center relative z-10">
+          <div><p className="text-[9px] text-emerald-400/80 uppercase tracking-widest font-bold">Role Akses</p><p className="text-xs text-white font-bold uppercase mt-0.5">{currentUser.role}</p></div>
           <button type="button" onClick={() => { setCurrentUser(null); localStorage.removeItem('simari_current_user'); }} className="p-2.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white rounded-xl transition-colors cursor-pointer" title="Keluar Akun"><LogOut size={16} /></button>
         </div>
       </aside>
 
       {/* Sidebar Mobile Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden bg-slate-900/60 backdrop-blur-sm">
-          <div className="w-72 bg-slate-900 text-slate-300 flex flex-col shadow-2xl h-full animate-in slide-in-from-left duration-200 border-r border-slate-800">
-            <div className="p-6 flex justify-between items-center border-b border-slate-800/50">
+        <div className="fixed inset-0 z-50 flex md:hidden bg-emerald-950/60 backdrop-blur-sm">
+          <div className="w-72 bg-emerald-950 text-emerald-50 flex flex-col shadow-2xl h-full animate-in slide-in-from-left duration-200 border-r border-emerald-900">
+            <div className="p-6 flex justify-between items-center border-b border-emerald-900/50">
               <div>
                 <div className="flex items-center space-x-3 mb-2">
-                  <div className="p-2 bg-indigo-500/20 rounded-xl border border-indigo-400/20">
-                    <Shield size={20} className="text-indigo-400" />
+                  <div className="p-2 bg-emerald-800/50 rounded-xl border border-emerald-700/50">
+                    <Shield size={20} className="text-amber-400" />
                   </div>
                   <h1 className="text-xl font-extrabold text-white tracking-tight">SI-MARI</h1>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">{currentUser.nama}</p>
+                <p className="text-[11px] text-emerald-200 font-medium">{currentUser.nama}</p>
               </div>
-              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-slate-800 text-slate-400 hover:text-white rounded-xl cursor-pointer"><X size={18} /></button>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-emerald-900 text-emerald-400 hover:text-white rounded-xl cursor-pointer"><X size={18} /></button>
             </div>
-            <div className="px-6 py-4 flex items-center gap-2 border-b border-slate-800/50">
-              <span className="inline-flex items-center gap-1.5 bg-slate-800 text-slate-300 px-3 py-1 rounded-lg text-[11px] font-bold border border-slate-700"><Calendar size={13} className="text-indigo-400" /> THN: {currentUser.tahun}</span>
+            <div className="px-6 py-4 flex items-center gap-2 border-b border-emerald-900/50">
+              <span className="inline-flex items-center gap-1.5 bg-emerald-800 text-emerald-100 px-3 py-1 rounded-lg text-[11px] font-bold border border-emerald-700"><Calendar size={13} className="text-amber-400" /> THN: {currentUser.tahun}</span>
               {currentUser.role !== 'admin' && (
-                <span className="inline-block bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider">{currentUser.eselon || 'Eselon 2'}</span>
+                <span className="inline-block bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider">{currentUser.eselon || 'Eselon 2'}</span>
               )}
             </div>
             
             <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto custom-scrollbar">
               {currentUser.role === 'admin' ? (
                 <>
-                  <button type="button" onClick={() => { setActiveTab('admin_dashboard'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_dashboard' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}><LayoutTemplate size={18} /><span className="text-[13px]">Dashboard Admin</span></button>
-                  <button type="button" onClick={() => { setActiveTab('admin_users'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_users' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}><Users size={18} /><span className="text-[13px]">User & Unit</span></button>
-                  <button type="button" onClick={() => { setActiveTab('admin_sasaran'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_sasaran' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}><Compass size={18} /><span className="text-[13px]">Hierarki K/L</span></button>
-                  <button type="button" onClick={() => { setActiveTab('admin_security'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_security' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}><KeyRound size={18} /><span className="text-[13px]">Keamanan Admin</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_dashboard'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_dashboard' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><LayoutTemplate size={18} /><span className="text-[13px]">Dashboard Admin</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_users'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_users' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><Users size={18} /><span className="text-[13px]">User & Unit</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_sasaran'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_sasaran' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><Compass size={18} /><span className="text-[13px]">Hierarki K/L</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_security'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_security' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><KeyRound size={18} /><span className="text-[13px]">Keamanan Admin</span></button>
                 </>
               ) : (
-                unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => { setActiveTab(menu.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === menu.id ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}><menu.icon size={18} className={activeTab === menu.id ? 'text-indigo-200' : 'text-slate-500'}/><span className="text-[13px]">{menu.label}</span></button>))
+                unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => { setActiveTab(menu.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === menu.id ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><menu.icon size={18} className={activeTab === menu.id ? 'text-amber-400' : 'text-emerald-400/80'}/><span className="text-[13px]">{menu.label}</span></button>))
               )}
             </nav>
-            <div className="p-4 m-4 bg-slate-800/50 rounded-2xl border border-slate-700/50 flex justify-between items-center">
-              <div><p className="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Role Akses</p><p className="text-xs text-white font-bold uppercase mt-0.5">{currentUser.role}</p></div>
+            <div className="p-4 m-4 bg-emerald-900/50 rounded-2xl border border-emerald-800/50 flex justify-between items-center">
+              <div><p className="text-[9px] text-emerald-400/80 uppercase tracking-widest font-bold">Role Akses</p><p className="text-xs text-white font-bold uppercase mt-0.5">{currentUser.role}</p></div>
               <button type="button" onClick={() => { setCurrentUser(null); localStorage.removeItem('simari_current_user'); }} className="p-2.5 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white rounded-xl transition-colors cursor-pointer" title="Keluar"><LogOut size={16} /></button>
             </div>
           </div>
@@ -2581,7 +2582,7 @@ export default function App() {
 
       <main className="flex-1 flex flex-col overflow-hidden relative z-10">
         <header className="glass-panel border-b border-white/60 p-4 flex md:hidden justify-between items-center shadow-sm print:hidden">
-          <div className="flex items-center space-x-2"><Shield size={22} className="text-indigo-600" /><h1 className="font-extrabold text-slate-800 text-sm tracking-tight">SI-MARI BPI</h1></div>
+          <div className="flex items-center space-x-2"><Shield size={22} className="text-emerald-700" /><h1 className="font-extrabold text-slate-800 text-sm tracking-tight">SI-MARI BPI</h1></div>
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-white hover:bg-slate-50 text-slate-600 rounded-xl cursor-pointer shadow-sm border border-slate-200/50" title="Menu Navigasi"><Menu size={18} /></button>
           </div>
