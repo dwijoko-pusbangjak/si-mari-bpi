@@ -57,14 +57,14 @@ const GlobalStyle = () => (
   `}} />
 );
 
-// === FIREBASE SETUP ===
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-  apiKey: "ISI_API_KEY_ANDA",
-  authDomain: "ISI_PROJECT_ID.firebaseapp.com",
-  projectId: "ISI_PROJECT_ID",
-  storageBucket: "ISI_PROJECT_ID.appspot.com",
-  messagingSenderId: "ISI_MESSAGING_SENDER_ID",
-  appId: "ISI_APP_ID"
+// === FIREBASE SETUP (Ganti dengan kredensial asli Firebase Anda) ===
+const firebaseConfig = {
+  apiKey: "AIzaSyC34RHxpaFA4trv8mfUR4AqJzH-HXwtKoA",
+  authDomain: "simaribpi.firebaseapp.com",
+  projectId: "simaribpi",
+  storageBucket: "simaribpi.firebasestorage.app",
+  messagingSenderId: "324662251360",
+  appId: "1:324662251360:web:b0f7b4180fcd5530a0d805"
 };
 
 let app, auth, db;
