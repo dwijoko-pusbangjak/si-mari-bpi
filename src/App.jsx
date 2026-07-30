@@ -452,7 +452,7 @@ export default function App() {
     };
 
     return (
-      <div className="max-w-6xl space-y-8">
+      <div className="w-full space-y-8">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Panel Administrator Pusat BPI</h2>
           <p className="text-slate-500 text-sm mt-1">Kelola manajemen akun unit kerja, hierarki Sasaran K/L, dan keamanan sandi admin.</p>
@@ -755,7 +755,7 @@ export default function App() {
     const risikoRendah = unitRisks.filter(r => r.levelRisiko === 'Rendah' || r.levelRisiko === 'Sangat Rendah').length;
 
     return (
-      <div className="max-w-6xl space-y-6">
+      <div className="w-full space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Dashboard Manajemen Risiko ({currentUser?.nama})</h2>
           <p className="text-slate-500 text-sm mt-1">Sistem tersinkronisasi real-time ke seluruh tim BPI.</p>
@@ -841,7 +841,7 @@ export default function App() {
     const unitTujuanList = tujuanList.filter(t => t.unit === currentUser.nama && t.tahun === currentUser.tahun);
 
     return (
-      <div className="max-w-6xl space-y-6">
+      <div className="w-full space-y-6">
         <div><h2 className="text-2xl font-bold text-slate-800">1. Penetapan Tujuan (Tahun {currentUser?.tahun})</h2></div>
         <form onSubmit={handleSaveTujuan} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
             <div>
@@ -985,7 +985,7 @@ export default function App() {
     };
 
     return (
-      <div className="max-w-6xl space-y-6">
+      <div className="w-full space-y-6">
         <div><h2 className="text-2xl font-bold text-slate-800">2. Identifikasi Risiko (Tahun {currentUser?.tahun})</h2></div>
         <form onSubmit={handleSaveRisk} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1110,7 +1110,7 @@ export default function App() {
     };
 
     return (
-      <div className="max-w-6xl space-y-6">
+      <div className="w-full space-y-6">
         <div><h2 className="text-2xl font-bold text-slate-800">3. Analisis & Evaluasi</h2></div>
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Formulir Skala Kemungkinan & Dampak</h3></div>
@@ -1201,7 +1201,7 @@ export default function App() {
     };
 
     return (
-      <div className="max-w-6xl space-y-8">
+      <div className="w-full space-y-8">
         <div><h2 className="text-2xl font-bold text-slate-800">4. Penanganan Risiko</h2></div>
 
         {unitRisks.length > 0 && (
@@ -1305,7 +1305,7 @@ export default function App() {
     };
 
     return (
-      <div className="max-w-6xl space-y-8">
+      <div className="w-full space-y-8">
         <div><h2 className="text-2xl font-bold text-slate-800">5. Pemantauan RTP & Eviden</h2></div>
 
         {unitRisks.length > 0 && (
@@ -1402,7 +1402,7 @@ export default function App() {
     };
 
     return (
-      <div className="max-w-6xl space-y-6">
+      <div className="w-full space-y-6">
         <div className="flex justify-between items-center border-b border-slate-200 pb-4">
           <h2 className="text-2xl font-bold text-slate-800">6. Pencatatan Keterjadian Risiko</h2>
           {!isFormOpen && (
@@ -1617,7 +1617,7 @@ export default function App() {
     });
 
     return (
-      <div className="max-w-6xl space-y-8">
+      <div className="w-full space-y-8">
         <div><h2 className="text-2xl font-bold text-slate-800">7. Efektifitas RTP (Tahun {currentUser?.tahun})</h2></div>
         
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -1929,7 +1929,7 @@ export default function App() {
     };
 
     return (
-      <div className="space-y-6 max-w-7xl">
+      <div className="space-y-6 w-full">
         <style dangerouslySetInnerHTML={{ __html: `
           @media print {
             @page {
