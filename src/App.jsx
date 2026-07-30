@@ -1577,8 +1577,8 @@ export default function App() {
       }
 
       showConfirm(
-        'Teruskan Risiko', 
-        `Skala Aktual (${ev.srActual}) masih lebih tinggi dari Target (${ev.srDiharapkan}). Yakin ingin meneruskan risiko ini ke tahun pengelolaan ${nextYear}? Data akan dikembalikan ke tahap Identifikasi untuk dianalisis ulang.`,
+        'Jadikan Risiko Tahun Berikutnya', 
+        `Nilai Aktual (${ev.srActual}) lebih tinggi dari Target (${ev.srDiharapkan}). Yakin ingin menjadikan ini sebagai risiko di tahun ${nextYear} dengan memuat nilai K, D, dan Skala aktual?`,
         async () => {
           const newRiskId = `RSK-${Date.now()}`;
           const newRisk = {
@@ -1586,12 +1586,12 @@ export default function App() {
             id: newRiskId,
             tahun: nextYear,
             tahap: 'identifikasi',
-            kemungkinan: 0,
-            keparahan: 0,
-            skor: 0,
-            status: "Belum Dianalisis",
-            levelRisiko: "Belum Dianalisis",
-            keputusanMitigasi: "-",
+            kemungkinan: parseInt(ev.kActual) || 0,
+            keparahan: parseInt(ev.dActual) || 0,
+            skor: ev.srActual || 0,
+            levelRisiko: calculateLevelRisiko(ev.srActual),
+            status: "Lanjutan Tahun Sebelumnya",
+            keputusanMitigasi: (ev.srActual || 0) > 12 ? "Dimitigasi" : "Tidak Dimitigasi",
             rtp: "",
             prosesRtp: "",
             linkEviden: "",
@@ -1603,7 +1603,7 @@ export default function App() {
           try {
             if (db) await setDoc(getDocRef('risks', newRiskId), newRisk);
             setRisks(prev => [newRisk, ...prev]);
-            showAlert('Berhasil', `Risiko berhasil diteruskan ke tahun ${nextYear}. Silakan login di tahun tersebut untuk melihatnya di menu Identifikasi.`, 'success');
+            showAlert('Berhasil', `Risiko berhasil diteruskan ke tahun ${nextYear}. Silakan login di tahun tersebut untuk melihatnya.`, 'success');
           } catch (err) {
             showAlert('Error', 'Gagal meneruskan data risiko.', 'error');
           }
@@ -1634,19 +1634,23 @@ export default function App() {
                   <td className="p-3 border border-slate-200 text-center text-cyan-700 font-semibold">{e.srActual}</td>
                   <td className="p-3 border border-slate-200 text-center text-emerald-800 font-bold">{e.deviasi}</td>
                   <td className="p-3 border border-slate-200 text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      {e.srActual > e.srDiharapkan && (
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      {e.srActual <= e.srDiharapkan ? (
+                        <span className="px-2 py-1.5 bg-emerald-100 text-emerald-800 rounded-lg text-[10px] font-bold border border-emerald-200 w-full text-center">RTP Efektif</span>
+                      ) : (
                         <button 
                           type="button" 
                           onClick={() => handleTeruskanRisiko(e)} 
-                          className="px-2 py-1.5 bg-amber-50 text-amber-700 rounded-lg cursor-pointer border border-amber-200 hover:bg-amber-100 flex items-center gap-1 text-[10px] font-bold whitespace-nowrap" 
-                          title={`Teruskan ke Tahun ${parseInt(currentUser.tahun) + 1}`}
+                          className="px-2 py-1.5 bg-amber-50 text-amber-700 rounded-lg cursor-pointer border border-amber-200 hover:bg-amber-100 flex items-center justify-center gap-1 text-[10px] font-bold w-full whitespace-nowrap" 
+                          title={`Jadikan Risiko di Tahun ${parseInt(currentUser.tahun) + 1}`}
                         >
-                          <Calendar size={12} /> Teruskan ({parseInt(currentUser.tahun) + 1})
+                          <Calendar size={12} /> Jadikan Risiko {parseInt(currentUser.tahun) + 1}
                         </button>
                       )}
-                      <button type="button" onClick={() => handleStartEdit(e)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100" title="Edit"><Edit size={14}/></button>
-                      <button type="button" onClick={() => handleDeleteEv(e.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100" title="Hapus"><Trash2 size={14}/></button>
+                      <div className="flex gap-1 justify-center w-full">
+                        <button type="button" onClick={() => handleStartEdit(e)} className="p-1.5 w-full flex justify-center bg-teal-50 text-teal-700 rounded-lg cursor-pointer hover:bg-teal-100" title="Edit"><Edit size={14}/></button>
+                        <button type="button" onClick={() => handleDeleteEv(e.id)} className="p-1.5 w-full flex justify-center bg-rose-50 text-rose-600 rounded-lg cursor-pointer hover:bg-rose-100" title="Hapus"><Trash2 size={14}/></button>
+                      </div>
                     </div>
                   </td>
                 </tr>
