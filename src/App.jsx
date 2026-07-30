@@ -245,7 +245,7 @@ export default function App() {
         const unitObj = unitKerjaList.find(u => u.id === selectedUnit);
         if (unitObj) {
           if (unitPassword === (unitObj.sandi || 'bpi2026')) {
-            setCurrentUser({ role: 'unit', tahun: selectedTahun, ...unitObj });
+            setCurrentUser({ role: 'unit', tahun: selectedTahun, eselon: unitObj.eselon || 'Eselon 2', ...unitObj });
             setActiveTab('dashboard');
           } else { showAlert('Gagal Login', 'Kata sandi unit kerja salah!', 'error'); }
         } else { showAlert('Perhatian', 'Silakan pilih unit kerja yang valid.', 'warning'); }
@@ -275,7 +275,7 @@ export default function App() {
                   <label className="block text-xs font-semibold text-slate-700 uppercase mb-1.5 flex items-center gap-1.5"><Building2 size={14} className="text-teal-600" /> Pilih Unit Kerja</label>
                   <select value={selectedUnit} onChange={(e) => setSelectedUnit(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-slate-50 focus:border-teal-500">
                     {unitKerjaList.length === 0 && <option value="">-- Belum ada unit --</option>}
-                    {unitKerjaList.map((unit) => (<option key={unit.id} value={unit.id}>{unit.nama} ({unit.username})</option>))}
+                    {unitKerjaList.map((unit) => (<option key={unit.id} value={unit.id}>{unit.nama} ({unit.eselon || 'Eselon 2'})</option>))}
                   </select>
                 </div>
                 <div>
@@ -316,7 +316,7 @@ export default function App() {
   const AdminDashboard = () => {
     const [adminTahun, setAdminTahun] = useState('2026');
     const [adminUserTab, setAdminUserTab] = useState('list');
-    const [unitForm, setUnitForm] = useState({ id: '', nama: '', username: '', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
+    const [unitForm, setUnitForm] = useState({ id: '', nama: '', username: '', eselon: 'Eselon 2', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
     const [editUnitId, setEditUnitId] = useState(null);
 
     const [kategoriSasaran, setKategoriSasaran] = useState('strategis');
@@ -328,7 +328,6 @@ export default function App() {
     const [newPass, setNewPass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
 
-    // --- KALKULASI STATISTIK DASHBOARD ADMIN ---
     const adminRisks = risks.filter(r => r.tahun === adminTahun);
     const adminTotalRisks = adminRisks.length;
     const adminRtpCount = adminRisks.filter(r => r.keputusanMitigasi === 'Dimitigasi').length;
@@ -338,7 +337,6 @@ export default function App() {
     const tCount = adminRisks.filter(r => r.levelRisiko === 'Tinggi').length;
     const sCount = adminRisks.filter(r => r.levelRisiko === 'Sedang').length;
     const rCount = adminRisks.filter(r => r.levelRisiko === 'Rendah' || r.levelRisiko === 'Sangat Rendah').length;
-    // ------------------------------------------
 
     const handleUpdateAdminPassword = (e) => {
       e.preventDefault();
@@ -358,13 +356,13 @@ export default function App() {
 
     const handleAddUserClick = () => {
       setEditUnitId(null);
-      setUnitForm({ id: '', nama: '', username: '', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
+      setUnitForm({ id: '', nama: '', username: '', eselon: 'Eselon 2', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
       setAdminUserTab('form');
     };
 
     const handleEditUserClick = (unit) => {
       setEditUnitId(unit.id);
-      setUnitForm(unit);
+      setUnitForm({ ...unit, eselon: unit.eselon || 'Eselon 2' });
       setAdminUserTab('form');
     };
 
@@ -385,7 +383,7 @@ export default function App() {
 
           showAlert('Berhasil', 'Data unit kerja berhasil disimpan!', 'success');
           setEditUnitId(null);
-          setUnitForm({ id: '', nama: '', username: '', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
+          setUnitForm({ id: '', nama: '', username: '', eselon: 'Eselon 2', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
           setAdminUserTab('list');
         });
       }
@@ -550,6 +548,7 @@ export default function App() {
                   <thead>
                     <tr className="bg-white text-slate-500 uppercase">
                       <th className="p-4 border-b border-slate-200 font-bold">Nama Unit Kerja</th>
+                      <th className="p-4 border-b border-slate-200 font-bold">Jenis Unit</th>
                       <th className="p-4 border-b border-slate-200 font-bold text-center">Total Risiko</th>
                       <th className="p-4 border-b border-slate-200 font-bold text-center text-red-700">Risiko Tinggi</th>
                       <th className="p-4 border-b border-slate-200 font-bold text-center text-amber-700">RTP Ditetapkan</th>
@@ -569,6 +568,7 @@ export default function App() {
                       return (
                         <tr key={unit.id} className="hover:bg-slate-50">
                           <td className="p-4 font-bold text-slate-800 border-l-4 border-transparent hover:border-teal-500">{unit.nama}</td>
+                          <td className="p-4"><span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${unit.eselon === 'Eselon 1' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{unit.eselon || 'Eselon 2'}</span></td>
                           <td className="p-4 text-center font-bold text-slate-600 bg-slate-50/50">{uTotal}</td>
                           <td className="p-4 text-center font-bold text-red-600">{uTinggi}</td>
                           <td className="p-4 text-center font-bold text-amber-600 bg-amber-50/30">{uRtp}</td>
@@ -585,7 +585,7 @@ export default function App() {
                       );
                     })}
                     {unitKerjaList.length === 0 && (
-                      <tr><td colSpan="6" className="p-6 text-center text-slate-400 italic">Belum ada data unit kerja terdaftar.</td></tr>
+                      <tr><td colSpan="7" className="p-6 text-center text-slate-400 italic">Belum ada data unit kerja terdaftar.</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -634,7 +634,14 @@ export default function App() {
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                 <form onSubmit={handleSaveUnit} className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="md:col-span-2"><label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Nama Unit Kerja</label><input required type="text" value={unitForm.nama} onChange={(e) => setUnitForm({...unitForm, nama: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" /></div>
+                    <div className="md:col-span-2"><label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Nama Unit Kerja</label><input required type="text" value={unitForm.nama} onChange={(e) => setUnitForm({...unitForm, nama: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" placeholder="Contoh: Sekretariat Badan / Direktorat..." /></div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Jenis Unit Kerja (Eselon)</label>
+                      <select required value={unitForm.eselon} onChange={(e) => setUnitForm({...unitForm, eselon: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white focus:ring-2 focus:ring-teal-500 font-semibold text-teal-800">
+                        <option value="Eselon 1">Eselon 1 (Sampai Sasaran Program)</option>
+                        <option value="Eselon 2">Eselon 2 (Sampai Sasaran Kegiatan)</option>
+                      </select>
+                    </div>
                     <div><label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Username Login</label><input required type="text" value={unitForm.username} onChange={(e) => setUnitForm({...unitForm, username: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" /></div>
                     <div><label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Kata Sandi Akun</label><input required type="text" value={unitForm.sandi} onChange={(e) => setUnitForm({...unitForm, sandi: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" /></div>
                     <div className="md:col-span-2 pt-2 border-t border-slate-100"><h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Informasi Pimpinan</h4></div>
@@ -657,6 +664,7 @@ export default function App() {
                     <tr className="bg-slate-50 border-b border-slate-200 text-xs text-slate-600 uppercase">
                       <th className="p-4 font-semibold w-12 text-center">No</th>
                       <th className="p-4 font-semibold">Nama Unit Kerja</th>
+                      <th className="p-4 font-semibold">Jenis Eselon</th>
                       <th className="p-4 font-semibold">Login</th>
                       <th className="p-4 font-semibold">Pimpinan</th>
                       <th className="p-4 font-semibold w-24 text-center">Aksi</th>
@@ -676,6 +684,7 @@ export default function App() {
                             <Edit size={13} className="text-slate-400 hover:text-teal-600 inline" />
                           </button>
                         </td>
+                        <td className="p-4"><span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${unit.eselon === 'Eselon 1' ? 'bg-purple-50 text-purple-700 border border-purple-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`}>{unit.eselon || 'Eselon 2'}</span></td>
                         <td className="p-4"><p>User: <span className="font-bold text-teal-700">{unit.username}</span></p><p className="text-slate-500 text-xs">Pass: {unit.sandi}</p></td>
                         <td className="p-4"><p className="font-medium text-slate-800">{unit.namaPimpinan}</p><p className="text-xs text-slate-500">NIP: {unit.nipPimpinan}</p></td>
                         <td className="p-4 text-center space-x-2">
@@ -685,7 +694,7 @@ export default function App() {
                       </tr>
                     ))}
                     {unitKerjaList.length === 0 && (
-                      <tr><td colSpan="5" className="p-8 text-center text-slate-500 italic">Belum ada unit kerja. Silakan tambahkan.</td></tr>
+                      <tr><td colSpan="6" className="p-8 text-center text-slate-500 italic">Belum ada unit kerja. Silakan tambahkan.</td></tr>
                     )}
                   </tbody>
                 </table>
@@ -783,8 +792,8 @@ export default function App() {
                                     <p className="text-slate-600"><strong>Target:</strong> {strat.target} {strat.satuan}</p>
                                   </div>
                                   <div className="flex gap-1">
-                                    <button onClick={() => handleEditClickSasaran('strategis', strat)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
-                                    <button onClick={() => handleDeleteSasaran('strategis', strat.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
+                                    <button onClick={() => handleEditClickSasaran('strategis', strat)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14}/></button>
+                                    <button onClick={() => handleDeleteSasaran('strategis', strat.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
                                   </div>
                                 </div>
                               ))}
@@ -813,8 +822,8 @@ export default function App() {
                                           <p className="text-slate-600"><strong>Target:</strong> {prog.target} {prog.satuan}</p>
                                         </div>
                                         <div className="flex gap-1">
-                                          <button onClick={() => handleEditClickSasaran('program', prog)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
-                                          <button onClick={() => handleDeleteSasaran('program', prog.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
+                                          <button onClick={() => handleEditClickSasaran('program', prog)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14}/></button>
+                                          <button onClick={() => handleDeleteSasaran('program', prog.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
                                         </div>
                                       </div>
                                     ))}
@@ -839,8 +848,8 @@ export default function App() {
                                           <div key={keg.id} className="flex items-center justify-between bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
                                             <span className="text-slate-600 italic">Sasaran Kegiatan Aktif</span>
                                             <div className="flex gap-1">
-                                              <button onClick={() => handleEditClickSasaran('kegiatan', keg)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14} /></button>
-                                              <button onClick={() => handleDeleteSasaran('kegiatan', keg.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14} /></button>
+                                              <button onClick={() => handleEditClickSasaran('kegiatan', keg)} className="p-1.5 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 cursor-pointer" title="Edit"><Edit size={14}/></button>
+                                              <button onClick={() => handleDeleteSasaran('kegiatan', keg.id)} className="p-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 cursor-pointer" title="Hapus"><Trash2 size={14}/></button>
                                             </div>
                                           </div>
                                         ))}
@@ -888,7 +897,10 @@ export default function App() {
       <div className="w-full space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Dashboard Manajemen Risiko ({currentUser?.nama})</h2>
-          <p className="text-slate-500 text-sm mt-1">Sistem tersinkronisasi real-time ke seluruh tim BPI.</p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${currentUser.eselon === 'Eselon 1' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>Unit Kerja {currentUser.eselon || 'Eselon 2'}</span>
+            <p className="text-slate-500 text-sm">Sistem tersinkronisasi real-time ke seluruh tim BPI.</p>
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between"><div><p className="text-xs font-semibold text-slate-400 uppercase">Total Risiko</p><h3 className="text-3xl font-bold text-slate-800 mt-1">{totalRisiko}</h3></div><div className="p-4 bg-teal-50 text-teal-600 rounded-2xl shadow-sm"><ShieldAlert size={28} /></div></div>
@@ -910,6 +922,7 @@ export default function App() {
   };
 
   const PenetapanTujuan = () => {
+    const isEselon1 = currentUser.eselon === 'Eselon 1';
     const [selectedStrategis, setSelectedStrategis] = useState('');
     const [selectedProgram, setSelectedProgram] = useState('');
     const [selectedKegiatan, setSelectedKegiatan] = useState('');
@@ -933,12 +946,13 @@ export default function App() {
       e.preventDefault();
       const stratObj = masterSasaran.strategis.find(s => s.id === selectedStrategis);
       const progObj = masterSasaran.program.find(p => p.id === selectedProgram);
-      const kgtObj = masterSasaran.kegiatan.find(k => k.id === selectedKegiatan);
+      const kgtObj = isEselon1 ? null : masterSasaran.kegiatan.find(k => k.id === selectedKegiatan);
 
-      if (stratObj && progObj && kgtObj) {
+      if (stratObj && progObj && (isEselon1 || kgtObj)) {
         showConfirm('Konfirmasi Simpan', 'Apakah Anda yakin ingin menyimpan perubahan data penetapan tujuan ini?', async () => {
           const newId = editTujuanId || `TSJ-${Date.now()}`;
-          const newEntry = { id: newId, unit: currentUser.nama, tahun: currentUser.tahun, strategis: stratObj.nama, program: progObj.nama, kegiatan: kgtObj.nama, indikator: indikatorKgt, target: targetKgt, satuan: satuanKgt };
+          const targetLevelNama = isEselon1 ? progObj.nama : kgtObj.nama;
+          const newEntry = { id: newId, unit: currentUser.nama, tahun: currentUser.tahun, eselon: currentUser.eselon || 'Eselon 2', strategis: stratObj.nama, program: progObj.nama, kegiatan: targetLevelNama, indikator: indikatorKgt, target: targetKgt, satuan: satuanKgt };
           try { if (db) await setDoc(getDocRef('tujuan', newId), newEntry); } catch(e) {}
           
           setTujuanList(prev => {
@@ -972,7 +986,10 @@ export default function App() {
 
     return (
       <div className="w-full space-y-6">
-        <div><h2 className="text-2xl font-bold text-slate-800">1. Penetapan Tujuan (Tahun {currentUser?.tahun})</h2></div>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-800">1. Penetapan Tujuan (Tahun {currentUser?.tahun})</h2>
+          <p className="text-xs text-slate-500 mt-0.5">Mode Akses: <span className="font-bold text-teal-700">{currentUser.eselon || 'Eselon 2'}</span> {isEselon1 ? '(Hierarki sampai Sasaran Program)' : '(Hierarki sampai Sasaran Kegiatan)'}</p>
+        </div>
         <form onSubmit={handleSaveTujuan} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">1. Sasaran Strategis K/L</label>
@@ -982,10 +999,14 @@ export default function App() {
               <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">2. Sasaran Program</label>
               <select required value={selectedProgram} onChange={(e) => { setSelectedProgram(e.target.value); setSelectedKegiatan(''); }} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white" disabled={!selectedStrategis}><option value="">-- Pilih --</option>{uniqueProgram.map(p => <option key={p.id} value={p.id}>{p.nama}</option>)}</select>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">3. Sasaran Kegiatan</label>
-              <select required value={selectedKegiatan} onChange={(e) => setSelectedKegiatan(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white" disabled={!selectedProgram}><option value="">-- Pilih --</option>{uniqueKegiatan.map(k => <option key={k.id} value={k.id}>{k.nama}</option>)}</select>
-            </div>
+            
+            {!isEselon1 && (
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">3. Sasaran Kegiatan</label>
+                <select required value={selectedKegiatan} onChange={(e) => setSelectedKegiatan(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white" disabled={!selectedProgram}><option value="">-- Pilih --</option>{uniqueKegiatan.map(k => <option key={k.id} value={k.id}>{k.nama}</option>)}</select>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
               <div><label className="block text-xs font-semibold uppercase mb-1">Indikator IKU Unit</label><input required type="text" value={indikatorKgt} onChange={(e) => setIndikatorKgt(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl" placeholder="Indikator..." /></div>
               <div><label className="block text-xs font-semibold uppercase mb-1">Target</label><input required type="text" value={targetKgt} onChange={(e) => setTargetKgt(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl" placeholder="Target..." /></div>
@@ -998,11 +1019,13 @@ export default function App() {
         </form>
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <table className="w-full text-left border-collapse min-w-[900px]">
-            <thead><tr className="border-b border-slate-200 text-xs text-slate-600 bg-slate-50"><th className="p-3">ID</th><th className="p-3">Strategis</th><th className="p-3">Kegiatan & Indikator</th><th className="p-3 text-center">Target</th><th className="p-3 text-center">Satuan</th><th className="p-3 text-center">Aksi</th></tr></thead>
+            <thead><tr className="border-b border-slate-200 text-xs text-slate-600 bg-slate-50"><th className="p-3">ID</th><th className="p-3">Strategis</th><th className="p-3">{isEselon1 ? 'Program & Indikator' : 'Kegiatan & Indikator'}</th><th className="p-3 text-center">Target</th><th className="p-3 text-center">Satuan</th><th className="p-3 text-center">Aksi</th></tr></thead>
             <tbody className="divide-y divide-slate-100 text-xs">
               {unitTujuanList.map(item => (
                 <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="p-3 font-bold">{item.id}</td><td className="p-3">{item.strategis}</td><td className="p-3"><strong>{item.kegiatan}</strong><br/><span className="text-teal-700">IKU: {item.indikator}</span></td>
+                  <td className="p-3 font-bold">{item.id}</td>
+                  <td className="p-3">{item.strategis}</td>
+                  <td className="p-3"><strong>{isEselon1 ? item.program : item.kegiatan}</strong><br/><span className="text-teal-700">IKU: {item.indikator}</span></td>
                   <td className="p-3 text-center"><span className="bg-teal-50 text-teal-700 px-2.5 py-1 rounded-lg font-bold border border-teal-200">{item.target}</span></td>
                   <td className="p-3 text-center"><span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-bold">{item.satuan || '-'}</span></td>
                   <td className="p-3 text-center space-x-1">
@@ -1019,12 +1042,13 @@ export default function App() {
   };
 
   const IdentifikasiRisiko = () => {
+    const isEselon1 = currentUser.eselon === 'Eselon 1';
     const unitTujuanList = tujuanList.filter(t => t.unit === currentUser.nama && t.tahun === currentUser.tahun);
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
     const [editRiskId, setEditRiskId] = useState(null);
     const [formRisk, setFormRisk] = useState({ 
       indikatorKgt: unitTujuanList[0]?.indikator || '', 
-      sasaranKgt: unitTujuanList[0]?.kegiatan || '', 
+      sasaranKgt: unitTujuanList[0]?.kegiatan || unitTujuanList[0]?.program || '', 
       permasalahan: '', 
       pernyataanRisiko: '', 
       kategoriRisiko: 'Operasional', 
@@ -1044,7 +1068,7 @@ export default function App() {
       setFormRisk(prev => ({
         ...prev,
         indikatorKgt: val,
-        sasaranKgt: found ? found.kegiatan : prev.sasaranKgt
+        sasaranKgt: found ? (isEselon1 ? found.program : found.kegiatan) : prev.sasaranKgt
       }));
     };
 
@@ -1083,7 +1107,7 @@ export default function App() {
         setEditRiskId(null);
         setFormRisk({ 
           indikatorKgt: unitTujuanList[0]?.indikator || '', 
-          sasaranKgt: unitTujuanList[0]?.kegiatan || '', 
+          sasaranKgt: unitTujuanList[0]?.kegiatan || unitTujuanList[0]?.program || '', 
           permasalahan: '', 
           pernyataanRisiko: '', 
           kategoriRisiko: 'Operasional', 
@@ -1120,13 +1144,13 @@ export default function App() {
         <form onSubmit={handleSaveRisk} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold mb-1">Indikator Sasaran Kegiatan (IKU)</label>
+              <label className="block text-xs font-semibold mb-1">Indikator Sasaran {isEselon1 ? 'Program' : 'Kegiatan'} (IKU)</label>
               <select required value={formRisk.indikatorKgt} onChange={(e) => handleIndikatorChange(e.target.value)} className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-white outline-none">
                 {unitTujuanList.map((t, i) => <option key={i} value={t.indikator}>{t.indikator}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-1">Sasaran Kegiatan</label>
+              <label className="block text-xs font-semibold mb-1">Sasaran {isEselon1 ? 'Program' : 'Kegiatan'}</label>
               <input type="text" value={formRisk.sasaranKgt} readOnly className="w-full p-3 text-sm border border-slate-200 rounded-xl bg-slate-50 text-slate-600" />
             </div>
           </div>
@@ -1185,8 +1209,8 @@ export default function App() {
               <thead>
                 <tr className="bg-slate-50 text-xs uppercase text-slate-600">
                   <th className="border border-slate-200 p-3 w-16">ID</th>
-                  <th className="border border-slate-200 p-3">Sasaran Kegiatan</th>
-                  <th className="border border-slate-200 p-3">Indikator Sasaran Kegiatan (IKU)</th>
+                  <th className="border border-slate-200 p-3">Sasaran {isEselon1 ? 'Program' : 'Kegiatan'}</th>
+                  <th className="border border-slate-200 p-3">Indikator Sasaran (IKU)</th>
                   <th className="border border-slate-200 p-3">Pernyataan Risiko</th>
                   <th className="border border-slate-200 p-3">Kategori</th>
                   <th className="border border-slate-200 p-3">Kendali</th>
@@ -1564,7 +1588,6 @@ export default function App() {
                 <input required type="date" value={formKejadian.tanggal} onChange={(e) => setFormKejadian({...formKejadian, tanggal: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:border-teal-500" />
               </div>
               
-              {/* Kolom dibikin full width untuk detail */}
               <div className="md:col-span-2">
                 <label className="block text-xs font-semibold mb-1 text-slate-700">Kronologi Kejadian</label>
                 <textarea required rows="2" value={formKejadian.kronologi} onChange={(e) => setFormKejadian({...formKejadian, kronologi: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" placeholder="Uraikan bagaimana kronologi kejadian risiko ini berlangsung..." />
@@ -1661,9 +1684,6 @@ export default function App() {
         const srActual = calculateSkorRisiko(parseInt(editForm.kActual), parseInt(editForm.dActual));
         const deviasi = srDiharapkan - srActual;
 
-        // --- TAMBAHAN LOGIKA PENGHAPUSAN OTOMATIS (AUTO-CLEANUP) ---
-        // Jika nilai evaluasi direvisi menjadi EFEKTIF (Actual <= Target), 
-        // cek apakah risiko ini pernah diteruskan ke tahun berikutnya. Jika iya, hapus.
         if (srActual <= srDiharapkan && riskObj) {
           const nextYear = (parseInt(currentUser.tahun) + 1).toString();
           const carriedOverRisk = risks.find(r => 
@@ -1677,10 +1697,9 @@ export default function App() {
             try { 
               if (db) await deleteDoc(getDocRef('risks', carriedOverRisk.id)); 
               setRisks(prev => prev.filter(r => r.id !== carriedOverRisk.id));
-            } catch(e) { console.error("Gagal menghapus risiko lanjutan:", e); }
+            } catch(e) {}
           }
         }
-        // ---------------------------------------------------------
         
         const newEntry = { 
           id: targetId, 
@@ -1876,6 +1895,7 @@ export default function App() {
   };
 
   const ModulLaporan = () => {
+    const isEselon1 = currentUser.eselon === 'Eselon 1';
     const unitRisks = risks.filter(r => r.unit === currentUser.nama && r.tahun === currentUser.tahun);
     const unitKejadian = kejadianList.filter(k => k.unit === currentUser.nama && k.tahun === currentUser.tahun);
     const unitEfektivitas = riwayatEfektivitas.filter(e => {
@@ -1908,12 +1928,12 @@ export default function App() {
               <table style="border-collapse:collapse;font-family:Arial;font-size:11px;">
                 <tr><td colspan="16" class="title" style="font-size:14px;">KEMENTERIAN DESA DAN PEMBANGUNAN DAERAH TERTINGGAL RI</td></tr>
                 <tr><td colspan="16" class="title" style="font-size:13px;">BADAN PENGEMBANGAN DAN INFORMASI</td></tr>
-                <tr><td colspan="16" class="title" style="font-size:12px;color:#0d9488;">LAPORAN PETA REGISTER RISIKO UNIT KERJA (${currentUser.nama.toUpperCase()})</td></tr>
+                <tr><td colspan="16" class="title" style="font-size:12px;color:#0d9488;">LAPORAN PETA REGISTER RISIKO UNIT KERJA (${currentUser.nama.toUpperCase()}) - ${currentUser.eselon || 'Eselon 2'}</td></tr>
                 <tr><td colspan="16" class="title" style="font-size:11px;color:#6b7280;">TAHUN ANGGARAN ${currentUser.tahun}</td></tr>
                 <tr><td colspan="16" style="border:none;"></td></tr>
                 <tr>
           `;
-          const headers = ['No', 'Sasaran Kegiatan', 'Indikator Sasaran Kegiatan (IKU)', 'Sumber Risiko', 'Kategori Risiko', 'Risiko', 'Penyebab', 'Dampak', 'Pengendalian yang ada', 'Sisa Risiko', 'Pemilik Risiko', 'K', 'D', 'Skala Risiko', 'Level Risiko'];
+          const headers = ['No', isEselon1 ? 'Sasaran Program' : 'Sasaran Kegiatan', isEselon1 ? 'Indikator Sasaran Program (IKU)' : 'Indikator Sasaran Kegiatan (IKU)', 'Sumber Risiko', 'Kategori Risiko', 'Risiko', 'Penyebab', 'Dampak', 'Pengendalian yang ada', 'Sisa Risiko', 'Pemilik Risiko', 'K', 'D', 'Skala Risiko', 'Level Risiko'];
           headers.forEach(h => { html += `<td class="head">${h}</td>`; });
           html += '</tr>';
 
@@ -2166,7 +2186,7 @@ export default function App() {
               {subReportTab === 'pencatatan_keterjadian' && `LAPORAN PENCATATAN KETERJADIAN RISIKO (${currentUser?.nama.toUpperCase()})`}
               {subReportTab === 'efektivitas_rtp' && `LAPORAN EFEKTIFITAS & DEVIASI RTP (${currentUser?.nama.toUpperCase()})`}
             </h5>
-            <p className="text-xs text-slate-500 m-0 pt-1">TAHUN ANGGARAN {currentUser?.tahun}</p>
+            <p className="text-xs text-slate-500 m-0 pt-1">TAHUN ANGGARAN {currentUser?.tahun} ({currentUser?.eselon || 'Eselon 2'})</p>
           </div>
 
           {subReportTab === 'peta_risiko' && (
@@ -2175,8 +2195,8 @@ export default function App() {
                 <thead>
                   <tr className="bg-slate-100 text-slate-900 uppercase font-bold text-[11px]">
                     <th className="border border-slate-400 p-2 text-center align-middle">No</th>
-                    <th className="border border-slate-400 p-2 align-middle">Sasaran Kegiatan</th>
-                    <th className="border border-slate-400 p-2 align-middle">Indikator Sasaran Kegiatan (IKU)</th>
+                    <th className="border border-slate-400 p-2 align-middle">Sasaran {isEselon1 ? 'Program' : 'Kegiatan'}</th>
+                    <th className="border border-slate-400 p-2 align-middle">Indikator Sasaran (IKU)</th>
                     <th className="border border-slate-400 p-2 align-middle">Sumber Risiko</th>
                     <th className="border border-slate-400 p-2 align-middle">Kategori Risiko</th>
                     <th className="border border-slate-400 p-2 align-middle">Risiko</th>
@@ -2363,7 +2383,10 @@ export default function App() {
             <h1 className="text-2xl font-bold tracking-wider">SI-MARI <span className="text-[10px] bg-teal-700/80 px-2 py-0.5 rounded-full ml-1 font-semibold align-middle">v2.0</span></h1>
           </div>
           <p className="text-xs text-teal-100/80 border-t border-teal-800/60 pt-2 mt-2 font-medium">{currentUser.nama}</p>
-          <div className="mt-2 inline-flex gap-1.5 bg-teal-500/20 text-teal-200 px-3 py-1 rounded-xl text-xs font-semibold border border-teal-500/30"><Calendar size={13} /> Tahun: {currentUser.tahun}</div>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="inline-flex gap-1.5 bg-teal-500/20 text-teal-200 px-3 py-1 rounded-xl text-xs font-semibold border border-teal-500/30"><Calendar size={13} /> Tahun: {currentUser.tahun}</span>
+            <span className="inline-block bg-teal-800 text-teal-200 px-2.5 py-1 rounded-xl text-[11px] font-bold">{currentUser.eselon || 'Eselon 2'}</span>
+          </div>
         </div>
         <nav className="flex-1 px-3 mt-2 space-y-1 overflow-y-auto">
           {currentUser.role === 'admin' ? (
@@ -2394,7 +2417,10 @@ export default function App() {
               </div>
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-teal-800 text-teal-200 rounded-xl cursor-pointer"><X size={18} /></button>
             </div>
-            <div className="px-6 pb-2"><div className="inline-flex gap-1.5 bg-teal-500/20 text-teal-200 px-3 py-1 rounded-xl text-xs font-semibold border border-teal-500/30"><Calendar size={13} /> Tahun: {currentUser.tahun}</div></div>
+            <div className="px-6 pb-2 flex items-center gap-2">
+              <div className="inline-flex gap-1.5 bg-teal-500/20 text-teal-200 px-3 py-1 rounded-xl text-xs font-semibold border border-teal-500/30"><Calendar size={13} /> Tahun: {currentUser.tahun}</div>
+              <span className="inline-block bg-teal-800 text-teal-200 px-2.5 py-1 rounded-xl text-[11px] font-bold">{currentUser.eselon || 'Eselon 2'}</span>
+            </div>
             <nav className="flex-1 px-3 mt-2 space-y-1 overflow-y-auto">
               {currentUser.role === 'admin' ? (
                 <>
