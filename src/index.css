@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 html, body, #root {
@@ -5,5 +6,44 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Menggunakan font Outfit untuk kesan modern, segar, dan soft */
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  
+  /* Latar belakang gradien biru/putih yang sangat lembut */
+  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+  background-attachment: fixed;
+  color: #334155;
+  
+  /* Peningkatan rendering teks agar lebih jelas (crisp) */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Kustomisasi scrollbar agar terlihat estetik, melayang, dan bersih */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #bae6fd; /* Warna soft sky blue */
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #7dd3fc;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Utilitas kustom tambahan untuk efek Kaca (Glassmorphism) yang segar */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
 }
