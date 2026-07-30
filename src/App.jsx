@@ -548,7 +548,7 @@ export default function App() {
                   <thead>
                     <tr className="bg-white text-slate-500 uppercase">
                       <th className="p-4 border-b border-slate-200 font-bold">Nama Unit Kerja</th>
-                      <th className="p-4 border-b border-slate-200 font-bold">Jenis Unit</th>
+                      <th className="p-4 border-b border-slate-200 font-bold">Jenis Unit Kerja</th>
                       <th className="p-4 border-b border-slate-200 font-bold text-center">Total Risiko</th>
                       <th className="p-4 border-b border-slate-200 font-bold text-center text-red-700">Risiko Tinggi</th>
                       <th className="p-4 border-b border-slate-200 font-bold text-center text-amber-700">RTP Ditetapkan</th>
@@ -636,10 +636,10 @@ export default function App() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="md:col-span-2"><label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Nama Unit Kerja</label><input required type="text" value={unitForm.nama} onChange={(e) => setUnitForm({...unitForm, nama: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" placeholder="Contoh: Sekretariat Badan / Direktorat..." /></div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Jenis Unit Kerja (Eselon)</label>
+                      <label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Jenis Unit Kerja</label>
                       <select required value={unitForm.eselon} onChange={(e) => setUnitForm({...unitForm, eselon: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none bg-white focus:ring-2 focus:ring-teal-500 font-semibold text-teal-800">
-                        <option value="Eselon 1">Eselon 1 (Sampai Sasaran Program)</option>
-                        <option value="Eselon 2">Eselon 2 (Sampai Sasaran Kegiatan)</option>
+                        <option value="Eselon 1">Eselon 1</option>
+                        <option value="Eselon 2">Eselon 2</option>
                       </select>
                     </div>
                     <div><label className="block text-xs font-semibold text-slate-700 uppercase mb-1">Username Login</label><input required type="text" value={unitForm.username} onChange={(e) => setUnitForm({...unitForm, username: e.target.value})} className="w-full p-3 text-sm border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500" /></div>
@@ -664,7 +664,7 @@ export default function App() {
                     <tr className="bg-slate-50 border-b border-slate-200 text-xs text-slate-600 uppercase">
                       <th className="p-4 font-semibold w-12 text-center">No</th>
                       <th className="p-4 font-semibold">Nama Unit Kerja</th>
-                      <th className="p-4 font-semibold">Jenis Eselon</th>
+                      <th className="p-4 font-semibold">Jenis Unit Kerja</th>
                       <th className="p-4 font-semibold">Login</th>
                       <th className="p-4 font-semibold">Pimpinan</th>
                       <th className="p-4 font-semibold w-24 text-center">Aksi</th>
@@ -2468,4 +2468,3 @@ export default function App() {
       </main>
     </div>
   );
-}
