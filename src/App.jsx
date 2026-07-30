@@ -239,7 +239,7 @@ export default function App() {
       if (loginType === 'admin') {
         if (inputAdminPass === adminPassword) {
           setCurrentUser({ role: 'admin', nama: 'Administrator Pusat BPI', tahun: '2026' });
-          setActiveTab('admin_users');
+          setActiveTab('admin_dashboard');
         } else { showAlert('Gagal Login', 'Kata sandi Admin salah!', 'error'); }
       } else {
         const unitObj = unitKerjaList.find(u => u.id === selectedUnit);
@@ -314,6 +314,7 @@ export default function App() {
   };
 
   const AdminDashboard = () => {
+    const [adminTahun, setAdminTahun] = useState('2026');
     const [adminUserTab, setAdminUserTab] = useState('list');
     const [unitForm, setUnitForm] = useState({ id: '', nama: '', username: '', sandi: 'bpi2026', namaPimpinan: '', nipPimpinan: '' });
     const [editUnitId, setEditUnitId] = useState(null);
@@ -326,6 +327,18 @@ export default function App() {
     const [oldPass, setOldPass] = useState('');
     const [newPass, setNewPass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');
+
+    // --- KALKULASI STATISTIK DASHBOARD ADMIN ---
+    const adminRisks = risks.filter(r => r.tahun === adminTahun);
+    const adminTotalRisks = adminRisks.length;
+    const adminRtpCount = adminRisks.filter(r => r.keputusanMitigasi === 'Dimitigasi').length;
+    const adminRtpFollowedUp = adminRisks.filter(r => r.keputusanMitigasi === 'Dimitigasi' && (r.prosesRtp?.trim() || r.linkEviden?.trim())).length;
+    
+    const stCount = adminRisks.filter(r => r.levelRisiko === 'Sangat Tinggi').length;
+    const tCount = adminRisks.filter(r => r.levelRisiko === 'Tinggi').length;
+    const sCount = adminRisks.filter(r => r.levelRisiko === 'Sedang').length;
+    const rCount = adminRisks.filter(r => r.levelRisiko === 'Rendah' || r.levelRisiko === 'Sangat Rendah').length;
+    // ------------------------------------------
 
     const handleUpdateAdminPassword = (e) => {
       e.preventDefault();
@@ -459,10 +472,127 @@ export default function App() {
         </div>
 
         <div className="flex flex-wrap border-b border-slate-200 bg-white rounded-t-2xl shadow-sm px-4 pt-2 gap-2">
+          <button onClick={() => setActiveTab('admin_dashboard')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_dashboard' ? 'border-teal-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><LayoutDashboard size={18} /> Dashboard</button>
           <button onClick={() => setActiveTab('admin_users')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_users' ? 'border-teal-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><Users size={18} /> Manajemen User</button>
           <button onClick={() => setActiveTab('admin_sasaran')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_sasaran' ? 'border-teal-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><Compass size={18} /> Hierarki Sasaran K/L</button>
           <button onClick={() => setActiveTab('admin_security')} className={`py-3 px-6 font-semibold text-sm border-b-2 flex items-center gap-2 transition-all cursor-pointer ${activeTab === 'admin_security' ? 'border-teal-600 text-teal-600' : 'border-transparent text-slate-500 hover:text-slate-800'}`}><KeyRound size={18} /> Keamanan Admin</button>
         </div>
+
+        {activeTab === 'admin_dashboard' && (
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 rounded-2xl shadow-sm border border-slate-200 gap-4">
+               <div>
+                 <h3 className="font-bold text-slate-800 text-lg">Overview Manajemen Risiko BPI</h3>
+                 <p className="text-xs text-slate-500 mt-1">Agregasi data identifikasi dan mitigasi risiko seluruh unit kerja.</p>
+               </div>
+               <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                 <label className="text-xs font-semibold text-slate-700 flex items-center gap-1 pl-2"><Calendar size={14}/> Tahun Agregasi:</label>
+                 <select value={adminTahun} onChange={(e) => setAdminTahun(e.target.value)} className="p-2 text-sm border border-slate-200 rounded-lg bg-white focus:border-teal-500 outline-none font-bold text-teal-800">
+                    <option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option>
+                 </select>
+               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between"><div><p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Total Risiko (Global)</p><h3 className="text-3xl font-bold text-slate-800 mt-1">{adminTotalRisks}</h3></div><div className="p-4 bg-slate-100 text-slate-600 rounded-2xl"><ShieldAlert size={28} /></div></div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between"><div><p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">RTP Ditetapkan</p><h3 className="text-3xl font-bold text-amber-600 mt-1">{adminRtpCount}</h3></div><div className="p-4 bg-amber-50 text-amber-600 rounded-2xl"><ShieldCheck size={28} /></div></div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between"><div><p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">RTP Ditindaklanjuti</p><h3 className="text-3xl font-bold text-emerald-600 mt-1">{adminRtpFollowedUp}</h3></div><div className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl"><Activity size={28} /></div></div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between"><div><p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Unit Kerja Terdaftar</p><h3 className="text-3xl font-bold text-cyan-600 mt-1">{unitKerjaList.length}</h3></div><div className="p-4 bg-cyan-50 text-cyan-600 rounded-2xl"><Building2 size={28} /></div></div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wide border-b border-slate-100 pb-3 flex items-center gap-2"><BarChart2 size={16} className="text-teal-600"/> Distribusi Level Risiko</h3>
+                <div className="space-y-4 pt-2">
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5 font-semibold"><span className="text-red-700">Sangat Tinggi</span><span>{stCount} Risiko</span></div>
+                    <div className="w-full bg-slate-100 rounded-full h-3"><div className="bg-red-500 h-3 rounded-full transition-all duration-500" style={{ width: `${adminTotalRisks ? (stCount/adminTotalRisks)*100 : 0}%` }}></div></div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5 font-semibold"><span className="text-orange-700">Tinggi</span><span>{tCount} Risiko</span></div>
+                    <div className="w-full bg-slate-100 rounded-full h-3"><div className="bg-orange-500 h-3 rounded-full transition-all duration-500" style={{ width: `${adminTotalRisks ? (tCount/adminTotalRisks)*100 : 0}%` }}></div></div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5 font-semibold"><span className="text-amber-700">Sedang</span><span>{sCount} Risiko</span></div>
+                    <div className="w-full bg-slate-100 rounded-full h-3"><div className="bg-amber-500 h-3 rounded-full transition-all duration-500" style={{ width: `${adminTotalRisks ? (sCount/adminTotalRisks)*100 : 0}%` }}></div></div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1.5 font-semibold"><span className="text-emerald-700">Rendah / Sangat Rendah</span><span>{rCount} Risiko</span></div>
+                    <div className="w-full bg-slate-100 rounded-full h-3"><div className="bg-emerald-500 h-3 rounded-full transition-all duration-500" style={{ width: `${adminTotalRisks ? (rCount/adminTotalRisks)*100 : 0}%` }}></div></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col">
+                <div className="p-5 border-b border-slate-100"><h3 className="font-bold text-slate-800 text-sm uppercase tracking-wide flex items-center gap-2"><Target size={16} className="text-teal-600"/> Progres Mitigasi Global</h3></div>
+                <div className="flex-1 p-6 flex flex-col items-center justify-center">
+                  <div className="relative w-44 h-44 flex items-center justify-center">
+                    <svg className="absolute inset-0 w-full h-full -rotate-90 text-slate-100" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="15.9155" fill="none" stroke="currentColor" strokeWidth="3" />
+                    </svg>
+                    <svg className="absolute inset-0 w-full h-full -rotate-90 text-emerald-500 transition-all duration-1000" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="15.9155" fill="none" stroke="currentColor" strokeWidth="4" strokeDasharray={`${adminRtpCount ? (adminRtpFollowedUp/adminRtpCount)*100 : 0}, 100`} strokeLinecap="round" />
+                    </svg>
+                    <div className="text-center z-10">
+                      <span className="text-4xl font-black text-slate-800">{adminRtpCount ? Math.round((adminRtpFollowedUp/adminRtpCount)*100) : 0}<span className="text-xl text-slate-400">%</span></span>
+                      <span className="block text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">Selesai</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-6 text-center max-w-sm leading-relaxed">Dari total <span className="font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">{adminRtpCount} RTP</span> yang ditetapkan, sebanyak <span className="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">{adminRtpFollowedUp} RTP</span> telah dilengkapi dengan progres dan pengisian tautan eviden.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm flex items-center gap-2"><Building2 size={16} className="text-teal-600"/> Statistik Risiko Per Unit Kerja</h3></div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs min-w-[800px]">
+                  <thead>
+                    <tr className="bg-white text-slate-500 uppercase">
+                      <th className="p-4 border-b border-slate-200 font-bold">Nama Unit Kerja</th>
+                      <th className="p-4 border-b border-slate-200 font-bold text-center">Total Risiko</th>
+                      <th className="p-4 border-b border-slate-200 font-bold text-center text-red-700">Risiko Tinggi</th>
+                      <th className="p-4 border-b border-slate-200 font-bold text-center text-amber-700">RTP Ditetapkan</th>
+                      <th className="p-4 border-b border-slate-200 font-bold text-center text-emerald-700">RTP Berjalan</th>
+                      <th className="p-4 border-b border-slate-200 font-bold text-center w-40">Progres RTP</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-sm">
+                    {unitKerjaList.map(unit => {
+                      const uRisks = adminRisks.filter(r => r.unit === unit.nama);
+                      const uTotal = uRisks.length;
+                      const uTinggi = uRisks.filter(r => r.levelRisiko === 'Sangat Tinggi' || r.levelRisiko === 'Tinggi').length;
+                      const uRtp = uRisks.filter(r => r.keputusanMitigasi === 'Dimitigasi').length;
+                      const uRtpDone = uRisks.filter(r => r.keputusanMitigasi === 'Dimitigasi' && (r.prosesRtp?.trim() || r.linkEviden?.trim())).length;
+                      const pct = uRtp ? Math.round((uRtpDone/uRtp)*100) : 0;
+                      
+                      return (
+                        <tr key={unit.id} className="hover:bg-slate-50">
+                          <td className="p-4 font-bold text-slate-800 border-l-4 border-transparent hover:border-teal-500">{unit.nama}</td>
+                          <td className="p-4 text-center font-bold text-slate-600 bg-slate-50/50">{uTotal}</td>
+                          <td className="p-4 text-center font-bold text-red-600">{uTinggi}</td>
+                          <td className="p-4 text-center font-bold text-amber-600 bg-amber-50/30">{uRtp}</td>
+                          <td className="p-4 text-center font-bold text-emerald-600">{uRtpDone}</td>
+                          <td className="p-4 text-center">
+                            <div className="flex items-center gap-2">
+                              <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                                <div className={`h-2.5 rounded-full ${pct === 100 ? 'bg-emerald-500' : (pct > 50 ? 'bg-teal-400' : 'bg-amber-400')}`} style={{ width: `${pct}%` }}></div>
+                              </div>
+                              <span className="text-[11px] font-bold text-slate-600 w-8">{pct}%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {unitKerjaList.length === 0 && (
+                      <tr><td colSpan="6" className="p-6 text-center text-slate-400 italic">Belum ada data unit kerja terdaftar.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
 
         {activeTab === 'admin_security' && (
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 max-w-xl space-y-6">
@@ -2238,6 +2368,7 @@ export default function App() {
         <nav className="flex-1 px-3 mt-2 space-y-1 overflow-y-auto">
           {currentUser.role === 'admin' ? (
             <>
+              <button type="button" onClick={() => setActiveTab('admin_dashboard')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer ${activeTab === 'admin_dashboard' ? 'bg-teal-700/80 text-white shadow-md font-semibold' : 'text-teal-100/70 hover:bg-teal-800/40 hover:text-white'}`}><LayoutDashboard size={18} /><span className="text-xs">Dashboard Admin</span></button>
               <button type="button" onClick={() => setActiveTab('admin_users')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer ${activeTab === 'admin_users' ? 'bg-teal-700/80 text-white shadow-md font-semibold' : 'text-teal-100/70 hover:bg-teal-800/40 hover:text-white'}`}><Users size={18} /><span className="text-xs">User & Unit</span></button>
               <button type="button" onClick={() => setActiveTab('admin_sasaran')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer ${activeTab === 'admin_sasaran' ? 'bg-teal-700/80 text-white shadow-md font-semibold' : 'text-teal-100/70 hover:bg-teal-800/40 hover:text-white'}`}><Compass size={18} /><span className="text-xs">Hierarki K/L</span></button>
               <button type="button" onClick={() => setActiveTab('admin_security')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer ${activeTab === 'admin_security' ? 'bg-teal-700/80 text-white shadow-md font-semibold' : 'text-teal-100/70 hover:bg-teal-800/40 hover:text-white'}`}><KeyRound size={18} /><span className="text-xs">Keamanan Admin</span></button>
@@ -2267,6 +2398,7 @@ export default function App() {
             <nav className="flex-1 px-3 mt-2 space-y-1 overflow-y-auto">
               {currentUser.role === 'admin' ? (
                 <>
+                  <button type="button" onClick={() => { setActiveTab('admin_dashboard'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium ${activeTab === 'admin_dashboard' ? 'bg-teal-700/80 text-white font-semibold' : 'text-teal-100/70'}`}><LayoutDashboard size={18} /><span className="text-xs">Dashboard Admin</span></button>
                   <button type="button" onClick={() => { setActiveTab('admin_users'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium ${activeTab === 'admin_users' ? 'bg-teal-700/80 text-white font-semibold' : 'text-teal-100/70'}`}><Users size={18} /><span className="text-xs">User & Unit</span></button>
                   <button type="button" onClick={() => { setActiveTab('admin_sasaran'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium ${activeTab === 'admin_sasaran' ? 'bg-teal-700/80 text-white font-semibold' : 'text-teal-100/70'}`}><Compass size={18} /><span className="text-xs">Hierarki K/L</span></button>
                   <button type="button" onClick={() => { setActiveTab('admin_security'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium ${activeTab === 'admin_security' ? 'bg-teal-700/80 text-white font-semibold' : 'text-teal-100/70'}`}><KeyRound size={18} /><span className="text-xs">Keamanan Admin</span></button>
