@@ -1265,7 +1265,7 @@ export default function App() {
 
     return (
       <div className="w-full space-y-6">
-        <div><h2 className="text-2xl font-bold text-slate-800">3. Analisis & Evaluasi</h2></div>
+        <div><h2 className="text-2xl font-bold text-slate-800">3. Analisis K/D</h2></div>
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-4 bg-slate-50 border-b border-slate-200"><h3 className="font-bold text-slate-800 text-sm">Formulir Skala Kemungkinan & Dampak</h3></div>
           <div className="overflow-x-auto">
@@ -1356,7 +1356,7 @@ export default function App() {
 
     return (
       <div className="w-full space-y-8">
-        <div><h2 className="text-2xl font-bold text-slate-800">4. Penanganan Risiko</h2></div>
+        <div><h2 className="text-2xl font-bold text-slate-800">4. Rencana Tindak Pengendalian</h2></div>
 
         {unitRisks.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -2358,8 +2358,8 @@ export default function App() {
 
   const unitMenus = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard }, { id: 'tujuan', label: '1. Penetapan Tujuan', icon: Target },
-    { id: 'identifikasi', label: '2. Identifikasi Risiko', icon: Search }, { id: 'analisis', label: '3. Analisis & Evaluasi', icon: BarChart2 },
-    { id: 'penanganan', label: '4. Penanganan Risiko', icon: ShieldCheck }, { id: 'pemantauan', label: '5. Pemantauan RTP & Eviden', icon: Activity },
+    { id: 'identifikasi', label: '2. Identifikasi Risiko', icon: Search }, { id: 'analisis', label: '3. Analisis K/D', icon: BarChart2 },
+    { id: 'penanganan', label: '4. Rencana Tindak Pengendalian', icon: ShieldCheck }, { id: 'pemantauan', label: '5. Pemantauan RTP & Eviden', icon: Activity },
     { id: 'kejadian', label: '6. Pencatatan Keterjadian', icon: AlertOctagon }, { id: 'efektivitas', label: '7. Efektifitas RTP', icon: CheckCircle2 },
     { id: 'laporan', label: '8. Modul Laporan', icon: FileText }
   ];
@@ -2385,7 +2385,9 @@ export default function App() {
           <p className="text-xs text-teal-100/80 border-t border-teal-800/60 pt-2 mt-2 font-medium">{currentUser.nama}</p>
           <div className="mt-2 flex items-center gap-2">
             <span className="inline-flex gap-1.5 bg-teal-500/20 text-teal-200 px-3 py-1 rounded-xl text-xs font-semibold border border-teal-500/30"><Calendar size={13} /> Tahun: {currentUser.tahun}</span>
-            <span className="inline-block bg-teal-800 text-teal-200 px-2.5 py-1 rounded-xl text-[11px] font-bold">{currentUser.eselon || 'Eselon 2'}</span>
+            {currentUser.role !== 'admin' && (
+              <span className="inline-block bg-teal-800 text-teal-200 px-2.5 py-1 rounded-xl text-[11px] font-bold">{currentUser.eselon || 'Eselon 2'}</span>
+            )}
           </div>
         </div>
         <nav className="flex-1 px-3 mt-2 space-y-1 overflow-y-auto">
@@ -2419,7 +2421,9 @@ export default function App() {
             </div>
             <div className="px-6 pb-2 flex items-center gap-2">
               <div className="inline-flex gap-1.5 bg-teal-500/20 text-teal-200 px-3 py-1 rounded-xl text-xs font-semibold border border-teal-500/30"><Calendar size={13} /> Tahun: {currentUser.tahun}</div>
-              <span className="inline-block bg-teal-800 text-teal-200 px-2.5 py-1 rounded-xl text-[11px] font-bold">{currentUser.eselon || 'Eselon 2'}</span>
+              {currentUser.role !== 'admin' && (
+                <span className="inline-block bg-teal-800 text-teal-200 px-2.5 py-1 rounded-xl text-[11px] font-bold">{currentUser.eselon || 'Eselon 2'}</span>
+              )}
             </div>
             <nav className="flex-1 px-3 mt-2 space-y-1 overflow-y-auto">
               {currentUser.role === 'admin' ? (
