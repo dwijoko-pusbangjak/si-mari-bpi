@@ -21,7 +21,6 @@ const GlobalStyle = () => (
       margin: 0;
       padding: 0;
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
-      /* Gradien Lembut: Soft Green -> Warm Cream -> Soft Amber */
       background: linear-gradient(135deg, #ecfdf5 0%, #f4fdf8 50%, #fffbeb 100%);
       background-attachment: fixed;
       color: #1e293b;
@@ -39,7 +38,7 @@ const GlobalStyle = () => (
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 0 8px 32px rgba(4, 47, 46, 0.05); /* Bayangan sedikit kehijauan */
+      box-shadow: 0 8px 32px rgba(4, 47, 46, 0.05);
     }
     
     .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -1452,28 +1451,28 @@ export default function App() {
                 <thead>
                   <tr className="bg-white/30 text-[10px] text-slate-400 uppercase tracking-wider font-bold border-b border-slate-200/60">
                     <th className="p-4 w-16 text-center">ID</th>
-                    <th className="p-4 w-64">Pernyataan Risiko</th>
-                    <th className="p-4 w-32 text-center">Skor / Level</th>
-                    <th className="p-4">Rencana Tindak Pengendalian (RTP)</th>
-                    <th className="p-4 w-40">Penanggung Jawab</th>
-                    <th className="p-4 w-32 text-center">Target Waktu</th>
-                    <th className="p-4 w-40">Komunikasi</th>
-                    <th className="p-4 text-center w-28">Aksi</th>
+                    <th className="p-4 w-64 text-left align-top">Pernyataan Risiko</th>
+                    <th className="p-4 w-32 text-left align-top">Skor / Level</th>
+                    <th className="p-4 text-left align-top">Rencana Tindak Pengendalian (RTP)</th>
+                    <th className="p-4 w-40 text-left align-top">Penanggung Jawab</th>
+                    <th className="p-4 w-32 text-left align-top">Target Waktu</th>
+                    <th className="p-4 w-40 text-left align-top">Komunikasi</th>
+                    <th className="p-4 text-center w-28 align-top">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200/50 text-[13px]">
                   {unitRisks.map((item) => (
                     <tr key={item.id} className="hover:bg-emerald-50/40 transition-colors">
-                      <td className="p-4 font-bold text-center text-slate-400">{item.id}</td>
-                      <td className="p-4 font-bold text-slate-800 leading-relaxed">{item.pernyataanRisiko}</td>
-                      <td className="p-4 text-center">
-                        <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border block w-max mx-auto ${getStatusColor(item.levelRisiko)}`}>{item.skor} ({item.levelRisiko})</span>
+                      <td className="p-4 font-bold text-center text-slate-400 align-top">{item.id}</td>
+                      <td className="p-4 font-bold text-slate-800 leading-relaxed align-top">{item.pernyataanRisiko}</td>
+                      <td className="p-4 align-top">
+                        <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border inline-block ${getStatusColor(item.levelRisiko)}`}>{item.skor} ({item.levelRisiko})</span>
                       </td>
-                      <td className="p-4 text-emerald-700 font-semibold leading-relaxed">{item.rtp || <span className="text-slate-400/70 italic font-medium">Belum diisi</span>}</td>
-                      <td className="p-4 font-medium text-slate-700">{item.penanggungJawab || <span className="text-slate-400/70 italic">-</span>}</td>
-                      <td className="p-4 text-center font-medium text-slate-700">{item.targetWaktu || <span className="text-slate-400/70 italic">-</span>}</td>
-                      <td className="p-4 font-medium text-slate-700">{item.komunikasi || <span className="text-slate-400/70 italic">-</span>}</td>
-                      <td className="p-4 text-center space-x-1 whitespace-nowrap">
+                      <td className="p-4 text-emerald-700 font-semibold leading-relaxed align-top">{item.rtp || <span className="text-slate-400/70 italic font-medium">Belum diisi</span>}</td>
+                      <td className="p-4 font-medium text-slate-700 align-top">{item.penanggungJawab || <span className="text-slate-400/70 italic">-</span>}</td>
+                      <td className="p-4 font-medium text-slate-700 align-top">{item.targetWaktu || <span className="text-slate-400/70 italic">-</span>}</td>
+                      <td className="p-4 font-medium text-slate-700 align-top">{item.komunikasi || <span className="text-slate-400/70 italic">-</span>}</td>
+                      <td className="p-4 text-center space-x-1 whitespace-nowrap align-top">
                         <button type="button" onClick={() => handleStartEdit(item)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-emerald-50 hover:text-emerald-700 transition-colors" title="Edit"><Edit size={14}/></button>
                         <button type="button" onClick={() => handleDeleteRTP(item.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Hapus"><Trash2 size={14}/></button>
                       </td>
@@ -1565,19 +1564,19 @@ export default function App() {
                 <thead>
                   <tr className="bg-white/30 text-[10px] text-slate-400 uppercase tracking-wider font-bold border-b border-slate-200/60">
                     <th className="p-4 w-16 text-center">ID</th>
-                    <th className="p-4 w-72">Pernyataan Risiko</th>
-                    <th className="p-4">Progres Pelaksanaan RTP</th>
-                    <th className="p-4 w-60">Tautan (Link) Eviden</th>
-                    <th className="p-4 text-center w-24">Aksi</th>
+                    <th className="p-4 w-72 text-left align-top">Pernyataan Risiko</th>
+                    <th className="p-4 text-left align-top">Progres Pelaksanaan RTP</th>
+                    <th className="p-4 w-60 text-left align-top">Tautan (Link) Eviden</th>
+                    <th className="p-4 text-center w-24 align-top">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200/50 text-[13px]">
                   {unitRisks.map(r => (
                     <tr key={r.id} className="hover:bg-emerald-50/40 transition-colors">
-                      <td className="p-4 font-bold text-center text-slate-400">{r.id}</td>
-                      <td className="p-4 font-bold text-slate-800 leading-relaxed">{r.pernyataanRisiko}</td>
-                      <td className="p-4 font-medium text-slate-700 leading-relaxed">{r.prosesRtp || <span className="text-slate-400/70 italic">Belum ada progres dilaporkan.</span>}</td>
-                      <td className="p-4">
+                      <td className="p-4 font-bold text-center text-slate-400 align-top">{r.id}</td>
+                      <td className="p-4 font-bold text-slate-800 leading-relaxed align-top">{r.pernyataanRisiko}</td>
+                      <td className="p-4 font-medium text-slate-700 leading-relaxed align-top">{r.prosesRtp || <span className="text-slate-400/70 italic">Belum ada progres dilaporkan.</span>}</td>
+                      <td className="p-4 align-top">
                         {r.linkEviden ? (
                           <a href={r.linkEviden.startsWith('http') ? r.linkEviden : `https://${r.linkEviden}`} target="_blank" rel="noreferrer" className="text-emerald-700 font-bold hover:underline truncate block w-48 text-[11px] bg-white/60 p-1.5 rounded-md border border-white">
                             Buka Tautan &rarr;
@@ -1586,7 +1585,7 @@ export default function App() {
                           <span className="text-slate-400/70 italic text-[11px] font-medium">-</span>
                         )}
                       </td>
-                      <td className="p-4 text-center space-x-1 whitespace-nowrap">
+                      <td className="p-4 text-center space-x-1 whitespace-nowrap align-top">
                         <button type="button" onClick={() => handleStartEdit(r)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-emerald-50 hover:text-emerald-700 transition-colors" title="Update Progres"><Edit size={14}/></button>
                         <button type="button" onClick={() => handleDeletePemantauan(r.id)} className="p-2 bg-white/60 border border-white text-slate-500 rounded-lg cursor-pointer hover:bg-rose-50 hover:text-rose-600 transition-colors" title="Hapus Progres"><Trash2 size={14}/></button>
                       </td>
@@ -2380,7 +2379,7 @@ export default function App() {
                       <td className="border border-slate-300 p-2 font-bold text-slate-900 bg-emerald-50/20 leading-relaxed">{risk.pernyataanRisiko}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{risk.rtp || '-'}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{risk.prosesRtp || <span className="text-slate-400 italic">Belum diisi</span>}</td>
-                      <td className="border border-slate-300 p-2 text-emerald-700 truncate max-w-xs">{risk.linkEviden || '-'}</td>
+                      <td className="border border-slate-300 p-2 text-emerald-600 truncate max-w-xs">{risk.linkEviden || '-'}</td>
                       <td className="border border-slate-300 p-2 text-center font-bold"><span className={`px-2 py-0.5 rounded text-[11px] border block w-max mx-auto ${getStatusColor(risk.levelRisiko)}`}>{risk.levelRisiko}</span></td>
                     </tr>
                   ))}
@@ -2406,7 +2405,7 @@ export default function App() {
                   {unitKejadian.map((k, index) => (
                     <tr key={k.id} className="hover:bg-white/40 align-top">
                       <td className="border border-slate-300 p-2 text-center font-bold">{index + 1}</td>
-                      <td className="border border-slate-300 p-2 text-center font-semibold text-emerald-800">{k.tanggal || '-'}</td>
+                      <td className="border border-slate-300 p-2 text-center font-semibold text-emerald-700">{k.tanggal || '-'}</td>
                       <td className="border border-slate-300 p-2 font-bold bg-emerald-50/20 leading-relaxed">{k.risiko}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{k.kronologi || '-'}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{k.penyebab || '-'}</td>
