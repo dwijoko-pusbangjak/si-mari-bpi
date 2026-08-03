@@ -661,9 +661,9 @@ export default function App() {
         {activeTab === 'admin_users' && (
           <div className="space-y-6">
             <div className="flex space-x-2 border-b border-slate-200/60 pb-2">
-              <button onClick={() => { setAdminUserTab('list'); setEditUnitId(null); }} className={`px-4 py-2 text-sm font-bold rounded-t-xl flex items-center gap-2 cursor-pointer transition-colors ${adminUserTab === 'list' ? 'glass-panel text-emerald-800 border-b-2 border-emerald-600' : 'text-slate-500 hover:text-slate-800'}`}><List size={16} /> Daftar Unit Kerja</button>
-              <button onClick={handleAddUserClick} className={`px-4 py-2 text-sm font-bold rounded-t-xl flex items-center gap-2 cursor-pointer transition-colors ${adminUserTab === 'form' && !editUnitId ? 'glass-panel text-emerald-800 border-b-2 border-emerald-600' : 'text-slate-500 hover:text-slate-800'}`}><PlusCircle size={16} /> Tambah User</button>
-              {adminUserTab === 'form' && editUnitId && (<button className="px-4 py-2 text-sm font-bold rounded-t-xl glass-panel text-emerald-800 border-b-2 border-emerald-600 flex items-center gap-2"><Edit size={16} /> Edit User</button>)}
+              <button onClick={() => { setAdminUserTab('list'); setEditUnitId(null); }} className={`px-4 py-2 text-sm font-bold rounded-t-xl flex items-center gap-2 cursor-pointer transition-colors text-left ${adminUserTab === 'list' ? 'glass-panel text-emerald-800 border-b-2 border-emerald-600' : 'text-slate-500 hover:text-slate-800'}`}><List size={16} /> Daftar Unit Kerja</button>
+              <button onClick={handleAddUserClick} className={`px-4 py-2 text-sm font-bold rounded-t-xl flex items-center gap-2 cursor-pointer transition-colors text-left ${adminUserTab === 'form' && !editUnitId ? 'glass-panel text-emerald-800 border-b-2 border-emerald-600' : 'text-slate-500 hover:text-slate-800'}`}><PlusCircle size={16} /> Tambah User</button>
+              {adminUserTab === 'form' && editUnitId && (<button className="px-4 py-2 text-sm font-bold rounded-t-xl glass-panel text-emerald-800 border-b-2 border-emerald-600 flex items-center gap-2 text-left"><Edit size={16} /> Edit User</button>)}
             </div>
 
             {adminUserTab === 'form' ? (
@@ -2095,7 +2095,7 @@ export default function App() {
                 <tr><td colspan="16" style="border:none;"></td></tr>
                 <tr>
           `;
-          const headers = ['No', isEselon1 ? 'Sasaran Program' : 'Sasaran Kegiatan', isEselon1 ? 'Indikator Sasaran Program (IKU)' : 'Indikator Sasaran Kegiatan (IKU)', 'Sumber Risiko', 'Kategori Risiko', 'Risiko', 'Penyebab', 'Dampak', 'Pengendalian yang ada', 'Sisa Risiko', 'Pemilik Risiko', 'K', 'D', 'Skala Risiko', 'Level Risiko'];
+          const headers = ['No', isEselon1 ? 'Sasaran Program' : 'Sasaran Kegiatan', isEselon1 ? 'Indikator Sasaran Program (IKU)' : 'Indikator Sasaran Kegiatan (IKU)', 'Risiko', 'Sumber Risiko', 'Kategori Risiko', 'Penyebab', 'Dampak', 'Pengendalian yang ada', 'Sisa Risiko', 'Pemilik Risiko', 'K', 'D', 'Skala Risiko', 'Level Risiko'];
           headers.forEach(h => { html += `<td class="head">${h}</td>`; });
           html += '</tr>';
 
@@ -2104,9 +2104,9 @@ export default function App() {
               <td class="data" align="center">${index + 1}</td>
               <td class="data">${risk.sasaranKgt || '-'}</td>
               <td class="data">${risk.indikatorKgt || '-'}</td>
+              <td class="data" style="font-weight:bold;">${risk.pernyataanRisiko || '-'}</td>
               <td class="data">${risk.penyebabSumber || '-'}</td>
               <td class="data">${risk.kategoriRisiko || '-'}</td>
-              <td class="data" style="font-weight:bold;">${risk.pernyataanRisiko || '-'}</td>
               <td class="data">${risk.penyebabUraian || '-'}</td>
               <td class="data">${risk.dampakUraian || '-'}</td>
               <td class="data">${risk.pengendalianRisiko || '-'}</td>
@@ -2311,9 +2311,9 @@ export default function App() {
                     <th className="border border-slate-300 p-2.5 text-center align-middle">No</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Sasaran {isEselon1 ? 'Program' : 'Kegiatan'}</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Indikator Sasaran (IKU)</th>
+                    <th className="border border-slate-300 p-2.5 align-middle bg-emerald-50/50">Risiko</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Sumber Risiko</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Kategori Risiko</th>
-                    <th className="border border-slate-300 p-2.5 align-middle bg-emerald-50/50">Risiko</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Penyebab</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Dampak</th>
                     <th className="border border-slate-300 p-2.5 align-middle">Pengendalian yang ada</th>
@@ -2332,9 +2332,9 @@ export default function App() {
                         <td className="border border-slate-300 p-2 text-center font-bold align-top">{index + 1}</td>
                         <td className="border border-slate-300 p-2 font-medium align-top leading-relaxed">{risk.sasaranKgt || '-'}</td>
                         <td className="border border-slate-300 p-2 text-emerald-800 font-semibold align-top leading-relaxed">{risk.indikatorKgt || '-'}</td>
+                        <td className="border border-slate-300 p-2 font-bold text-slate-900 align-top leading-relaxed bg-emerald-50/20">{risk.pernyataanRisiko}</td>
                         <td className="border border-slate-300 p-2 align-top">{risk.penyebabSumber || '-'}</td>
                         <td className="border border-slate-300 p-2 font-semibold text-slate-600 align-top">{risk.kategoriRisiko || 'Operasional'}</td>
-                        <td className="border border-slate-300 p-2 font-bold text-slate-900 align-top leading-relaxed bg-emerald-50/20">{risk.pernyataanRisiko}</td>
                         <td className="border border-slate-300 p-2 align-top leading-relaxed">{risk.penyebabUraian}</td>
                         <td className="border border-slate-300 p-2 align-top leading-relaxed">{risk.dampakUraian}</td>
                         <td className="border border-slate-300 p-2 align-top leading-relaxed">{risk.pengendalianRisiko}</td>
@@ -2379,7 +2379,7 @@ export default function App() {
                       <td className="border border-slate-300 p-2 font-bold text-slate-900 bg-emerald-50/20 leading-relaxed">{risk.pernyataanRisiko}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{risk.rtp || '-'}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{risk.prosesRtp || <span className="text-slate-400 italic">Belum diisi</span>}</td>
-                      <td className="border border-slate-300 p-2 text-emerald-600 truncate max-w-xs">{risk.linkEviden || '-'}</td>
+                      <td className="border border-slate-300 p-2 text-emerald-700 truncate max-w-xs">{risk.linkEviden || '-'}</td>
                       <td className="border border-slate-300 p-2 text-center font-bold"><span className={`px-2 py-0.5 rounded text-[11px] border block w-max mx-auto ${getStatusColor(risk.levelRisiko)}`}>{risk.levelRisiko}</span></td>
                     </tr>
                   ))}
@@ -2405,7 +2405,7 @@ export default function App() {
                   {unitKejadian.map((k, index) => (
                     <tr key={k.id} className="hover:bg-white/40 align-top">
                       <td className="border border-slate-300 p-2 text-center font-bold">{index + 1}</td>
-                      <td className="border border-slate-300 p-2 text-center font-semibold text-emerald-700">{k.tanggal || '-'}</td>
+                      <td className="border border-slate-300 p-2 text-center font-semibold text-emerald-800">{k.tanggal || '-'}</td>
                       <td className="border border-slate-300 p-2 font-bold bg-emerald-50/20 leading-relaxed">{k.risiko}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{k.kronologi || '-'}</td>
                       <td className="border border-slate-300 p-2 leading-relaxed">{k.penyebab || '-'}</td>
@@ -2520,13 +2520,13 @@ export default function App() {
           <p className="text-[10px] font-bold text-emerald-400/80 uppercase tracking-widest mb-3 px-2">Menu Utama</p>
           {currentUser.role === 'admin' ? (
             <>
-              <button type="button" onClick={() => setActiveTab('admin_dashboard')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_dashboard' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><LayoutTemplate size={18} /><span className="text-[13px]">Dashboard Admin</span></button>
-              <button type="button" onClick={() => setActiveTab('admin_users')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_users' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><Users size={18} /><span className="text-[13px]">User & Unit</span></button>
-              <button type="button" onClick={() => setActiveTab('admin_sasaran')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_sasaran' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><Compass size={18} /><span className="text-[13px]">Hierarki K/L</span></button>
-              <button type="button" onClick={() => setActiveTab('admin_security')} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_security' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><KeyRound size={18} /><span className="text-[13px]">Keamanan Admin</span></button>
+              <button type="button" onClick={() => setActiveTab('admin_dashboard')} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_dashboard' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><LayoutTemplate size={18} /><span className="text-[13px]">Dashboard Admin</span></button>
+              <button type="button" onClick={() => setActiveTab('admin_users')} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_users' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><Users size={18} /><span className="text-[13px]">User & Unit</span></button>
+              <button type="button" onClick={() => setActiveTab('admin_sasaran')} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_sasaran' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><Compass size={18} /><span className="text-[13px]">Hierarki K/L</span></button>
+              <button type="button" onClick={() => setActiveTab('admin_security')} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === 'admin_security' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><KeyRound size={18} /><span className="text-[13px]">Keamanan Admin</span></button>
             </>
           ) : (
-            unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => setActiveTab(menu.id)} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === menu.id ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><menu.icon size={18} className={activeTab === menu.id ? 'text-amber-400' : 'text-emerald-400/80'} /><span className="text-[13px]">{menu.label}</span></button>))
+            unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => setActiveTab(menu.id)} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${activeTab === menu.id ? 'bg-emerald-700 text-white shadow-md shadow-emerald-900/20 border border-emerald-600/50' : 'text-emerald-200/70 hover:bg-emerald-800/50 hover:text-white'}`}><menu.icon size={18} className={activeTab === menu.id ? 'text-amber-400' : 'text-emerald-400/80'} /><span className="text-[13px]">{menu.label}</span></button>))
           )}
         </nav>
         
@@ -2562,13 +2562,13 @@ export default function App() {
             <nav className="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto custom-scrollbar">
               {currentUser.role === 'admin' ? (
                 <>
-                  <button type="button" onClick={() => { setActiveTab('admin_dashboard'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_dashboard' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><LayoutTemplate size={18} /><span className="text-[13px]">Dashboard Admin</span></button>
-                  <button type="button" onClick={() => { setActiveTab('admin_users'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_users' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><Users size={18} /><span className="text-[13px]">User & Unit</span></button>
-                  <button type="button" onClick={() => { setActiveTab('admin_sasaran'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_sasaran' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><Compass size={18} /><span className="text-[13px]">Hierarki K/L</span></button>
-                  <button type="button" onClick={() => { setActiveTab('admin_security'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_security' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><KeyRound size={18} /><span className="text-[13px]">Keamanan Admin</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_dashboard'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_dashboard' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><LayoutTemplate size={18} /><span className="text-[13px]">Dashboard Admin</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_users'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_users' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><Users size={18} /><span className="text-[13px]">User & Unit</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_sasaran'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_sasaran' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><Compass size={18} /><span className="text-[13px]">Hierarki K/L</span></button>
+                  <button type="button" onClick={() => { setActiveTab('admin_security'); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === 'admin_security' ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><KeyRound size={18} /><span className="text-[13px]">Keamanan Admin</span></button>
                 </>
               ) : (
-                unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => { setActiveTab(menu.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === menu.id ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><menu.icon size={18} className={activeTab === menu.id ? 'text-amber-400' : 'text-emerald-400/80'}/><span className="text-[13px]">{menu.label}</span></button>))
+                unitMenus.map(menu => (<button type="button" key={menu.id} onClick={() => { setActiveTab(menu.id); setIsMobileMenuOpen(false); }} className={`w-full flex items-center space-x-3 text-left px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${activeTab === menu.id ? 'bg-emerald-700 text-white' : 'text-emerald-200/70 hover:bg-emerald-800/50'}`}><menu.icon size={18} className={activeTab === menu.id ? 'text-amber-400' : 'text-emerald-400/80'}/><span className="text-[13px]">{menu.label}</span></button>))
               )}
             </nav>
             <div className="p-4 m-4 bg-emerald-900/50 rounded-2xl border border-emerald-800/50 flex justify-between items-center">
