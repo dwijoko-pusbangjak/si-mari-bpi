@@ -925,11 +925,54 @@ export default function App() {
     });
 
     const totalRisiko = unitRisks.length;
-    const risikoDimitigasi = unitRisks.filter(r => r.keputusanMitigasi === 'Dimitigasi').length;
-    const risikoSangatTinggi = unitRisks.filter(r => r.levelRisiko === 'Sangat Tinggi').length;
-    const risikoTinggi = unitRisks.filter(r => r.levelRisiko === 'Tinggi').length;
-    const risikoSedang = unitRisks.filter(r => r.levelRisiko === 'Sedang').length;
-    const risikoRendah = unitRisks.filter(r => r.levelRisiko === 'Rendah' || r.levelRisiko === 'Sangat Rendah').length;
+    const risksDimitigasiList = unitRisks.filter(r => r.keputusanMitigasi === 'Dimitigasi');
+    const risikoDimitigasi = risksDimitigasiList.length;
+    
+    // Memisahkan list berdasarkan level untuk keperluan tooltip detail
+    const listSangatTinggi = unitRisks.filter(r => r.levelRisiko === 'Sangat Tinggi');
+    const listTinggi = unitRisks.filter(r => r.levelRisiko === 'Tinggi');
+    const listSedang = unitRisks.filter(r => r.levelRisiko === 'Sedang');
+    const listRendah = unitRisks.filter(r => r.levelRisiko === 'Rendah' || r.levelRisiko === 'Sangat Rendah');
+
+    const risikoSangatTinggi = listSangatTinggi.length;
+    const risikoTinggi = listTinggi.length;
+    const risikoSedang = listSedang.length;
+    const risikoRendah = listRendah.length;
+
+    // Komponen Kartu Internal dengan Tooltip interaktif
+    const DashboardCard = ({ title, value, icon: Icon, iconWrapperClass, tooltipTitle, tooltipColorClass, children }) => {
+      return (
+        <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group relative cursor-help">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">{title}</p>
+              <h3 className="text-3xl font-extrabold text-slate-800 mt-1">{value}</h3>
+            </div>
+            <div className={`p-4 rounded-2xl transition-colors ${iconWrapperClass}`}>
+              <Icon size={28} />
+            </div>
+          </div>
+          
+          {/* Indikator Tooltip */}
+          <div className="mt-4 flex items-center text-[10px] text-slate-400 font-medium">
+            <span className="border-b border-dashed border-slate-300">Sorot untuk detail</span>
+          </div>
+
+          {/* Konten Tooltip */}
+          <div className="absolute top-full left-0 mt-2 w-72 bg-slate-800 text-white text-sm rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-4 transform origin-top group-hover:translate-y-0 translate-y-2 pointer-events-none border border-slate-700">
+            <div className="absolute -top-2 left-6 w-4 h-4 bg-slate-800 transform rotate-45 border-t border-l border-slate-700"></div>
+            <div className="relative z-10">
+              <h4 className={`font-bold mb-2 border-b border-slate-600 pb-1 text-xs uppercase tracking-wider ${tooltipColorClass}`}>
+                {tooltipTitle}
+              </h4>
+              <ul className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
+                {children}
+              </ul>
+            </div>
+          </div>
+        </div>
+      );
+    };
 
     return (
       <div className="w-full space-y-6 animate-in fade-in duration-300">
@@ -940,19 +983,163 @@ export default function App() {
             <p className="text-slate-500 text-sm font-medium">{currentUser.nama}</p>
           </div>
         </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Total Risiko</p><h3 className="text-3xl font-extrabold text-slate-800 mt-1">{totalRisiko}</h3></div><div className="p-4 bg-white/60 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-700 rounded-2xl transition-colors"><Hexagon size={28} /></div></div>
-          <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">RTP Dimitigasi</p><h3 className="text-3xl font-extrabold text-teal-600 mt-1">{risikoDimitigasi}</h3></div><div className="p-4 bg-white/60 text-teal-500 group-hover:bg-teal-50 group-hover:text-teal-600 rounded-2xl transition-colors"><ShieldCheck size={28} /></div></div>
-          <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Kejadian Risiko</p><h3 className="text-3xl font-extrabold text-rose-600 mt-1">{unitKejadian.length}</h3></div><div className="p-4 bg-white/60 text-rose-500 group-hover:bg-rose-50 group-hover:text-rose-600 rounded-2xl transition-colors"><AlertTriangle size={28} /></div></div>
-          <div className="glass-panel p-6 rounded-2xl flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"><div><p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Efektifitas</p><h3 className="text-3xl font-extrabold text-emerald-600 mt-1">{unitEfektivitas.length}</h3></div><div className="p-4 bg-white/60 text-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-600 rounded-2xl transition-colors"><BadgeCheck size={28} /></div></div>
+          
+          {/* Kartu 1: Total Risiko */}
+          <DashboardCard 
+            title="Total Risiko" 
+            value={totalRisiko} 
+            icon={Hexagon} 
+            iconWrapperClass="bg-white/60 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-700"
+            tooltipTitle="Daftar Risiko Teridentifikasi"
+            tooltipColorClass="text-emerald-400"
+          >
+            {unitRisks.length > 0 ? unitRisks.map(r => (
+              <li key={r.id} className="flex flex-col gap-0.5 border-b border-slate-700/50 pb-1.5 last:border-0">
+                <span className="text-[11px] text-slate-300 font-mono">{r.id}</span>
+                <span className="text-[12px] truncate" title={r.pernyataanRisiko}>{r.pernyataanRisiko}</span>
+                <span className={`text-[9px] w-max px-1.5 rounded ${r.levelRisiko.includes('Tinggi') ? 'bg-rose-500/20 text-rose-300' : r.levelRisiko === 'Sedang' ? 'bg-amber-500/20 text-amber-300' : 'bg-teal-500/20 text-teal-300'}`}>
+                  {r.levelRisiko}
+                </span>
+              </li>
+            )) : <li className="text-[11px] text-slate-500 italic">Belum ada risiko.</li>}
+          </DashboardCard>
+
+          {/* Kartu 2: RTP Dimitigasi */}
+          <DashboardCard 
+            title="RTP Dimitigasi" 
+            value={risikoDimitigasi} 
+            icon={ShieldCheck} 
+            iconWrapperClass="bg-white/60 text-teal-500 group-hover:bg-teal-50 group-hover:text-teal-600"
+            tooltipTitle="Risiko yang Dimitigasi"
+            tooltipColorClass="text-teal-400"
+          >
+            {risksDimitigasiList.length > 0 ? risksDimitigasiList.map(r => (
+              <li key={r.id} className="flex justify-between items-start gap-2 text-[11px] border-b border-slate-700/50 pb-1.5 last:border-0">
+                <span className="truncate flex-1 font-mono text-slate-300" title={r.pernyataanRisiko}>{r.id}</span>
+                <span className={r.rtp ? 'text-teal-400' : 'text-rose-400'}>{r.rtp ? 'Ada RTP' : 'RTP Kosong'}</span>
+              </li>
+            )) : <li className="text-[11px] text-slate-500 italic">Belum ada RTP.</li>}
+          </DashboardCard>
+
+          {/* Kartu 3: Kejadian Risiko */}
+          <DashboardCard 
+            title="Kejadian Risiko" 
+            value={unitKejadian.length} 
+            icon={AlertTriangle} 
+            iconWrapperClass="bg-white/60 text-rose-500 group-hover:bg-rose-50 group-hover:text-rose-600"
+            tooltipTitle="Insiden Tercatat"
+            tooltipColorClass="text-rose-400"
+          >
+            {unitKejadian.length > 0 ? unitKejadian.map(k => (
+              <li key={k.id} className="flex flex-col gap-0.5 border-b border-slate-700/50 pb-1.5 last:border-0">
+                <span className="text-[10px] text-slate-400">{k.tanggal}</span>
+                <span className="text-[11px] truncate text-rose-200" title={k.risiko}>{k.risiko}</span>
+              </li>
+            )) : <li className="text-[11px] text-slate-500 italic">Belum ada insiden.</li>}
+          </DashboardCard>
+
+          {/* Kartu 4: Efektifitas */}
+          <DashboardCard 
+            title="Efektifitas" 
+            value={unitEfektivitas.length} 
+            icon={BadgeCheck} 
+            iconWrapperClass="bg-white/60 text-emerald-500 group-hover:bg-emerald-50 group-hover:text-emerald-600"
+            tooltipTitle="Evaluasi Efektivitas"
+            tooltipColorClass="text-emerald-400"
+          >
+            {unitEfektivitas.length > 0 ? unitEfektivitas.map(e => (
+              <li key={e.id} className="flex justify-between items-start gap-2 text-[11px] border-b border-slate-700/50 pb-1.5 last:border-0">
+                <span className="truncate flex-1 font-mono text-slate-300">{e.riskId}</span>
+                <span className={e.srActual <= e.srDiharapkan ? 'text-emerald-400' : 'text-amber-400'}>
+                  {e.srActual <= e.srDiharapkan ? 'Efektif' : 'Tdk Efektif'}
+                </span>
+              </li>
+            )) : <li className="text-[11px] text-slate-500 italic">Belum ada evaluasi.</li>}
+          </DashboardCard>
+
         </div>
         <div className="glass-panel p-6 rounded-2xl space-y-5">
           <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2"><PieChart size={16} className="text-emerald-600"/> Distribusi Level Risiko</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="p-5 bg-rose-50/70 border border-rose-100 rounded-2xl hover:bg-rose-100 transition-colors"><p className="text-[11px] font-bold text-rose-600 uppercase tracking-wide">Sangat Tinggi</p><p className="text-3xl font-extrabold text-rose-900 mt-2">{risikoSangatTinggi}</p></div>
-            <div className="p-5 bg-orange-50/70 border border-orange-100 rounded-2xl hover:bg-orange-100 transition-colors"><p className="text-[11px] font-bold text-orange-600 uppercase tracking-wide">Tinggi</p><p className="text-3xl font-extrabold text-orange-900 mt-2">{risikoTinggi}</p></div>
-            <div className="p-5 bg-amber-50/70 border border-amber-100 rounded-2xl hover:bg-amber-100 transition-colors"><p className="text-[11px] font-bold text-amber-600 uppercase tracking-wide">Sedang</p><p className="text-3xl font-extrabold text-amber-900 mt-2">{risikoSedang}</p></div>
-            <div className="p-5 bg-teal-50/70 border border-teal-100 rounded-2xl hover:bg-teal-100 transition-colors"><p className="text-[11px] font-bold text-teal-600 uppercase tracking-wide">Rendah</p><p className="text-3xl font-extrabold text-teal-900 mt-2">{risikoRendah}</p></div>
+            
+            {/* Kartu Sangat Tinggi */}
+            <div className="p-5 bg-rose-50/70 border border-rose-100 rounded-2xl hover:bg-rose-100 transition-all duration-300 group relative cursor-help">
+              <p className="text-[11px] font-bold text-rose-600 uppercase tracking-wide">Sangat Tinggi</p>
+              <p className="text-3xl font-extrabold text-rose-900 mt-2">{risikoSangatTinggi}</p>
+              <div className="mt-2 text-[9px] text-rose-400/80 font-medium border-b border-dashed border-rose-300/50 w-max">Sorot detail</div>
+              
+              <div className="absolute bottom-full left-0 mb-3 w-64 bg-slate-800 text-white text-sm rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-4 border border-slate-700 pointer-events-none">
+                <div className="absolute -bottom-2 left-6 w-4 h-4 bg-slate-800 transform rotate-45 border-b border-r border-slate-700"></div>
+                <div className="relative z-10">
+                  <h4 className="font-bold mb-2 border-b border-slate-600 pb-1 text-xs uppercase tracking-wider text-rose-400">Risiko Sangat Tinggi</h4>
+                  <ul className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
+                    {listSangatTinggi.length > 0 ? listSangatTinggi.map(r => (
+                      <li key={r.id} className="flex flex-col gap-0.5 border-b border-slate-700/50 pb-1.5 last:border-0"><span className="text-[10px] text-slate-400 font-mono">{r.id}</span><span className="text-[11px] truncate text-slate-200" title={r.pernyataanRisiko}>{r.pernyataanRisiko}</span></li>
+                    )) : <li className="text-[11px] text-slate-500 italic">Tidak ada data</li>}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Kartu Tinggi */}
+            <div className="p-5 bg-orange-50/70 border border-orange-100 rounded-2xl hover:bg-orange-100 transition-all duration-300 group relative cursor-help">
+              <p className="text-[11px] font-bold text-orange-600 uppercase tracking-wide">Tinggi</p>
+              <p className="text-3xl font-extrabold text-orange-900 mt-2">{risikoTinggi}</p>
+              <div className="mt-2 text-[9px] text-orange-400/80 font-medium border-b border-dashed border-orange-300/50 w-max">Sorot detail</div>
+              
+              <div className="absolute bottom-full left-0 mb-3 w-64 bg-slate-800 text-white text-sm rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-4 border border-slate-700 pointer-events-none">
+                <div className="absolute -bottom-2 left-6 w-4 h-4 bg-slate-800 transform rotate-45 border-b border-r border-slate-700"></div>
+                <div className="relative z-10">
+                  <h4 className="font-bold mb-2 border-b border-slate-600 pb-1 text-xs uppercase tracking-wider text-orange-400">Risiko Tinggi</h4>
+                  <ul className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
+                    {listTinggi.length > 0 ? listTinggi.map(r => (
+                      <li key={r.id} className="flex flex-col gap-0.5 border-b border-slate-700/50 pb-1.5 last:border-0"><span className="text-[10px] text-slate-400 font-mono">{r.id}</span><span className="text-[11px] truncate text-slate-200" title={r.pernyataanRisiko}>{r.pernyataanRisiko}</span></li>
+                    )) : <li className="text-[11px] text-slate-500 italic">Tidak ada data</li>}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Kartu Sedang */}
+            <div className="p-5 bg-amber-50/70 border border-amber-100 rounded-2xl hover:bg-amber-100 transition-all duration-300 group relative cursor-help">
+              <p className="text-[11px] font-bold text-amber-600 uppercase tracking-wide">Sedang</p>
+              <p className="text-3xl font-extrabold text-amber-900 mt-2">{risikoSedang}</p>
+              <div className="mt-2 text-[9px] text-amber-500/80 font-medium border-b border-dashed border-amber-300/50 w-max">Sorot detail</div>
+
+              <div className="absolute bottom-full left-0 mb-3 w-64 bg-slate-800 text-white text-sm rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-4 border border-slate-700 pointer-events-none">
+                <div className="absolute -bottom-2 left-6 w-4 h-4 bg-slate-800 transform rotate-45 border-b border-r border-slate-700"></div>
+                <div className="relative z-10">
+                  <h4 className="font-bold mb-2 border-b border-slate-600 pb-1 text-xs uppercase tracking-wider text-amber-400">Risiko Sedang</h4>
+                  <ul className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
+                    {listSedang.length > 0 ? listSedang.map(r => (
+                      <li key={r.id} className="flex flex-col gap-0.5 border-b border-slate-700/50 pb-1.5 last:border-0"><span className="text-[10px] text-slate-400 font-mono">{r.id}</span><span className="text-[11px] truncate text-slate-200" title={r.pernyataanRisiko}>{r.pernyataanRisiko}</span></li>
+                    )) : <li className="text-[11px] text-slate-500 italic">Tidak ada data</li>}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Kartu Rendah */}
+            <div className="p-5 bg-teal-50/70 border border-teal-100 rounded-2xl hover:bg-teal-100 transition-all duration-300 group relative cursor-help">
+              <p className="text-[11px] font-bold text-teal-600 uppercase tracking-wide">Rendah</p>
+              <p className="text-3xl font-extrabold text-teal-900 mt-2">{risikoRendah}</p>
+              <div className="mt-2 text-[9px] text-teal-500/80 font-medium border-b border-dashed border-teal-300/50 w-max">Sorot detail</div>
+
+              <div className="absolute bottom-full right-0 mb-3 w-64 bg-slate-800 text-white text-sm rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 p-4 border border-slate-700 pointer-events-none">
+                <div className="absolute -bottom-2 right-6 w-4 h-4 bg-slate-800 transform rotate-45 border-b border-r border-slate-700"></div>
+                <div className="relative z-10">
+                  <h4 className="font-bold mb-2 border-b border-slate-600 pb-1 text-xs uppercase tracking-wider text-teal-400">Risiko Rendah</h4>
+                  <ul className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
+                    {listRendah.length > 0 ? listRendah.map(r => (
+                      <li key={r.id} className="flex flex-col gap-0.5 border-b border-slate-700/50 pb-1.5 last:border-0"><span className="text-[10px] text-slate-400 font-mono">{r.id}</span><span className="text-[11px] truncate text-slate-200" title={r.pernyataanRisiko}>{r.pernyataanRisiko}</span></li>
+                    )) : <li className="text-[11px] text-slate-500 italic">Tidak ada data</li>}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
